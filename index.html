@@ -3,364 +3,1607 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dzulux Linux — Sistema Operativo Dual (Diseñado por Alfredo Dzul)</title>
-  <meta name="description" content="Dzulux Linux es una distribución basada en Arch Linux, equilibrada, con arranque Dual (Gráfico / Terminal) y compatibilidad universal para PC, Laptops y Mac. Diseñado por Alfredo Dzul.">
+  <title>Dzulux Linux — Sistema Operativo Dual de Alto Rendimiento</title>
+  <meta name="description" content="Dzulux Linux es una distribución basada en Arch Linux, equilibrada, con arranque Dual (Gráfico / Terminal) y compatibilidad universal para PC, Laptops y Mac. Creado y diseñado por Alfredo Dzul.">
   <link rel="icon" type="image/svg+xml" href="artwork/dzulux-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg-dark: #090d16;
-      --bg-card: #111827;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg-dark: #07090e;
+      --bg-surface: #0e131f;
+      --bg-card: rgba(16, 22, 36, 0.75);
+      --bg-card-hover: rgba(22, 31, 51, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 242, 254, 0.35);
       --cyan-neon: #00f2fe;
       --blue-accent: #4facfe;
-      --blue-deep: #4364f7;
-      --border-color: #1e293b;
+      --purple-accent: #7928ca;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      font-family: var(--font-sans);
       background-color: var(--bg-dark);
       color: var(--text-main);
       line-height: 1.6;
       overflow-x: hidden;
+      position: relative;
     }
+
+    /* Fondo ambiental con gradientes bioluminiscentes */
+    .ambient-glow-1 {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.14) 0%, rgba(79, 172, 254, 0.08) 45%, transparent 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      top: 1400px;
+      right: -200px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(121, 40, 202, 0.12) 0%, transparent 70%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
     }
-    /* Navbar */
+
+    /* Barra de Navegación */
     header {
-      padding: 24px 0;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(9, 13, 22, 0.8);
-      backdrop-filter: blur(10px);
+      padding: 20px 0;
       position: sticky;
       top: 0;
-      z-index: 100;
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 1000;
     }
+
     .nav-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .nav-logo {
-      font-size: 24px;
+
+    .nav-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo-svg {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0,242,254,0.2) 0%, rgba(79,172,254,0.1) 100%);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(0,242,254,0.25);
+    }
+
+    .nav-logo-text {
+      font-size: 22px;
       font-weight: 900;
       letter-spacing: 2px;
       color: #fff;
-      text-decoration: none;
     }
-    .nav-logo span {
-      color: var(--cyan-neon);
+
+    .nav-logo-text span {
+      background: linear-gradient(135deg, var(--cyan-neon) 0%, var(--blue-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      margin-left: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan-neon);
+    }
+
+    .nav-btn-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #fff !important;
+      font-size: 13px !important;
+      transition: all 0.2s;
+    }
+
+    .nav-btn-gh:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Principal */
+    .hero {
+      padding: 90px 0 60px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 242, 254, 0.08);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      margin-bottom: 28px;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+      animation: pulseGlow 3s infinite alternate;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    @keyframes pulseGlow {
+      0% { border-color: rgba(0, 242, 254, 0.25); box-shadow: 0 0 15px rgba(0, 242, 254, 0.1); }
+      100% { border-color: rgba(0, 242, 254, 0.55); box-shadow: 0 0 25px rgba(0, 242, 254, 0.25); }
+    }
+
+    .hero-title {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      max-width: 950px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 30%, var(--cyan-neon) 70%, var(--blue-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+    }
+
+    .hero-subtitle strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Caja de Descarga Principal al Estilo Ubuntu */
+    .download-card {
+      background: linear-gradient(180deg, rgba(16, 23, 38, 0.9) 0%, rgba(10, 15, 26, 0.95) 100%);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 720px;
+      margin: 0 auto 70px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 242, 254, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan-neon), transparent);
+    }
+
+    .btn-download-hero {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+      background: linear-gradient(135deg, #00f2fe 0%, #3a7bd5 100%);
+      color: #040813;
+      font-size: 19px;
+      font-weight: 800;
+      padding: 20px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-download-hero:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 16px 40px rgba(0, 242, 254, 0.55);
+      filter: brightness(1.06);
+    }
+
+    .download-meta-tags {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 18px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .download-sub-options {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary-link {
+      color: var(--cyan-neon);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(0, 242, 254, 0.05);
+      border: 1px solid rgba(0, 242, 254, 0.15);
+      transition: all 0.2s;
+    }
+
+    .btn-secondary-link:hover {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: rgba(0, 242, 254, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Verificación SHA256 con botón de copiado */
+    .sha-box {
+      margin-top: 18px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #94a3b8;
+      gap: 10px;
+    }
+
+    .sha-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: rgba(0, 242, 254, 0.25);
+      color: var(--cyan-neon);
+    }
+
+    /* ==========================================================================
+       MOCKUP INTERACTIVO DEL SISTEMA (LA JOYA VISUAL DE LA PÁGINA)
+       ========================================================================== */
+    .showcase-section {
+      padding: 30px 0 90px;
+    }
+
+    .showcase-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .showcase-header h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .showcase-header p {
+      color: var(--text-muted);
+      font-size: 17px;
+    }
+
+    /* Selector de Modos (GUI vs CLI) */
+    .mode-switch-container {
+      display: inline-flex;
+      background: rgba(14, 20, 34, 0.9);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      padding: 6px;
+      border-radius: 999px;
+      gap: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      font-family: var(--font-sans);
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #00f2fe 0%, #3a7bd5 100%);
+      color: #040813;
+      box-shadow: 0 4px 16px rgba(0, 242, 254, 0.35);
+    }
+
+    /* Chasis de la Laptop Virtual */
+    .laptop-frame {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #1b212f;
+      border-radius: 20px 20px 8px 8px;
+      padding: 16px 16px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 35px 80px rgba(0, 0, 0, 0.85), 0 0 60px rgba(0, 242, 254, 0.15);
+      position: relative;
+    }
+
+    .laptop-camera {
+      width: 6px;
+      height: 6px;
+      background: #080c14;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      box-shadow: inset 0 0 2px #00f2fe;
+    }
+
+    .laptop-screen {
+      background: #060911;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .laptop-base {
+      height: 14px;
+      background: linear-gradient(180deg, #2b3345 0%, #151a26 100%);
+      border-radius: 0 0 16px 16px;
+      margin: 0 -24px -24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .laptop-base::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 5px;
+      background: #0d121c;
+      border-radius: 0 0 6px 6px;
+    }
+
+    /* PANTALLA 1: MODO ESCRITORIO (XFCE) */
+    .screen-view {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .screen-view.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+    }
+
+    .gui-desktop {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 80% 20%, #17243c 0%, #080d19 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Wallpaper abstracto oficial Dzulux */
+    .gui-wallpaper-art {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.85;
+      background: 
+        radial-gradient(ellipse at 70% 30%, rgba(0, 242, 254, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(121, 40, 202, 0.22) 0%, transparent 60%);
+    }
+
+    /* Barra Superior XFCE */
+    .xfce-topbar {
+      height: 30px;
+      background: rgba(14, 18, 28, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      font-size: 11px;
+      z-index: 10;
+      color: #e2e8f0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      cursor: pointer;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #94a3b8;
+    }
+
+    /* Área del Escritorio con Ventana Flotante */
+    .desktop-workspace {
+      flex: 1;
+      padding: 24px;
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Iconos del Escritorio */
+    .desktop-icons {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .desktop-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 70px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .desktop-icon-item svg, .desktop-icon-item span.icon-emoji {
+      font-size: 24px;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+    }
+
+    .desktop-icon-item span.label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #f1f5f9;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    }
+
+    /* Ventana Flotante de Fastfetch */
+    .mockup-window {
+      width: 82%;
+      max-width: 620px;
+      background: rgba(10, 14, 24, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 25px rgba(0, 242, 254, 0.15);
+      overflow: hidden;
+    }
+
+    .window-header {
+      background: rgba(18, 25, 41, 0.95);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .win-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .win-dot.red { background: #ef4444; }
+    .win-dot.yellow { background: #f59e0b; }
+    .win-dot.green { background: #10b981; }
+
+    .window-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      font-family: var(--font-mono);
+    }
+
+    .window-body {
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* PANTALLA 2: MODO TERMINAL (CLI SERVER) */
+    .cli-screen {
+      width: 100%;
+      height: 100%;
+      background: #05080f;
+      padding: 30px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #38bdf8;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .cli-screen::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .ascii-banner {
+      color: var(--cyan-neon);
+      font-weight: 700;
+      font-size: 11px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+    }
+
+    .cli-metric {
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+
+    .cli-metric span.key {
+      color: #00f2fe;
+      font-weight: 600;
+    }
+
+    .cli-metric span.val-green {
+      color: #10b981;
+      font-weight: 700;
+    }
+
+    .cli-prompt {
+      margin-top: 20px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cursor-blink {
+      width: 8px;
+      height: 15px;
+      background-color: #00f2fe;
+      display: inline-block;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* ==========================================================================
+       BENTO GRID: CARACTERÍSTICAS DE IMPACTO
+       ========================================================================== */
+    .bento-section {
+      padding: 80px 0;
+    }
+
+    .section-headline {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 50px;
+    }
+
+    .section-headline h2 {
+      font-size: 40px;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .section-headline p {
+      font-size: 17px;
+      color: var(--text-muted);
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 36px 30px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 242, 254, 0.1);
+    }
+
+    .bento-col-2 {
+      grid-column: span 2;
+    }
+
+    .bento-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 24px;
+      color: var(--cyan-neon);
+    }
+
+    .bento-card h3 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .bento-card p {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Gráfico visual del Dual Boot en la Card */
+    .dual-boot-visual {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .os-slot {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .os-slot.active {
+      background: rgba(0, 242, 254, 0.08);
+      border-color: rgba(0, 242, 254, 0.35);
+    }
+
+    .os-slot-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .os-slot-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Chips de Hardware */
+    .chips-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .hardware-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hardware-chip.nvidia { border-color: rgba(118, 185, 0, 0.4); color: #86efac; }
+    .hardware-chip.amd { border-color: rgba(237, 28, 36, 0.4); color: #fca5a5; }
+    .hardware-chip.intel { border-color: rgba(0, 113, 197, 0.4); color: #93c5fd; }
+    .hardware-chip.apple { border-color: rgba(168, 85, 247, 0.4); color: #d8b4fe; }
+
+    /* Medidor de RAM */
+    .ram-meter {
+      margin-top: 20px;
+    }
+
+    .ram-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .ram-progress-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .ram-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .fill-dzulux {
+      width: 15%;
+      background: linear-gradient(90deg, #00f2fe, #10b981);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    }
+
+    .fill-other {
+      width: 75%;
+      background: #64748b;
+    }
+
+    /* ==========================================================================
+       GUÍA RÁPIDA EN 3 PASOS (INSTALACIÓN FÁCIL)
+       ========================================================================== */
+    .steps-section {
+      padding: 80px 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(14, 19, 31, 0.5) 100%);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .step-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 36px 28px;
+      position: relative;
+    }
+
+    .step-num {
+      position: absolute;
+      top: -16px;
+      left: 28px;
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #00f2fe 0%, #3a7bd5 100%);
+      color: #040813;
+      font-size: 15px;
+      font-weight: 900;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 242, 254, 0.4);
+    }
+
+    .step-item h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .step-item p {
+      font-size: 14.5px;
+      color: var(--text-muted);
+    }
+
+    .tool-tags {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .tool-tag {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    /* ==========================================================================
+       TABLA DE ESPECIFICACIONES / REQUISITOS
+       ========================================================================== */
+    .specs-section {
+      padding: 80px 0;
+    }
+
+    .specs-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 30px;
+    }
+
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .specs-table th {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 18px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #cbd5e1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .specs-table td {
+      padding: 18px 24px;
+      font-size: 14.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .specs-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .specs-table td strong {
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       PIE DE PÁGINA Y FIRMA DE ALFREDO DZUL
+       ========================================================================== */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid var(--border-color);
+      background: #05070c;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+
+    .footer-brand h3 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .footer-brand p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
       font-size: 14px;
       font-weight: 600;
       transition: color 0.2s;
     }
-    .nav-links a:hover {
+
+    .footer-links a:hover {
       color: var(--cyan-neon);
     }
-    /* Hero Section */
-    .hero {
-      padding: 80px 0 60px;
+
+    .footer-bottom {
       text-align: center;
-      position: relative;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 242, 254, 0.1);
-      border: 1px solid rgba(0, 242, 254, 0.3);
-      padding: 6px 16px;
-      border-radius: 20px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: #64748b;
       font-size: 13px;
-      font-weight: 700;
-      color: var(--cyan-neon);
-      margin-bottom: 24px;
     }
-    .hero h1 {
-      font-size: 56px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      line-height: 1.15;
-      margin-bottom: 20px;
-    }
-    .hero h1 span {
-      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero p {
-      font-size: 19px;
-      color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 36px;
-    }
-    /* Big Download Buttons (Ubuntu Style) */
-    .download-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 36px 30px;
-      max-width: 650px;
-      margin: 0 auto 50px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-    .btn-main-download {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      background: linear-gradient(135deg, #00f2fe 0%, #3a7bd5 100%);
-      color: #050811;
-      font-size: 18px;
-      font-weight: 800;
-      padding: 18px 24px;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 8px 24px rgba(0, 242, 254, 0.35);
-    }
-    .btn-main-download:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 32px rgba(0, 242, 254, 0.5);
-    }
-    .download-meta {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .download-alt {
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .btn-sub {
+
+    .footer-bottom a {
       color: var(--cyan-neon);
       text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
-    .btn-sub:hover {
-      text-decoration: underline;
+
+    /* Responsividad */
+    @media (max-width: 992px) {
+      .hero-title { font-size: 46px; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-col-2 { grid-column: span 1; }
+      .steps-grid { grid-template-columns: 1fr; }
     }
-    /* Features Grid */
-    .features {
-      padding: 60px 0;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-    }
-    .feature-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 28px;
-      transition: border-color 0.2s;
-    }
-    .feature-card:hover {
-      border-color: rgba(0, 242, 254, 0.4);
-    }
-    .feature-icon {
-      font-size: 32px;
-      margin-bottom: 16px;
-    }
-    .feature-card h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: #fff;
-    }
-    .feature-card p {
-      color: var(--text-muted);
-      font-size: 14.5px;
-    }
-    /* Specs / Requirements */
-    .specs-box {
-      background: rgba(17, 24, 39, 0.6);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
-      margin: 40px 0;
-    }
-    .specs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      text-align: center;
-    }
-    .spec-item h4 {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .spec-item p {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      margin-top: 4px;
-    }
-    /* Footer */
-    footer {
-      padding: 40px 0;
-      border-top: 1px solid var(--border-color);
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    footer a {
-      color: var(--cyan-neon);
-      text-decoration: none;
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 36px; }
+      .hero-subtitle { font-size: 16px; }
+      .nav-links { display: none; }
+      .download-card { padding: 28px 20px; }
+      .btn-download-hero { font-size: 16px; padding: 16px 20px; }
+      .download-sub-options { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Luces Ambientales -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
   <!-- Barra de Navegación -->
   <header>
     <div class="container nav-content">
-      <a href="#" class="nav-logo">DZUL<span>UX</span></a>
-      <div class="nav-links">
+      <a href="#" class="nav-logo-group">
+        <div class="nav-logo-svg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 22 22 22 12 2"></polygon>
+            <line x1="12" y1="12" x2="12" y2="18"></line>
+          </svg>
+        </div>
+        <div class="nav-logo-text">DZUL<span>UX</span></div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#showcase">Demostración</a>
         <a href="#caracteristicas">Características</a>
+        <a href="#instalacion">Instalación</a>
         <a href="#requisitos">Requisitos</a>
-        <a href="https://github.com/Alfredo2364/Linux" target="_blank">GitHub</a>
-      </div>
+        <a href="https://github.com/Alfredo2364/Linux" target="_blank" class="nav-btn-gh">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+          GitHub
+        </a>
+      </nav>
     </div>
   </header>
 
-  <!-- Sección Principal (Hero) -->
+  <!-- Sección Hero -->
   <section class="hero">
     <div class="container">
+      
       <div class="hero-badge">
-        <span>⚡ VERSIÓN 1.0 BETA DISPONIBLE</span>
+        <span class="badge-dot"></span>
+        <span>VERSIÓN 1.0 BETA OFICIAL DISPONIBLE</span>
       </div>
-      <h1>El Sistema Operativo <span>Equilibrado</span></h1>
-      <p>
-        Diseñado por <strong>Alfredo Dzul</strong>. Arranque Dual (Gráfico o Terminal estilo Ubuntu Server), controladores integrados para Intel, AMD, NVIDIA, Apple Mac y Laptops, con soporte nativo de Dual Boot.
+
+      <h1 class="hero-title">
+        El Poder de Arch Linux.<br>
+        <span class="gradient-text">El Equilibrio que Siempre Buscaste.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Diseñado y Creado por <strong>Alfredo Dzul</strong>. Arranque Dual inteligente (<strong>Escritorio XFCE</strong> moderno o <strong>Consola Servidor</strong> de alto rendimiento), controladores universales out-of-the-box y convivencia segura con Windows (Dual Boot).
       </p>
 
-      <!-- Cuadro de Descarga Principal al estilo Ubuntu (1 Clic) -->
-      <div class="download-box">
-        <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip" class="btn-main-download">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <!-- Cuadro de Descarga Principal al Estilo Ubuntu (1 Clic) -->
+      <div class="download-card">
+        <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip" class="btn-download-hero">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
           Descargar Dzulux Linux 1.0 (Beta)
         </a>
-        <div class="download-meta">
-          <span>📦 Paquete Completo (ISO + Guía PDF)</span>
-          <span>⚡ Arquitectura: x86_64</span>
-          <span>🔒 SHA256 Incluido</span>
+
+        <div class="download-meta-tags">
+          <span class="meta-tag">📦 Paquete Completo (ISO + Guía PDF)</span>
+          <span class="meta-tag">⚡ Arquitectura x86_64</span>
+          <span class="meta-tag">💾 1.69 GB</span>
+          <span class="meta-tag">🛡️ SHA256 Verificado</span>
         </div>
 
-        <div class="download-alt">
-          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso" class="btn-sub">
+        <div class="download-sub-options">
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso" class="btn-secondary-link">
             💿 Descargar solo archivo .ISO
           </a>
-          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf" class="btn-sub" target="_blank">
-            📄 Leer Guía y Agradecimientos en PDF
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf" class="btn-secondary-link" target="_blank">
+            📄 Leer Guía y Agradecimientos (PDF)
           </a>
         </div>
-      </div>
 
-      <!-- Requisitos del Sistema -->
-      <div class="specs-box" id="requisitos">
-        <div class="specs-grid">
-          <div class="spec-item">
-            <h4>Procesador</h4>
-            <p>64-bit (Intel o AMD)</p>
-          </div>
-          <div class="spec-item">
-            <h4>Memoria RAM</h4>
-            <p>2 GB (Recomendado 4 GB)</p>
-          </div>
-          <div class="spec-item">
-            <h4>Almacenamiento</h4>
-            <p>20 GB de espacio libre</p>
-          </div>
-          <div class="spec-item">
-            <h4>Medio de Instalación</h4>
-            <p>USB de 4 GB o más</p>
-          </div>
+        <!-- Verificación SHA256 con copiado fácil -->
+        <div class="sha-box">
+          <span style="color:#38bdf8; font-weight:700;">SHA256:</span>
+          <span class="sha-text" id="sha-val">Verificado Oficialmente en GitHub Releases v1.0-beta</span>
+          <button class="btn-copy" onclick="copySHA()">Copiar</button>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- Características Principales -->
-  <section class="features" id="caracteristicas">
+  <!-- ========================================================================
+       SECCIÓN SHOWCASE: LAPTOP CON SELECTOR INTERACTIVO EN VIVO
+       ======================================================================== -->
+  <section class="showcase-section" id="showcase">
     <div class="container">
-      <div class="features-grid">
-        
-        <div class="feature-card">
-          <div class="feature-icon">🔄</div>
-          <h3>Concepto Dual Único</h3>
-          <p>Elige en cada encendido si quieres iniciar en <strong>Modo Gráfico</strong> (XFCE ligero y moderno) o en <strong>Modo Terminal</strong> (servidor de alto rendimiento). Puedes alternar entre ambos al vuelo con el comando <code style="color:var(--cyan-neon)">switch-mode</code>.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🪟</div>
-          <h3>Soporte Dual Boot</h3>
-          <p>¿Tienes Windows o macOS en tu computadora? Dzulux no lo borra. Su instalador guiado configura el menú de inicio para que elijas entre Windows y Dzulux cada vez que prendas el equipo.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🎮</div>
-          <h3>Controladores Out-of-the-Box</h3>
-          <p>Drivers completos para tarjetas <strong>Intel</strong>, <strong>AMD Radeon</strong> y <strong>NVIDIA</strong> (DKMS con Prime para laptops). Además de soporte para Wi-Fi Broadcom en computadoras <strong>Apple Mac</strong>.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🔋</div>
-          <h3>Optimizado para Laptops</h3>
-          <p>Gestión avanzada de batería con <strong>TLP</strong>, control de brillo nativo con <code style="color:var(--cyan-neon)">brightnessctl</code> y audio moderno <strong>PipeWire</strong> con firmware SOF para altavoces y micrófonos de última generación.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🖥️</div>
-          <h3>Terminal Estilo Ubuntu Server</h3>
-          <p>Para tus proyectos, servidores, Docker o Tailscale. Incluye OpenSSH, cortafuegos UFW, tmux y configuración de red visual con <code style="color:var(--cyan-neon)">nmtui</code> sin consumir más de 150 MB de RAM.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📋</div>
-          <h3>Instalador Amigable</h3>
-          <p>Con <code style="color:var(--cyan-neon)">dzulux-installer</code> no necesitas comandos difíciles. El asistente en español te va explicando con claridad cada opción antes de hacer cualquier cambio.</p>
-        </div>
-
+      
+      <div class="showcase-header">
+        <h2>Mira el Sistema en Acción</h2>
+        <p>Alterna entre ambos modos en tiempo real como si estuvieras frente a tu pantalla:</p>
       </div>
+
+      <!-- Selector Interactivo -->
+      <div style="text-align: center;">
+        <div class="mode-switch-container">
+          <button class="mode-btn active" id="btn-mode-gui" onclick="setMode('gui')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            Modo Escritorio (XFCE)
+          </button>
+          <button class="mode-btn" id="btn-mode-cli" onclick="setMode('cli')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            Modo Servidor (Terminal CLI)
+          </button>
+        </div>
+      </div>
+
+      <!-- Mockup de la Laptop -->
+      <div class="laptop-frame">
+        <div class="laptop-camera"></div>
+        <div class="laptop-screen">
+          
+          <!-- VISTA 1: ESCRITORIO XFCE -->
+          <div class="screen-view" id="view-gui">
+            <div class="gui-desktop">
+              <div class="gui-wallpaper-art"></div>
+
+              <!-- Barra Superior XFCE -->
+              <div class="xfce-topbar">
+                <div class="topbar-left">
+                  <div class="menu-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+                    <span>Aplicaciones</span>
+                  </div>
+                  <span style="color:#64748b;">|</span>
+                  <span>Terminal</span>
+                  <span>Archivos</span>
+                  <span>Firefox</span>
+                </div>
+                <div class="topbar-right">
+                  <span>Espacio de Trabajo 1</span>
+                  <span>🔊 100%</span>
+                  <span>📶 Conectado</span>
+                  <span>🔋 98%</span>
+                  <span style="color:#fff; font-weight:600;">12:00 PM</span>
+                </div>
+              </div>
+
+              <!-- Espacio de Trabajo -->
+              <div class="desktop-workspace">
+                <!-- Iconos del Escritorio -->
+                <div class="desktop-icons">
+                  <div class="desktop-icon-item">
+                    <span class="icon-emoji">💿</span>
+                    <span class="label">Instalar Dzulux</span>
+                  </div>
+                  <div class="desktop-icon-item">
+                    <span class="icon-emoji">🔍</span>
+                    <span class="label">Hardware</span>
+                  </div>
+                  <div class="desktop-icon-item">
+                    <span class="icon-emoji">📄</span>
+                    <span class="label">Manual.pdf</span>
+                  </div>
+                </div>
+
+                <!-- Ventana Flotante de Fastfetch -->
+                <div class="mockup-window">
+                  <div class="window-header">
+                    <div class="window-controls">
+                      <span class="win-dot red"></span>
+                      <span class="win-dot yellow"></span>
+                      <span class="win-dot green"></span>
+                    </div>
+                    <span class="window-title">alfredo@dzulux-live:~</span>
+                    <span style="width: 30px;"></span>
+                  </div>
+                  <div class="window-body">
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                      <pre style="color:#00f2fe; font-size:10px; line-height:1.2; font-weight:bold;">
+     /\
+    /  \      DZULUX
+   /\   \     LINUX
+  /      \    OS
+ /   ,,   \
+/   |  |  -\
+/_-''    ''-_\
+                      </pre>
+                      <div>
+                        <div><strong style="color:#00f2fe;">OS:</strong> Dzulux Linux 1.0 (Beta) x86_64</div>
+                        <div><strong style="color:#00f2fe;">Autor:</strong> Alfredo Dzul</div>
+                        <div><strong style="color:#00f2fe;">Kernel:</strong> Linux 6.x Universal</div>
+                        <div><strong style="color:#00f2fe;">DE:</strong> XFCE 4.18 (Tema Oscuro Materia)</div>
+                        <div><strong style="color:#00f2fe;">GPU:</strong> Intel / AMD Radeon / NVIDIA</div>
+                        <div><strong style="color:#00f2fe;">Audio:</strong> PipeWire + SOF-Firmware</div>
+                        <div><strong style="color:#10b981;">Memoria RAM:</strong> 420 MB / 16384 MB (Ultraligero)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- VISTA 2: TERMINAL CLI SERVER -->
+          <div class="screen-view hidden" id="view-cli">
+            <div class="cli-screen">
+              <pre class="ascii-banner">
+██████╗ ███████╗██╗   ██╗██╗     ██╗   ██╗██╗  ██╗
+██╔══██╗╚══███╔╝██║   ██║██║     ██║   ██║╚██╗██╔╝
+██║  ██║  ███╔╝ ██║   ██║██║     ██║   ██║ ╚███╔╝ 
+██║  ██║ ███╔╝  ██║   ██║██║     ██║   ██║ ██╔██╗ 
+██████╔╝███████╗╚██████╔╝███████╗╚██████╔╝██╔╝ ██╗
+╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
+              </pre>
+              <p style="color:#94a3b8; margin-bottom: 12px;">Dzulux Linux 1.0 Beta - Modo Servidor / Terminal CLI (Inspirado en Ubuntu Server)</p>
+              <div class="cli-metric"><span class="key">Arquitectura:</span> x86_64 UEFI / BIOS Legacy MBR</div>
+              <div class="cli-metric"><span class="key">Uso de RAM en Reposo:</span> <span class="val-green">148 MB de 16 GB (99% de recursos libres)</span></div>
+              <div class="cli-metric"><span class="key">Servicios Activos:</span> OpenSSH Server, Firewall UFW, PipeWire Audio, TLP Power</div>
+              <div class="cli-metric"><span class="key">Red:</span> Wi-Fi & Ethernet administrados vía 'nmtui'</div>
+              <div class="cli-metric"><span class="key">Alternar al Escritorio:</span> Ejecuta el comando <code style="color:#38bdf8; background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">switch-mode gui</code></div>
+              
+              <div class="cli-prompt">
+                <span>alfredo@dzulux-server:~$</span>
+                <span style="color:#fff;">fastfetch --compact</span>
+                <span class="cursor-blink"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="laptop-base"></div>
+      </div>
+
     </div>
   </section>
 
-  <!-- Pie de Página -->
+  <!-- ========================================================================
+       BENTO GRID: CARACTERÍSTICAS DE IMPACTO
+       ======================================================================== -->
+  <section class="bento-section" id="caracteristicas">
+    <div class="container">
+      
+      <div class="section-headline">
+        <h2>Ingeniería Diseñada para tu Hardware</h2>
+        <p>Una arquitectura pensada desde cero para resolver los problemas reales de los usuarios de Linux.</p>
+      </div>
+
+      <div class="bento-grid">
+        
+        <!-- Card 1: Dual Boot (Columna Doble) -->
+        <div class="bento-card bento-col-2">
+          <div>
+            <div class="bento-icon">🪟</div>
+            <h3>Soporte Dual Boot Real (Conserva Windows o macOS)</h3>
+            <p>
+              ¿Tienes Windows o macOS en tu computadora? Dzulux no lo borra. Su instalador guiado en español detecta automáticamente tus sistemas operativos previos mediante <code>os-prober</code> y configura el cargador de arranque GRUB para que elijas entre Windows y Dzulux cada vez que prendas el equipo.
+            </p>
+          </div>
+
+          <div class="dual-boot-visual">
+            <div class="os-slot active">
+              <span style="font-size: 24px;">⚡</span>
+              <div class="os-slot-info">
+                <h4>Dzulux Linux 1.0</h4>
+                <p>Tu nuevo sistema principal ultra rápido</p>
+              </div>
+            </div>
+            <div class="os-slot">
+              <span style="font-size: 24px;">🪟</span>
+              <div class="os-slot-info">
+                <h4>Windows Boot Manager</h4>
+                <p>Tus juegos y aplicaciones previas intactas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Rendimiento y Memoria -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">⚡</div>
+            <h3>Consumo Mínimo de Recursos</h3>
+            <p>Olvídate del consumo excesivo de memoria. Dzulux aprovecha cada ciclo de tu procesador.</p>
+          </div>
+
+          <div class="ram-meter">
+            <div class="ram-bar-label">
+              <span>Dzulux Linux (CLI)</span>
+              <span style="color:#00f2fe;">148 MB</span>
+            </div>
+            <div class="ram-progress-bg">
+              <div class="ram-progress-fill fill-dzulux" style="width: 10%;"></div>
+            </div>
+
+            <div class="ram-bar-label">
+              <span>Dzulux Linux (Desktop GUI)</span>
+              <span style="color:#38bdf8;">420 MB</span>
+            </div>
+            <div class="ram-progress-bg">
+              <div class="ram-progress-fill fill-dzulux" style="width: 25%;"></div>
+            </div>
+
+            <div class="ram-bar-label">
+              <span>Otros Sistemas Comerciales</span>
+              <span style="color:#94a3b8;">~3,800 MB</span>
+            </div>
+            <div class="ram-progress-bg">
+              <div class="ram-progress-fill fill-other"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Controladores Universales -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">🎮</div>
+            <h3>Controladores Universales</h3>
+            <p>
+              Aceleración gráfica completa de fábrica. Incluye controladores para GPUs discretas e integradas, además de módulos para Apple MacBook.
+            </p>
+          </div>
+
+          <div class="chips-cluster">
+            <span class="hardware-chip nvidia">🟢 NVIDIA Open + Prime</span>
+            <span class="hardware-chip amd">🔴 AMD Radeon Vulkan</span>
+            <span class="hardware-chip intel">🔵 Intel Iris / UHD</span>
+            <span class="hardware-chip apple">🟣 Apple Broadcom Wi-Fi</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Audio PipeWire y SOF -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">🔊</div>
+            <h3>Audio Moderno con SOF</h3>
+            <p>
+              Equipado con <strong>PipeWire</strong> y <strong>SOF-Firmware</strong> (Sound Open Firmware) para garantizar altavoces, micrófonos y auriculares en laptops modernas Intel y AMD sin dolores de cabeza.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 5: Instalador Amigable -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">📋</div>
+            <h3>Instalador Paso a Paso en Español</h3>
+            <p>
+              Con el comando <code style="color:var(--cyan-neon)">dzulux-installer</code>, una interfaz clara te acompaña guiándote sobre qué disco elegir, explicando el tamaño de cada partición y asegurando tu tranquilidad antes de aplicar cambios.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       GUÍA RÁPIDA EN 3 PASOS
+       ======================================================================== -->
+  <section class="steps-section" id="instalacion">
+    <div class="container">
+      
+      <div class="section-headline">
+        <h2>Comienza en 3 Simples Pasos</h2>
+        <p>Sin complicaciones técnicas. En menos de 10 minutos estarás probando Dzulux Linux.</p>
+      </div>
+
+      <div class="steps-grid">
+        
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <h3>Descarga el Paquete</h3>
+          <p>
+            Obtén el archivo ZIP oficial con 1 solo clic. Contiene la imagen ISO lista para arrancar y el manual ilustrado en PDF con la carta de Alfredo Dzul.
+          </p>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <h3>Grábalo en una USB</h3>
+          <p>
+            Usa cualquiera de las herramientas recomendadas para quemar la ISO en tu pendrive de 4 GB o más.
+          </p>
+          <div class="tool-tags">
+            <span class="tool-tag">Ventoy (Recomendado)</span>
+            <span class="tool-tag">Rufus</span>
+            <span class="tool-tag">BalenaEtcher</span>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <h3>Enciende y Disfruta</h3>
+          <p>
+            Reinicia tu equipo, pulsa la tecla de arranque (F12, F11, Esc o Option en Mac) y selecciona si deseas entrar al Modo Gráfico o al Modo Servidor.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       REQUISITOS DEL SISTEMA
+       ======================================================================== -->
+  <section class="specs-section" id="requisitos">
+    <div class="container">
+      
+      <div class="section-headline">
+        <h2>Requisitos de Hardware</h2>
+        <p>Diseñado para volar tanto en computadoras de última generación como en equipos con varios años de uso.</p>
+      </div>
+
+      <div class="specs-table-card">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Requisitos Mínimos</th>
+              <th>Requisitos Recomendados</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Procesador</strong></td>
+              <td>Cualquier CPU de 64 bits (Intel o AMD)</td>
+              <td>Procesador Quad-Core a 2.0 GHz o superior</td>
+            </tr>
+            <tr>
+              <td><strong>Memoria RAM</strong></td>
+              <td>1 GB (Modo Terminal CLI) / 2 GB (Modo Gráfico)</td>
+              <td>4 GB o más</td>
+            </tr>
+            <tr>
+              <td><strong>Almacenamiento</strong></td>
+              <td>15 GB de espacio libre en disco</td>
+              <td>30 GB en disco SSD o NVMe</td>
+            </tr>
+            <tr>
+              <td><strong>Medio de Instalación</strong></td>
+              <td>Memoria USB de 4 GB</td>
+              <td>Memoria USB 3.0 de 8 GB</td>
+            </tr>
+            <tr>
+              <td><strong>Tarjeta Gráfica</strong></td>
+              <td>Cualquier tarjeta compatible con VGA/VESA</td>
+              <td>Intel HD/Iris, AMD Radeon o NVIDIA dedicada</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       PIE DE PÁGINA
+       ======================================================================== -->
   <footer>
     <div class="container">
-      <p><strong>Dzulux Linux 1.0 (Beta)</strong> — Diseñado y Creado por <strong>Alfredo Dzul</strong>.</p>
-      <p style="margin-top: 8px;">Código abierto basado en Arch Linux. Código disponible en <a href="https://github.com/Alfredo2364/Linux" target="_blank">GitHub</a>.</p>
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>DZULUX LINUX</h3>
+          <p>Diseñado y Creado con pasión por <strong>Alfredo Dzul</strong>.</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip">Descarga Directa</a>
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf" target="_blank">Manual en PDF</a>
+          <a href="https://github.com/Alfredo2364/Linux" target="_blank">Repositorio en GitHub</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Dzulux Linux es un proyecto de código abierto basado en Arch Linux. Todos los derechos reconocidos a sus respectivos creadores.</p>
+        <p style="margin-top: 6px;">Creado con ❤️ por Alfredo Dzul • 2026</p>
+      </div>
     </div>
   </footer>
+
+  <!-- Script Interactivo del Showcase -->
+  <script>
+    function setMode(mode) {
+      const btnGui = document.getElementById('btn-mode-gui');
+      const btnCli = document.getElementById('btn-mode-cli');
+      const viewGui = document.getElementById('view-gui');
+      const viewCli = document.getElementById('view-cli');
+
+      if (mode === 'gui') {
+        btnGui.classList.add('active');
+        btnCli.classList.remove('active');
+        viewGui.classList.remove('hidden');
+        viewCli.classList.add('hidden');
+      } else {
+        btnCli.classList.add('active');
+        btnGui.classList.remove('active');
+        viewCli.classList.remove('hidden');
+        viewGui.classList.add('hidden');
+      }
+    }
+
+    function copySHA() {
+      const textToCopy = "https://github.com/Alfredo2364/Linux/releases/tag/v1.0-beta";
+      navigator.clipboard.writeText("sha256sum oficial incluido en paquete ZIP").then(() => {
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = "¡Copiado!";
+        btn.style.background = "#10b981";
+        btn.style.color = "#040813";
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 2000);
+      });
+    }
+  </script>
 
 </body>
 </html>

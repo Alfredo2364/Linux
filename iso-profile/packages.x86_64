@@ -142,4 +142,6 @@ exfatprogs                # Soporte para discos exFAT
 arch-install-scripts      # pacstrap, genfstab y arch-chroot para dzulux-installer
 efibootmgr                # Modificación de entradas de arranque UEFI
 grub                      # Gestor de arranque universal
+syslinux                  # Gestor de arranque BIOS legacy requerido por archiso
+mtools                    # Manipulación de imágenes FAT/EFI
 os-prober                 # Detección de otros sistemas operativos (Dual Boot)

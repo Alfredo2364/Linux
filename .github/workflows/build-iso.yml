@@ -28,10 +28,20 @@ jobs:
       - name: Compilar Dzulux Linux ISO (mkarchiso)
         run: |
           mkdir -p output /tmp/archiso-work
-          mkarchiso -v -w /tmp/archiso-work -o output iso-profile
+          mkarchiso -v -w /tmp/archiso-work -o output iso-profile 2>&1 | tee /tmp/mkarchiso.log
           cd output
           sha256sum *.iso > sha256sum.txt
           ls -lh
+
+      - name: Reportar registro detallado en caso de fallo
+        if: failure()
+        run: |
+          if [ -f /tmp/mkarchiso.log ]; then
+            echo "### ❌ Registro de la compilación:" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 100 /tmp/mkarchiso.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Guardar Artefacto de ISO
         uses: actions/upload-artifact@v4

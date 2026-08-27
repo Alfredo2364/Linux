@@ -85,9 +85,9 @@ mousepad
 firefox
 
 # Apariencia y Fuentes
-arc-gtk-theme
+materia-gtk-theme
 papirus-icon-theme
-ttf-inter
+inter-font
 ttf-jetbrains-mono-nerd
 noto-fonts
 
@@ -101,7 +101,7 @@ micro
 nano
 vim
 dialog
-whiptail
+libnewt
 git
 curl
 wget

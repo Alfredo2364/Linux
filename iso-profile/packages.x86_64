@@ -15,7 +15,7 @@ linux-firmware
 sof-firmware              # Esencial para audio y micrófonos en laptops Intel/AMD modernas
 alsa-firmware             # Firmware para tarjetas de sonido integradas y dedicadas
 alsa-ucm-conf             # Perfiles de casos de uso ALSA (MacBook, Dell XPS, ThinkPad)
-broadcom-wl-dkms          # Wi-Fi Broadcom usado en Apple MacBook, MacBook Pro y Air
+broadcom-wl               # Wi-Fi Broadcom usado en Apple MacBook, MacBook Pro y Air
 b43-fwcutter              # Extractor de firmware para tarjetas Wi-Fi legacy
 wireless-regdb            # Base de datos regulatoria inalámbrica
 

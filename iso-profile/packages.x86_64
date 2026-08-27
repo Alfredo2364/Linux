@@ -1,6 +1,6 @@
 # ==============================================================================
-# Equalrch Linux - Lista Maestra de Paquetes (packages.x86_64)
-# Diseñado y Personalizado por Alfredo Dzul
+# Dzulux Linux - Lista Maestra de Paquetes (packages.x86_64)
+# Diseñado y Creado por Alfredo Dzul
 # Arquitectura: x86_64 (PC, Laptops & Apple Mac Intel)
 # ==============================================================================
 
@@ -105,7 +105,7 @@ noto-fonts                # Soporte tipográfico universal
 # --- Herramientas de Terminal (TUI / CLI) ---
 bash-completion
 zsh
-fastfetch                 # Pantalla de bienvenida con información de Equalrch
+fastfetch                 # Pantalla de bienvenida con información de Dzulux
 btop                      # Monitor de recursos visual e interactivo en terminal
 htop
 micro                     # Editor de texto moderno con atajos Ctrl+C / Ctrl+V
@@ -139,7 +139,7 @@ e2fsprogs                 # Soporte para ext4
 btrfs-progs               # Soporte para Btrfs
 ntfs-3g                   # Soporte para NTFS (discos externos Windows)
 exfatprogs                # Soporte para discos exFAT
-arch-install-scripts      # pacstrap, genfstab y arch-chroot para equalrch-installer
+arch-install-scripts      # pacstrap, genfstab y arch-chroot para dzulux-installer
 efibootmgr                # Modificación de entradas de arranque UEFI
 grub                      # Gestor de arranque universal
 os-prober                 # Detección de otros sistemas operativos (Dual Boot)

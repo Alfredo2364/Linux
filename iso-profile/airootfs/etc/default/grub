@@ -1,0 +1,16 @@
+# Configuración de GRUB para Dzulux Linux
+# Diseñado por Alfredo Dzul
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=10
+GRUB_DISTRIBUTOR="Dzulux"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=3"
+GRUB_CMDLINE_LINUX=""
+
+# HABILITAR DETECCIÓN DE DUAL BOOT (WINDOWS / MACOS / OTROS LINUX)
+# Esto permite que os-prober agregue automáticamente Windows Boot Manager o macOS al menú de GRUB
+GRUB_DISABLE_OS_PROBER=false
+
+# Aspecto visual
+GRUB_TERMINAL_OUTPUT="gfxterm"
+GRUB_GFXMODE="auto"

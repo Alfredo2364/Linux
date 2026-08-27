@@ -1,0 +1,102 @@
+name: Compilar ISO y Paquete de Dzulux Linux
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+jobs:
+  build-dzulux-iso:
+    name: Compilar Dzulux Linux y Guía en PDF
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Liberar Espacio en Disco en el Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      - name: Compilar ISO en Contenedor Arch Linux (mkarchiso)
+        run: |
+          mkdir -p output
+          docker run --privileged --rm \
+            -v "$PWD":/workspace \
+            -w /workspace \
+            archlinux:base-devel bash -c "
+              echo '==> Actualizando repositorios de Arch Linux...'
+              pacman -Syu --noconfirm
+              
+              echo '==> Instalando archiso y dependencias de compilación...'
+              pacman -S --noconfirm archiso git squashfs-tools dosfstools libisoburn mtools
+              
+              echo '==> Iniciando compilación de Dzulux Linux...'
+              mkarchiso -v -w /tmp/archiso-tmp -o /workspace/output /workspace/iso-profile
+              
+              echo '==> Generando suma de comprobación SHA256...'
+              cd /workspace/output
+              sha256sum *.iso > sha256sum.txt
+              ls -lh /workspace/output
+            "
+
+      - name: Generar Guía y Agradecimientos en PDF
+        run: |
+          chmod +x scripts/generate-pdf.sh
+          ./scripts/generate-pdf.sh "$PWD/output/Guia_y_Agradecimientos_Dzulux.pdf"
+
+      - name: Empaquetar ISO + Guía PDF en Archivo ZIP
+        run: |
+          sudo apt-get update && sudo apt-get install -y zip
+          mkdir -p paquete_distribucion/Dzulux-Linux-1.0-Beta
+          
+          # Copiar la ISO, la Guía en PDF y la suma SHA256 a la carpeta del paquete
+          cp output/*.iso paquete_distribucion/Dzulux-Linux-1.0-Beta/
+          cp output/Guia_y_Agradecimientos_Dzulux.pdf paquete_distribucion/Dzulux-Linux-1.0-Beta/
+          cp output/sha256sum.txt paquete_distribucion/Dzulux-Linux-1.0-Beta/
+          
+          # Crear el archivo comprimido .zip final
+          cd paquete_distribucion
+          zip -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
+          cd ..
+          
+          echo "==> Contenido final de la carpeta output:"
+          ls -lh output/
+
+      - name: Subir Paquete Completo (ZIP) como Artefacto de Descarga
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dzulux-Linux-1.0-Beta-Paquete-Completo
+          path: output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip
+          retention-days: 14
+
+      - name: Crear Release Oficial (si es un Tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip
+            output/*.iso
+            output/Guia_y_Agradecimientos_Dzulux.pdf
+            output/sha256sum.txt
+          name: Dzulux Linux ${{ github.ref_name }}
+          body: |
+            # Dzulux Linux v1.0 (Beta)
+            **Diseñado y Creado por Alfredo Dzul**
+
+            ---
+            ### 📦 Contenido del Paquete de Descarga:
+            * **Dzulux-Linux-1.0-Beta-Paquete-Completo.zip**: Incluye la imagen `.iso` de instalación + la **Guía de Inicio y Carta de Agradecimiento de Alfredo Dzul en PDF**.
+            
+            ### 🚀 Características Principales:
+            * **Concepto Dual**: Arranque en Modo Gráfico (XFCE personalizado) o Modo Terminal de alto rendimiento (estilo Ubuntu Server).
+            * **Soporte Dual Boot Completo**: Convivencia con Windows Boot Manager o macOS sin borrar datos.
+            * **Controladores Universales**: Intel (Mesa/Vulkan), AMD Radeon y NVIDIA (DKMS + Prime).
+            * **Laptops & Apple Mac**: Wi-Fi Broadcom, audio PipeWire con SOF-Firmware y gestión de batería con TLP.
+            * **Instalador Explicativo**: `dzulux-installer` paso a paso en español.
+          draft: false
+          prerelease: true

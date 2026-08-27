@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-welcome - Pantalla de Bienvenida de Dzulux Linux (Beta)
+# Diseñado y Creado por Alfredo Dzul
+# ==============================================================================
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+clear
+if command -v fastfetch >/dev/null 2>&1; then
+    fastfetch
+else
+    cat /etc/motd
+fi
+
+echo -e "${CYAN}${BOLD}"
+echo "================================================================="
+echo "        ¡Bienvenido al Entorno Live de Dzulux Linux!            "
+echo "                   Diseñado por Alfredo Dzul                    "
+echo "================================================================="
+echo -e "${NC}"
+echo -e "Acciones recomendadas:"
+echo -e "  1. ${GREEN}${BOLD}dzulux-installer${NC}  -> Instalar Dzulux en tu disco (Dual Boot o Limpio)"
+echo -e "  2. ${GREEN}${BOLD}nmtui${NC}             -> Conectar a Wi-Fi / Configurar Red (interfaz TUI)"
+echo -e "  3. ${GREEN}${BOLD}hw-detect${NC}         -> Verificar drivers (GPU, Batería, Audio, Mac)"
+echo -e "  4. ${GREEN}${BOLD}switch-mode gui${NC}   -> Iniciar el escritorio visual XFCE"
+echo -e "  5. ${GREEN}${BOLD}switch-mode cli${NC}   -> Permanecer en modo terminal puro"
+echo ""
+echo -e "Servicios de Servidor disponibles (Estilo Ubuntu Server):"
+echo -e "  * SSH Server: 'sudo systemctl start sshd' (o 'enable sshd' para inicio automático)"
+echo -e "  * Firewall UFW: 'sudo ufw enable' y 'sudo ufw allow 22/tcp'"
+echo ""
+echo -e "${YELLOW}Nota: Sistema en fase BETA. Reporta detalles en: https://github.com/Alfredo2364/Linux${NC}"
+echo "================================================================="

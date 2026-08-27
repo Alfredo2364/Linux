@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Guía de Inicio y Agradecimientos - Dzulux Linux (Beta)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 11pt;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, #0a0e17 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border-bottom: 4px solid #00f2fe;
+    }
+    .logo-title {
+      font-size: 28pt;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin: 0;
+      color: #ffffff;
+    }
+    .logo-title span {
+      color: #00f2fe;
+    }
+    .subtitle {
+      font-size: 12pt;
+      color: #94a3b8;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .badge {
+      display: inline-block;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: #00f2fe;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 9pt;
+      font-weight: 700;
+      font-family: monospace;
+    }
+    h2 {
+      color: #0f172a;
+      font-size: 14pt;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+    .letter-box {
+      background-color: #f8fafc;
+      border-left: 4px solid #4364f7;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 18px;
+      font-style: italic;
+      color: #334155;
+    }
+    .author-sign {
+      font-weight: 700;
+      font-style: normal;
+      color: #0f172a;
+      margin-top: 8px;
+      text-align: right;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 10pt;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+    .code-pill {
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #0369a1;
+      font-size: 9.5pt;
+    }
+    .card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .warning {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+      font-size: 10pt;
+    }
+    .page-break {
+      page-break-after: always;
+    }
+    .footer {
+      margin-top: 30px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      text-align: center;
+      font-size: 8.5pt;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado con Identidad de Dzulux -->
+  <div class="header">
+    <div class="logo-title">DZUL<span>UX</span> LINUX</div>
+    <div class="subtitle">SISTEMA OPERATIVO DUAL (GRÁFICO / TERMINAL) • BASE ARCH LINUX</div>
+    <div class="badge">DISEÑADO Y CREADO POR ALFREDO DZUL</div>
+  </div>
+
+  <!-- Sección 1: Agradecimientos -->
+  <h2>💖 Agradecimientos y Bienvenida</h2>
+  <div class="letter-box">
+    "Estimado usuario y compañero de la comunidad tecnológica:<br><br>
+    Quiero expresarte mi más sincero y profundo agradecimiento por descargar y darle una oportunidad a <strong>Dzulux Linux</strong>. Este sistema operativo nace del deseo de tener una plataforma verdaderamente equilibrada: con la potencia y solidez de un servidor moderno, pero con la accesibilidad y elegancia visual de un entorno de escritorio rápido y universal.<br><br>
+    Ha sido diseñado poniendo especial atención en que funcione en cualquier computadora: ya sea tu laptop de diario con control inteligente de batería, una PC de escritorio con tarjetas Intel, AMD o NVIDIA, o incluso una computadora Apple Mac con chips Intel y Wi-Fi Broadcom.<br><br>
+    Espero de corazón que esta herramienta te sea de gran utilidad en tus proyectos, estudios, desarrollo o uso cotidiano. ¡Gracias por formar parte de este viaje!"
+    <div class="author-sign">— Alfredo Dzul (Creador de Dzulux Linux)</div>
+  </div>
+
+  <div class="warning">
+    <strong>⚠️ Aviso de Versión BETA:</strong> Dzulux Linux 1.0 se encuentra en fase beta activa de desarrollo. Si encuentras algún comportamiento inesperado o deseas proponer mejoras, tu opinión es sumamente valiosa en: <u>https://github.com/Alfredo2364/Linux/issues</u>.
+  </div>
+
+  <!-- Sección 2: Grabado de la Memoria USB -->
+  <h2>💾 Paso 1: ¿Cómo grabar la imagen ISO en una USB?</h2>
+  <p>Para probar o instalar Dzulux Linux en un equipo físico, necesitas grabar el archivo <strong>.iso</strong> que viene en este paquete en una memoria USB (de al menos 4 GB):</p>
+  <ul>
+    <li><strong>Ventoy (La opción más recomendada)</strong>: Instala Ventoy en tu memoria USB una sola vez y luego simplemente copia y pega el archivo <span class="code-pill">dzulux-1.0-beta-x86_64.iso</span> dentro de la USB.</li>
+    <li><strong>Rufus (Windows)</strong>: Abre Rufus, selecciona tu memoria USB, elige el archivo ISO de Dzulux y presiona <em>Empezar</em> (en modo ISO o DD).</li>
+    <li><strong>BalenaEtcher (Windows / Mac / Linux)</strong>: Selecciona <em>Flash from file</em>, elige la ISO, tu USB y presiona <em>Flash!</em>.</li>
+  </ul>
+
+  <!-- Salto de página para que quede como un libro/guía perfecto -->
+  <div class="page-break"></div>
+
+  <!-- Sección 3: Arranque y Modo Dual -->
+  <h2>🔄 Paso 2: Menú de Inicio y Modo Dual</h2>
+  <p>Conecta la memoria USB al equipo y enciéndelo presionando la tecla de selección de arranque (<strong>F12</strong>, <strong>F11</strong> o <strong>F8</strong> en PC; o manteniendo presionada la tecla <strong>Option / Alt</strong> en Mac). Verás el menú oficial de Dzulux con las siguientes opciones:</p>
+
+  <div class="card">
+    <strong>1. Dzulux Linux (Modo Gráfico / Desktop):</strong><br>
+    Inicia directamente el entorno visual moderno basado en XFCE personalizado con tema oscuro, fuentes estilizadas y wallpapers oficiales. Consumo aproximado de solo 550 MB de RAM.
+  </div>
+
+  <div class="card">
+    <strong>2. Dzulux Linux (Modo Terminal / Servidor CLI):</strong><br>
+    Inicia en modo consola pura de alta velocidad, inspirado en la estabilidad y herramientas de <em>Ubuntu Server</em> (incluye OpenSSH, UFW, tmux, fastfetch y nmtui). Consume apenas 150 MB de RAM.
+  </div>
+
+  <div class="card">
+    <strong>3. Iniciar Windows Boot Manager (Disco Local):</strong><br>
+    Te permite arrancar directamente el Windows o sistema que ya tienes instalado en tu disco duro si necesitas usarlo sin desconectar la USB.
+  </div>
+
+  <!-- Sección 4: Instalación y Dual Boot -->
+  <h2>⚙️ Paso 3: Instalación con Soporte Dual Boot</h2>
+  <p>Para instalar Dzulux en tu disco duro, solo abre el acceso directo en el escritorio o escribe en la terminal:</p>
+  <p><span class="code-pill">sudo dzulux-installer</span></p>
+
+  <p>El instalador es completamente interactivo y te preguntará cómo deseas configurarlo:</p>
+  <ul>
+    <li><strong>Modo Dual Boot (Recomendado si ya tienes Windows o Mac)</strong>: Mantiene intacto tu sistema operativo original. Dzulux se instalará en una partición dedicada compartiendo la partición EFI de arranque. Al reiniciar, podrás elegir cada vez si quieres entrar a Dzulux o a Windows/Mac.</li>
+    <li><strong>Modo Limpio</strong>: Reemplaza todo el disco para uso exclusivo de Dzulux Linux.</li>
+  </ul>
+
+  <!-- Sección 5: Comandos Rápidos -->
+  <h2>📋 Resumen de Comandos Rápidos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Comando</th>
+        <th>¿Para qué sirve?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">dzulux-installer</span></td>
+        <td>Inicia el instalador interactivo paso a paso.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">switch-mode gui</span></td>
+        <td>Inicia el entorno de escritorio gráfico XFCE.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">switch-mode cli</span></td>
+        <td>Regresa a la terminal / consola pura.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">nmtui</span></td>
+        <td>Configura y conecta redes Wi-Fi mediante interfaz visual en consola.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">hw-detect</span></td>
+        <td>Muestra el diagnóstico de tus tarjetas gráficas, audio y batería.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">fastfetch</span></td>
+        <td>Despliega el resumen de componentes y la firma de Alfredo Dzul.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <strong>Dzulux Linux 1.0 (Beta)</strong> — Creado y Diseñado con dedicación por <strong>Alfredo Dzul</strong>.<br>
+    Repositorio Oficial y Soporte: <u>https://github.com/Alfredo2364/Linux</u>
+  </div>
+
+</body>
+</html>

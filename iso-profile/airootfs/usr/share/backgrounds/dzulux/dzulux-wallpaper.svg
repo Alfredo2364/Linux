@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#04060a" />
+    </radialGradient>
+    <linearGradient id="cyanBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#4facfe" stop-opacity="0.85" />
+    </linearGradient>
+    <linearGradient id="purpleRoyal" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4e54c8" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#8f94fb" stop-opacity="0.5" />
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="30" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bgGrad)" />
+
+  <circle cx="960" cy="480" r="340" fill="url(#cyanBlue)" filter="url(#softGlow)" opacity="0.14" />
+  <circle cx="1240" cy="620" r="300" fill="url(#purpleRoyal)" filter="url(#softGlow)" opacity="0.12" />
+
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1.5" fill="none">
+    <polygon points="960,180 1380,820 540,820" />
+    <polygon points="960,260 1280,760 640,760" />
+    <line x1="80" y1="940" x2="1840" y2="940" stroke-opacity="0.08" />
+  </g>
+
+  <g transform="translate(865, 330)">
+    <path d="M 95 20 L 185 180 L 145 180 L 95 90 L 45 180 L 5 180 Z" fill="url(#cyanBlue)" filter="url(#softGlow)" />
+    <path d="M 60 105 L 130 105 L 70 165 L 135 165" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="95" cy="50" r="8" fill="#ffffff" />
+  </g>
+
+  <text x="960" y="580" text-anchor="middle" font-family="'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="68" font-weight="900" fill="#ffffff" letter-spacing="6">
+    DZUL<tspan fill="#00f2fe">UX</tspan>
+  </text>
+  
+  <text x="960" y="620" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" fill="#718096" letter-spacing="5">
+    EQUILIBRIO • RENDIMIENTO • DUAL MODE (GUI / CLI)
+  </text>
+
+  <g transform="translate(810, 645)">
+    <rect width="300" height="34" rx="17" fill="#111827" stroke="#1f2d42" stroke-width="1.5" />
+    <text x="150" y="22" text-anchor="middle" font-family="'Segoe UI', Roboto, monospace" font-size="13" font-weight="700" fill="#00f2fe" letter-spacing="1">
+      DISEÑADO POR ALFREDO DZUL
+    </text>
+  </g>
+
+  <text x="60" y="1030" font-family="'Segoe UI', Roboto, monospace" font-size="14" fill="#3b485d">
+    Dzulux Linux OS 1.0 (Beta) — Compatible con PC, Laptops &amp; Apple Mac x86_64
+  </text>
+  <text x="1860" y="1030" text-anchor="end" font-family="'Segoe UI', Roboto, monospace" font-size="14" fill="#3b485d">
+    Arch Linux Base System
+  </text>
+</svg>

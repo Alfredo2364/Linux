@@ -1,0 +1,12 @@
+[Unit]
+Description=Inicializacion del Entorno Live de Dzulux Linux (Alfredo Dzul)
+Before=lightdm.service display-manager.service
+After=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/dzulux-live-init
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

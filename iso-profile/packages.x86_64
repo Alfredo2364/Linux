@@ -1,0 +1,145 @@
+# ==============================================================================
+# Equalrch Linux - Lista Maestra de Paquetes (packages.x86_64)
+# Diseñado y Personalizado por Alfredo Dzul
+# Arquitectura: x86_64 (PC, Laptops & Apple Mac Intel)
+# ==============================================================================
+
+# --- Sistema Base y Kernel ---
+base
+base-devel
+linux
+linux-headers
+linux-firmware
+
+# --- Firmware Especializado (Laptops y Apple Mac) ---
+sof-firmware              # Esencial para audio y micrófonos en laptops Intel/AMD modernas
+alsa-firmware             # Firmware para tarjetas de sonido integradas y dedicadas
+alsa-ucm-conf             # Perfiles de casos de uso ALSA (MacBook, Dell XPS, ThinkPad)
+broadcom-wl-dkms          # Wi-Fi Broadcom usado en Apple MacBook, MacBook Pro y Air
+b43-fwcutter              # Extractor de firmware para tarjetas Wi-Fi legacy
+wireless-regdb            # Base de datos regulatoria inalámbrica
+
+# --- Controladores Gráficos y Aceleración (Intel / AMD / NVIDIA) ---
+mesa                      # Implementación de OpenGL / Vulkan de código abierto
+lib32-mesa                # Compatibilidad de 32 bits para juegos y emuladores
+vulkan-icd-loader
+lib32-vulkan-icd-loader
+
+# AMD
+xf86-video-amdgpu
+vulkan-radeon
+lib32-vulkan-radeon
+libva-mesa-driver
+
+# Intel
+vulkan-intel
+lib32-vulkan-intel
+intel-media-driver        # Aceleración por hardware VAAPI para Intel HD/UHD/Iris
+
+# NVIDIA & Gráficos Híbridos
+nvidia-dkms               # Módulos del kernel NVIDIA compilados dinámicamente
+nvidia-utils              # Utilidades y bibliotecas de NVIDIA
+lib32-nvidia-utils
+nvidia-settings           # Panel de control de NVIDIA
+opencl-nvidia             # Aceleración de cómputo GPU
+nvidia-prime              # Herramienta para alternar GPU integrada/dedicada en laptops
+xf86-video-nouveau        # Driver libre de NVIDIA (fallback)
+
+# Drivers de Pantalla Genéricos
+xf86-video-vesa
+xf86-video-fbdev
+
+# --- Gestión de Laptops, Batería y Periféricos ---
+tlp                       # Optimización avanzada de batería en portátiles
+tlp-rdw                   # Asistente de dispositivos de radio para TLP
+acpid                     # Demonio de eventos ACPI (tapa de laptop, botones)
+upower                    # Detección y métricas de batería
+brightnessctl             # Control de brillo de pantalla por teclas de función Fn
+thermald                  # Demonio de control térmico para procesadores Intel
+libinput                  # Controlador moderno para touchpads, ratones y pantallas táctiles
+xf86-input-libinput
+
+# --- Pila Moderna de Audio (PipeWire) ---
+pipewire
+pipewire-audio
+pipewire-alsa
+pipewire-pulse
+pipewire-jack
+wireplumber               # Gestor de sesiones de PipeWire
+pavucontrol               # Mezclador gráfico de control de volumen
+pamixer                   # Control de volumen por línea de comandos
+alsa-utils                # Utilidades de diagnóstico de audio
+
+# --- Redes y Conectividad Inalámbrica ---
+networkmanager            # Gestor integral de conexiones de red
+network-manager-applet    # Icono en bandeja del sistema para WiFi/Ethernet
+iwd                       # Demonio inalámbrico moderno y veloz
+wpa_supplicant
+bluez                     # Pila de Bluetooth
+bluez-utils               # Utilidades de terminal para emparejamiento Bluetooth
+blueman                   # Gestor visual de Bluetooth
+
+# --- Entorno Gráfico Equilibrado (XFCE Optimizado) ---
+xorg-server
+xorg-xinit
+xorg-xrandr
+lightdm                   # Display Manager ligero y elegante
+lightdm-gtk-greeter       # Pantalla de inicio de sesión gráfica
+lightdm-gtk-greeter-settings
+xfce4                     # Entorno de escritorio XFCE
+xfce4-goodies             # Plugins de panel, monitor de batería, etc.
+xfce4-terminal            # Terminal gráfica de XFCE
+thunar                    # Gestor de archivos veloz
+thunar-archive-plugin
+file-roller               # Gestor de archivos comprimidos (zip, tar, 7z)
+mousepad                  # Editor de texto gráfico ligero
+firefox                   # Navegador web moderno
+
+# --- Temas, Fuentes y Estética Visual ---
+arc-gtk-theme             # Tema moderno oscuro y equilibrado
+papirus-icon-theme        # Colección de iconos vectoriales modernos
+ttf-inter                 # Tipografía de alta legibilidad en pantalla
+ttf-jetbrains-mono-nerd   # Tipografía con iconos para terminal y código
+noto-fonts                # Soporte tipográfico universal
+
+# --- Herramientas de Terminal (TUI / CLI) ---
+bash-completion
+zsh
+fastfetch                 # Pantalla de bienvenida con información de Equalrch
+btop                      # Monitor de recursos visual e interactivo en terminal
+htop
+micro                     # Editor de texto moderno con atajos Ctrl+C / Ctrl+V
+nano
+vim
+dialog                    # Creador de interfaces de diálogo para el instalador
+whiptail
+git
+curl
+wget
+rsync
+sudo
+tree
+pciutils                  # lspci (detección de hardware)
+usbutils                  # lsusb
+lshw                      # Información detallada del equipo
+inxi                      # Diagnóstico completo de componentes y drivers
+
+# --- Suite de Servidor y Redes (Inspirado en Ubuntu Server) ---
+openssh                   # Servidor y cliente SSH para administración remota
+ufw                       # Cortafuegos intuitivo (el mismo de Ubuntu Server: ufw allow ssh)
+tmux                      # Multiplexor de terminales para mantener sesiones abiertas
+net-tools                 # Comandos de red clásicos (ifconfig, netstat)
+bind-tools                # Herramientas de consulta DNS (dig, nslookup)
+
+# --- Sistemas de Archivos y Particionado ---
+parted
+gparted                   # Editor gráfico de particiones
+dosfstools                # Soporte para FAT32 (particiones EFI)
+e2fsprogs                 # Soporte para ext4
+btrfs-progs               # Soporte para Btrfs
+ntfs-3g                   # Soporte para NTFS (discos externos Windows)
+exfatprogs                # Soporte para discos exFAT
+arch-install-scripts      # pacstrap, genfstab y arch-chroot para equalrch-installer
+efibootmgr                # Modificación de entradas de arranque UEFI
+grub                      # Gestor de arranque universal
+os-prober                 # Detección de otros sistemas operativos (Dual Boot)

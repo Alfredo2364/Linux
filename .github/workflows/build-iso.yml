@@ -87,7 +87,7 @@ jobs:
           fi
           
           cd paquete_distribucion
-          zip -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
+          zip -9 -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
           cd ..
           
           echo "==> Contenido final del paquete de descarga:"
@@ -101,7 +101,7 @@ jobs:
           retention-days: 14
 
       - name: Publicar Release Oficial y Enlace de Descarga Directa (1 Clic)
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: "v1.0-beta"
           files: |

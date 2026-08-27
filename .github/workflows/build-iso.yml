@@ -87,9 +87,22 @@ jobs:
           fi
           
           cd paquete_distribucion
-          zip -9 -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
+          zip -0 -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
           cd ..
           
+          # Verificación automática de tamaño para cumplir con el límite de 2 GiB de GitHub Release
+          for f in output/*; do
+            if [ -f "$f" ]; then
+              FSIZE=$(stat -c%s "$f")
+              echo "Archivo: $f -> $FSIZE bytes"
+              if [ "$FSIZE" -ge 2147483640 ]; then
+                echo "⚠️ El archivo $f excede 2 GiB ($FSIZE bytes). Dividiendo en partes para permitir la subida..."
+                split -b 1800M "$f" "${f}.part"
+                rm "$f"
+              fi
+            fi
+          done
+
           echo "==> Contenido final del paquete de descarga:"
           ls -lh output/
 
@@ -97,18 +110,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Dzulux-Linux-1.0-Beta-Paquete-Completo
-          path: output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip
+          path: output/
           retention-days: 14
 
       - name: Publicar Release Oficial y Enlace de Descarga Directa (1 Clic)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v1.0-beta"
-          files: |
-            output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip
-            output/*.iso
-            output/Guia_y_Agradecimientos_Dzulux.pdf
-            output/sha256sum.txt
+          files: output/*
           name: "Dzulux Linux 1.0 (Beta) - Descarga Oficial"
           body: |
             # ⚡ Dzulux Linux v1.0 (Beta)

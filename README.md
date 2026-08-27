@@ -17,6 +17,18 @@
   <img src="https://img.shields.io/badge/Modo-Dual%20(GUI%20%7C%20CLI)-blueviolet?style=for-the-badge" alt="Dual Mode"/>
 </p>
 
+<p align="center">
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip">
+    <img src="https://img.shields.io/badge/📥%20DESCARGAR%20DZULUX%20LINUX%20(1%20CLIC)-PAQUETE%20COMPLETO%20[ISO%20+%20GUÍA%20PDF]-00f2fe?style=for-the-badge&logo=linux&logoColor=black" alt="Descargar Dzulux Linux"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso">💿 Descargar solo archivo .ISO</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
+  <a href="https://alfredo2364.github.io/Linux/">🌐 Ver Sitio Web Oficial</a>
+</p>
+
 ---
 
 ## ⚠️ Aviso Importante: Versión en Estado BETA

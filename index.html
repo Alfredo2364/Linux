@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dzulux Linux — Sistema Operativo Dual (Diseñado por Alfredo Dzul)</title>
+  <meta name="description" content="Dzulux Linux es una distribución basada en Arch Linux, equilibrada, con arranque Dual (Gráfico / Terminal) y compatibilidad universal para PC, Laptops y Mac. Diseñado por Alfredo Dzul.">
+  <link rel="icon" type="image/svg+xml" href="artwork/dzulux-logo.svg">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #111827;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan-neon: #00f2fe;
+      --blue-accent: #4facfe;
+      --blue-deep: #4364f7;
+      --border-color: #1e293b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    /* Navbar */
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(9, 13, 22, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-logo span {
+      color: var(--cyan-neon);
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--cyan-neon);
+    }
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 19px;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 36px;
+    }
+    /* Big Download Buttons (Ubuntu Style) */
+    .download-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 36px 30px;
+      max-width: 650px;
+      margin: 0 auto 50px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .btn-main-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      background: linear-gradient(135deg, #00f2fe 0%, #3a7bd5 100%);
+      color: #050811;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 18px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(0, 242, 254, 0.35);
+    }
+    .btn-main-download:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0, 242, 254, 0.5);
+    }
+    .download-meta {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .download-alt {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-sub {
+      color: var(--cyan-neon);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-sub:hover {
+      text-decoration: underline;
+    }
+    /* Features Grid */
+    .features {
+      padding: 60px 0;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(0, 242, 254, 0.4);
+    }
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+    }
+    /* Specs / Requirements */
+    .specs-box {
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 40px 0;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      text-align: center;
+    }
+    .spec-item h4 {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .spec-item p {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 4px;
+    }
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    footer a {
+      color: var(--cyan-neon);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Navegación -->
+  <header>
+    <div class="container nav-content">
+      <a href="#" class="nav-logo">DZUL<span>UX</span></a>
+      <div class="nav-links">
+        <a href="#caracteristicas">Características</a>
+        <a href="#requisitos">Requisitos</a>
+        <a href="https://github.com/Alfredo2364/Linux" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sección Principal (Hero) -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span>⚡ VERSIÓN 1.0 BETA DISPONIBLE</span>
+      </div>
+      <h1>El Sistema Operativo <span>Equilibrado</span></h1>
+      <p>
+        Diseñado por <strong>Alfredo Dzul</strong>. Arranque Dual (Gráfico o Terminal estilo Ubuntu Server), controladores integrados para Intel, AMD, NVIDIA, Apple Mac y Laptops, con soporte nativo de Dual Boot.
+      </p>
+
+      <!-- Cuadro de Descarga Principal al estilo Ubuntu (1 Clic) -->
+      <div class="download-box">
+        <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip" class="btn-main-download">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar Dzulux Linux 1.0 (Beta)
+        </a>
+        <div class="download-meta">
+          <span>📦 Paquete Completo (ISO + Guía PDF)</span>
+          <span>⚡ Arquitectura: x86_64</span>
+          <span>🔒 SHA256 Incluido</span>
+        </div>
+
+        <div class="download-alt">
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso" class="btn-sub">
+            💿 Descargar solo archivo .ISO
+          </a>
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf" class="btn-sub" target="_blank">
+            📄 Leer Guía y Agradecimientos en PDF
+          </a>
+        </div>
+      </div>
+
+      <!-- Requisitos del Sistema -->
+      <div class="specs-box" id="requisitos">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <h4>Procesador</h4>
+            <p>64-bit (Intel o AMD)</p>
+          </div>
+          <div class="spec-item">
+            <h4>Memoria RAM</h4>
+            <p>2 GB (Recomendado 4 GB)</p>
+          </div>
+          <div class="spec-item">
+            <h4>Almacenamiento</h4>
+            <p>20 GB de espacio libre</p>
+          </div>
+          <div class="spec-item">
+            <h4>Medio de Instalación</h4>
+            <p>USB de 4 GB o más</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Características Principales -->
+  <section class="features" id="caracteristicas">
+    <div class="container">
+      <div class="features-grid">
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3>Concepto Dual Único</h3>
+          <p>Elige en cada encendido si quieres iniciar en <strong>Modo Gráfico</strong> (XFCE ligero y moderno) o en <strong>Modo Terminal</strong> (servidor de alto rendimiento). Puedes alternar entre ambos al vuelo con el comando <code style="color:var(--cyan-neon)">switch-mode</code>.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🪟</div>
+          <h3>Soporte Dual Boot</h3>
+          <p>¿Tienes Windows o macOS en tu computadora? Dzulux no lo borra. Su instalador guiado configura el menú de inicio para que elijas entre Windows y Dzulux cada vez que prendas el equipo.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎮</div>
+          <h3>Controladores Out-of-the-Box</h3>
+          <p>Drivers completos para tarjetas <strong>Intel</strong>, <strong>AMD Radeon</strong> y <strong>NVIDIA</strong> (DKMS con Prime para laptops). Además de soporte para Wi-Fi Broadcom en computadoras <strong>Apple Mac</strong>.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔋</div>
+          <h3>Optimizado para Laptops</h3>
+          <p>Gestión avanzada de batería con <strong>TLP</strong>, control de brillo nativo con <code style="color:var(--cyan-neon)">brightnessctl</code> y audio moderno <strong>PipeWire</strong> con firmware SOF para altavoces y micrófonos de última generación.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🖥️</div>
+          <h3>Terminal Estilo Ubuntu Server</h3>
+          <p>Para tus proyectos, servidores, Docker o Tailscale. Incluye OpenSSH, cortafuegos UFW, tmux y configuración de red visual con <code style="color:var(--cyan-neon)">nmtui</code> sin consumir más de 150 MB de RAM.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Instalador Amigable</h3>
+          <p>Con <code style="color:var(--cyan-neon)">dzulux-installer</code> no necesitas comandos difíciles. El asistente en español te va explicando con claridad cada opción antes de hacer cualquier cambio.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Pie de Página -->
+  <footer>
+    <div class="container">
+      <p><strong>Dzulux Linux 1.0 (Beta)</strong> — Diseñado y Creado por <strong>Alfredo Dzul</strong>.</p>
+      <p style="margin-top: 8px;">Código abierto basado en Arch Linux. Código disponible en <a href="https://github.com/Alfredo2364/Linux" target="_blank">GitHub</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

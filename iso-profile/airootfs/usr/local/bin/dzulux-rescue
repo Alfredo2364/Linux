@@ -21,122 +21,260 @@ else
     UI=""
 fi
 
-main_menu() {
-    if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux Rescue - Rescate y Diagnóstico (Alfredo Dzul)" --menu \
-"Selecciona una herramienta de rescate:" 16 70 4 \
-"1" "🔑 Quitar Contraseña Olvidada de Windows (SAM Reset)" \
-"2" "📂 Rescatar Archivos de Partición Windows Dañada" \
-"3" "🩺 Auditoría de Salud del Disco Duro (S.M.A.R.T.)" \
-"4" "Salir" 3>&1 1>&2 2>&3)
-    else
-        clear
-        echo -e "${CYAN}${BOLD}=== DZULUX RESCUE - HERRAMIENTAS DE EMERGENCIA ===${NC}"
-        echo -e "Diseñado por Alfredo Dzul\n"
-        echo "1) Quitar Contraseña de Windows Olvidada"
-        echo "2) Rescatar Archivos de Partición Windows"
-        echo "3) Auditoría de Salud de Disco (S.M.A.R.T.)"
-        echo "4) Salir"
-        read -p "Elige una opción (1-4): " CHOICE
+verificar_root() {
+    if [ "$(id -u)" -ne 0 ]; then
+        echo -e "${YELLOW}dzulux-rescue requiere permisos de administrador para acceder a particiones físicas.${NC}"
+        exec sudo "$0" "$@"
     fi
-
-    case "$CHOICE" in
-        1) reset_windows_password ;;
-        2) rescue_windows_files ;;
-        3) check_disk_health ;;
-        *) exit 0 ;;
-    esac
 }
 
+main_menu() {
+    while true; do
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Rescue - Centro de Rescate y Diagnóstico (Alfredo Dzul)" --menu \
+"Herramientas de recuperación para discos, particiones y sistemas Windows dañados:" 18 74 5 \
+"1" "📂 Rescatar Archivos Personales (Montaje Seguro Solo Lectura)" \
+"2" "🔑 Quitar Contraseña Olvidada de Windows (SAM Reset con chntpw)" \
+"3" "🩺 Auditoría de Salud Física de Discos (S.M.A.R.T.)" \
+"4" "⏏️ Desmontar Particiones de Rescate (/mnt/windows_rescue)" \
+"5" "🚪 Salir" 3>&1 1>&2 2>&3 || echo "5")
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX RESCUE - SUITE DE RECUPERACIÓN Y SALVAMENTO ===${NC}"
+            echo -e "Diseñado y Creado por Alfredo Dzul\n"
+            echo "1) Rescatar Archivos Personales (Montaje Seguro Solo Lectura)"
+            echo "2) Quitar Contraseña Olvidada de Windows (SAM Reset)"
+            echo "3) Auditoría de Salud Física de Discos (S.M.A.R.T.)"
+            echo "4) Desmontar Particiones de Rescate"
+            echo "5) Salir"
+            echo ""
+            read -p "Elige una opción [1-5]: " CHOICE
+        fi
+
+        case "$CHOICE" in
+            1) rescue_files ;;
+            2) reset_windows_password ;;
+            3) check_disk_health ;;
+            4) unmount_rescue ;;
+            5|*) 
+                clear
+                echo "¡Hasta luego!"
+                exit 0 
+                ;;
+        esac
+    done
+}
+
+# ------------------------------------------------------------------------------
+# 1. RESCATE DE ARCHIVOS PERSONALES
+# ------------------------------------------------------------------------------
+rescue_files() {
+    clear
+    echo -e "${CYAN}${BOLD}Escaneando discos y particiones de almacenamiento...${NC}"
+    
+    # Buscar particiones NTFS, exFAT, EXT4, FAT32
+    PARTS_RAW=$(lsblk -lno NAME,SIZE,FSTYPE,LABEL | grep -iE "ntfs|vfat|exfat|ext4|btrfs" || true)
+
+    if [ -z "$PARTS_RAW" ]; then
+        msg_box "Error" "No se detectaron particiones de almacenamiento en este equipo."
+        return
+    fi
+
+    PART_ITEMS=()
+    while read -r line; do
+        DEV_NAME=$(echo "$line" | awk '{print $1}')
+        DEV_INFO=$(echo "$line" | cut -d' ' -f2-)
+        PART_ITEMS+=("/dev/${DEV_NAME}" "${DEV_INFO}")
+    done <<< "$PARTS_RAW"
+
+    if [ -n "$UI" ]; then
+        SELECTED_PART=$($UI --title "Rescate de Archivos: Selecciona Partición" --menu \
+"Selecciona la partición de donde deseas rescatar tus documentos, fotos o tareas:\n(Se montará en modo de solo lectura seguro para no dañar tus archivos)" 18 74 6 \
+"${PART_ITEMS[@]}" 3>&1 1>&2 2>&3 || echo "")
+    else
+        echo "Particiones encontradas:"
+        for ((i=0; i<${#PART_ITEMS[@]}; i+=2)); do
+            echo "$((i/2 + 1))) ${PART_ITEMS[i]} (${PART_ITEMS[i+1]})"
+        done
+        read -p "Selecciona el número de partición: " NUM
+        INDEX=$(( (NUM - 1) * 2 ))
+        SELECTED_PART="${PART_ITEMS[INDEX]:-}"
+    fi
+
+    if [ -z "$SELECTED_PART" ]; then
+        return
+    fi
+
+    MOUNT_POINT="/mnt/windows_rescue"
+    mkdir -p "$MOUNT_POINT"
+    umount "$MOUNT_POINT" 2>/dev/null || true
+
+    echo -e "${YELLOW}Montando ${SELECTED_PART} en ${MOUNT_POINT} (Modo Seguro Solo Lectura)...${NC}"
+    
+    # Intentar montar con soporte NTFS-3G y remover dirty bit/hibernación de Windows si es necesario
+    if mount -o ro "$SELECTED_PART" "$MOUNT_POINT" 2>/dev/null || \
+       mount -t ntfs-3g -o ro,remove_hiberfile "$SELECTED_PART" "$MOUNT_POINT" 2>/dev/null || \
+       ntfs-3g -o ro "$SELECTED_PART" "$MOUNT_POINT" 2>/dev/null; then
+        
+        echo -e "${GREEN}${BOLD}✓ ¡Partición montada con éxito en ${MOUNT_POINT}!${NC}"
+
+        TARGET_OPEN="$MOUNT_POINT"
+        if [ -d "${MOUNT_POINT}/Users" ]; then
+            TARGET_OPEN="${MOUNT_POINT}/Users"
+            echo -e "  * Se detectó la carpeta de usuarios de Windows: ${GREEN}${TARGET_OPEN}${NC}"
+        fi
+
+        # Si estamos en entorno gráfico XFCE, abrir el administrador de archivos Thunar
+        if [ -n "${DISPLAY:-}" ] && command -v thunar >/dev/null 2>&1; then
+            # Abrir como usuario normal si existe liveuser
+            if id -u liveuser >/dev/null 2>&1; then
+                su - liveuser -c "thunar '${TARGET_OPEN}' &" 2>/dev/null || thunar "$TARGET_OPEN" &
+            else
+                thunar "$TARGET_OPEN" &
+            fi
+        fi
+
+        msg_box "Partición Montada con Éxito" \
+"¡La partición ${SELECTED_PART} está lista en modo seguro!\n\n\
+Ubicación de rescate: ${TARGET_OPEN}\n\n\
+INSTRUCCIONES DE USO:\n\
+1. Conecta otra memoria USB externa o disco externo a tu equipo.\n\
+2. En el explorador de archivos Thunar que se acaba de abrir, copia tus fotos, documentos y carpetas.\n\
+3. Pégalos en tu otra memoria USB externa.\n\
+4. Al terminar, regresa a este menú y selecciona la opción 4 ('Desmontar') para desconectar todo limpiamente."
+    else
+        msg_box "Fallo de Montaje" "No se pudo montar la partición ${SELECTED_PART}.\nSi el disco tiene sectores dañados graves, ejecuta la opción 3 (Auditoría S.M.A.R.T.)."
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# 2. QUITAR CONTRASEÑA DE WINDOWS
+# ------------------------------------------------------------------------------
 reset_windows_password() {
     clear
-    echo -e "${CYAN}${BOLD}Buscando instalaciones de Windows en tus discos...${NC}"
+    echo -e "${CYAN}${BOLD}Buscando particiones con sistema Windows instalado...${NC}"
     
-    WIN_PARTS="$(lsblk -lno NAME,FSTYPE | grep -iE "ntfs|vfat" | awk '{print "/dev/"$1}' || true)"
+    WIN_PARTS=$(lsblk -lno NAME,FSTYPE | grep -iE "ntfs|vfat" | awk '{print "/dev/"$1}' || true)
     if [ -z "$WIN_PARTS" ]; then
-        echo -e "${RED}No se encontraron particiones NTFS de Windows.${NC}"
-        read -p "Presiona ENTER para volver..." _
-        main_menu
+        msg_box "Sin Particiones" "No se encontraron particiones NTFS de Windows en este equipo."
         return
     fi
 
     TARGET_SAM=""
+    WIN_PART_FOUND=""
+    TEMP_MNT="/tmp/win_sam_mnt"
+    mkdir -p "$TEMP_MNT"
+
     for p in $WIN_PARTS; do
-        sudo mkdir -p /tmp/win_mnt
-        if sudo mount -o ro "$p" /tmp/win_mnt 2>/dev/null; then
-            if [ -f "/tmp/win_mnt/Windows/System32/config/SAM" ]; then
-                TARGET_SAM="/tmp/win_mnt/Windows/System32/config/SAM"
+        umount "$TEMP_MNT" 2>/dev/null || true
+        if mount -o ro "$p" "$TEMP_MNT" 2>/dev/null || mount -t ntfs-3g -o ro,remove_hiberfile "$p" "$TEMP_MNT" 2>/dev/null; then
+            # Buscar archivo SAM en Windows/System32/config (respetando mayúsculas/minúsculas)
+            SAM_FILE="$(find "$TEMP_MNT" -maxdepth 4 -ipath "*/system32/config/sam" 2>/dev/null | head -n1 || true)"
+            if [ -n "$SAM_FILE" ] && [ -f "$SAM_FILE" ]; then
+                TARGET_SAM="$SAM_FILE"
                 WIN_PART_FOUND="$p"
-                sudo umount /tmp/win_mnt
-                sudo mount -o rw "$p" /tmp/win_mnt
+                umount "$TEMP_MNT"
                 break
             fi
-            sudo umount /tmp/win_mnt 2>/dev/null || true
+            umount "$TEMP_MNT" 2>/dev/null || true
         fi
     done
 
-    if [ -n "$TARGET_SAM" ]; then
-        echo -e "${GREEN}¡Partición de Windows encontrada en ${WIN_PART_FOUND}!${NC}"
-        echo -e "Ejecutando chntpw para restablecer contraseña...\n"
-        cd /tmp/win_mnt/Windows/System32/config/
-        sudo chntpw -u Administrator SAM 2>/dev/null || sudo chntpw -i SAM
-        cd /
-        sudo umount /tmp/win_mnt
-        echo -e "\n${GREEN}${BOLD}✓ ¡Contraseña de Windows actualizada / eliminada con éxito!${NC}"
-    else
-        echo -e "${YELLOW}No se pudo localizar el archivo SAM de Windows.${NC}"
-    fi
-
-    read -p "Presiona ENTER para volver..." _
-    main_menu
-}
-
-rescue_windows_files() {
-    clear
-    echo -e "${CYAN}${BOLD}Montando particiones de Windows en modo de solo lectura seguro...${NC}"
-    WIN_PARTS="$(lsblk -lno NAME,FSTYPE | grep -i "ntfs" | awk '{print "/dev/"$1}' || true)"
-    
-    if [ -z "$WIN_PARTS" ]; then
-        echo -e "${RED}No se encontraron particiones NTFS.${NC}"
-        read -p "Presiona ENTER para volver..." _
-        main_menu
+    if [ -z "$TARGET_SAM" ] || [ -z "$WIN_PART_FOUND" ]; then
+        msg_box "No Encontrado" "No se pudo localizar el archivo de cuentas SAM de Windows en los discos analizados."
         return
     fi
 
-    sudo mkdir -p /mnt/windows_rescue
-    for p in $WIN_PARTS; do
-        if sudo mount -o ro "$p" /mnt/windows_rescue 2>/dev/null; then
-            echo -e "${GREEN}✓ Partición $p montada en /mnt/windows_rescue${NC}"
-            if command -v thunar >/dev/null 2>&1 && [ -n "${DISPLAY:-}" ]; then
-                thunar /mnt/windows_rescue &
-            fi
-            echo "Puedes copiar tus fotos y tareas desde /mnt/windows_rescue hacia otra memoria USB."
-            break
-        fi
-    done
+    # Montar en lectura y escritura para permitir el cambio de contraseña
+    umount "$TEMP_MNT" 2>/dev/null || true
+    if ! mount -t ntfs-3g -o remove_hiberfile "$WIN_PART_FOUND" "$TEMP_MNT" 2>/dev/null && ! mount "$WIN_PART_FOUND" "$TEMP_MNT" 2>/dev/null; then
+        msg_box "Error de Escritura" "La partición de Windows está bloqueada por hibernación rápida.\nSe intentó liberar pero el disco requiere arranque limpio."
+        return
+    fi
 
-    read -p "Presiona ENTER para volver..." _
-    main_menu
+    SAM_PATH="$(find "$TEMP_MNT" -maxdepth 4 -ipath "*/system32/config/sam" 2>/dev/null | head -n1)"
+    SAM_DIR="$(dirname "$SAM_PATH")"
+
+    clear
+    echo -e "${GREEN}${BOLD}¡Instalación de Windows localizada en ${WIN_PART_FOUND}!${NC}"
+    echo -e "Abriendo el editor de cuentas de Windows (chntpw)...\n"
+    echo -e "${YELLOW}INSTRUCCIONES RÁPIDAS EN CHNTPW:${NC}"
+    echo "1. Selecciona el número del usuario de Windows que deseas desbloquear."
+    echo "2. Presiona '1' para dejar la contraseña en blanco (sin contraseña)."
+    echo "3. Presiona '2' si la cuenta estaba bloqueada para reactivarla."
+    echo "4. Presiona 'q' para salir y 'y' para guardar los cambios en el disco.\n"
+    read -p "Presiona ENTER para iniciar chntpw..." _
+
+    cd "$SAM_DIR"
+    chntpw -i SAM || true
+    cd /
+    umount "$TEMP_MNT" 2>/dev/null || true
+
+    msg_box "Operación Concluida" "El archivo de contraseñas SAM de Windows ha sido actualizado.\n\nAl encender Windows, tu cuenta ya no te pedirá clave o podrás entrar presionando ENTER."
 }
 
+# ------------------------------------------------------------------------------
+# 3. AUDITORÍA DE SALUD FÍSICA (S.M.A.R.T.)
+# ------------------------------------------------------------------------------
 check_disk_health() {
     clear
-    echo -e "${CYAN}${BOLD}Diagnóstico de Salud de Discos (S.M.A.R.T.):${NC}\n"
-    DISKS="$(lsblk -dno NAME,TYPE | grep -i "disk" | awk '{print "/dev/"$1}')"
+    DISKS=$(lsblk -dno NAME,TYPE,SIZE,MODEL | grep -i "disk" || true)
     
-    for d in $DISKS; do
-        echo -e "${YELLOW}Auditoría para ${d}:${NC}"
-        if command -v smartctl >/dev/null 2>&1; then
-            sudo smartctl -H "$d" 2>/dev/null | grep -E "result|status|passed|failed" || true
-            sudo smartctl -A "$d" 2>/dev/null | grep -iE "reallocated|temperature|power_on" || true
-        else
-            echo "smartctl no disponible en esta sesión."
-        fi
-        echo "-----------------------------------------------------"
-    done
+    if [ -z "$DISKS" ]; then
+        msg_box "Sin Discos" "No se encontraron discos físicos para diagnosticar."
+        return
+    fi
 
-    read -p "Presiona ENTER para volver..." _
-    main_menu
+    REPORT="REPORTE DE SALUD DE DISCOS Y SSDS (S.M.A.R.T.):\n==================================================================\n\n"
+
+    while read -r line; do
+        DEV_NAME=$(echo "$line" | awk '{print $1}')
+        DEV_DETAILS=$(echo "$line" | cut -d' ' -f2-)
+        DISK_PATH="/dev/${DEV_NAME}"
+
+        REPORT+="📦 Disco: ${DISK_PATH} [${DEV_DETAILS}]\n"
+        if command -v smartctl >/dev/null 2>&1; then
+            HEALTH_STATUS=$(smartctl -H "$DISK_PATH" 2>/dev/null | grep -iE "result|status|health" || echo "Estado: No disponible")
+            REALLOC_SECTORS=$(smartctl -A "$DISK_PATH" 2>/dev/null | grep -iE "reallocated_sector|wear_leveling" || echo "Sectores reasignados: 0")
+            TEMP=$(smartctl -A "$DISK_PATH" 2>/dev/null | grep -i "temperature_celsius" | awk '{print $10}' || echo "N/A")
+
+            REPORT+="   • Diagnóstico: ${HEALTH_STATUS}\n"
+            REPORT+="   • Sectores Dañados / Reasignados: ${REALLOC_SECTORS}\n"
+            [ "$TEMP" != "N/A" ] && REPORT+="   • Temperatura actual: ${TEMP} °C\n"
+        else
+            REPORT+="   • smartctl no disponible en esta sesión.\n"
+        fi
+        REPORT+="\n------------------------------------------------------------------\n\n"
+    done <<< "$DISKS"
+
+    if [ -n "$UI" ]; then
+        $UI --title "Diagnóstico de Discos S.M.A.R.T." --msgbox "${REPORT}" 20 76
+    else
+        echo -e "${CYAN}${REPORT}${NC}"
+        read -p "Presiona ENTER para volver..." _
+    fi
 }
 
+# ------------------------------------------------------------------------------
+# 4. DESMONTAR PARTICIONES DE RESCATE
+# ------------------------------------------------------------------------------
+unmount_rescue() {
+    umount -R /mnt/windows_rescue 2>/dev/null || true
+    umount -R /tmp/win_sam_mnt 2>/dev/null || true
+    umount -R /tmp/win_mnt 2>/dev/null || true
+    msg_box "Particiones Liberadas" "Todas las particiones de rescate han sido desmontadas de forma segura.\nPuedes desconectar tus memorias USB externas sin riesgo de pérdida de datos."
+}
+
+msg_box() {
+    local TITLE="$1"
+    local MSG="$2"
+    if [ -n "$UI" ]; then
+        $UI --title "${TITLE}" --msgbox "${MSG}" 16 74
+    else
+        echo -e "\n${GREEN}${BOLD}=== ${TITLE} ===${NC}\n${MSG}\n"
+        read -p "Presiona ENTER para continuar..." _
+    fi
+}
+
+verificar_root "$@"
 main_menu

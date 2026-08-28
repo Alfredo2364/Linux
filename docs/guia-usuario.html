@@ -502,19 +502,50 @@
     </div>
   </div>
 
-  <!-- Suite de Rescate de Windows -->
-  <h2>🚑 11. Herramienta de Rescate de Windows y Discos (`dzulux-rescue`)</h2>
+  <!-- Suite de Rescate de Windows y Salvamento de Datos -->
+  <h2>🚑 11. Herramienta de Rescate de Archivos, Windows y Discos (`dzulux-rescue`)</h2>
   <div class="tool-card red">
     <h3>¿Para qué sirve?</h3>
-    <p>Convierte a Dzulux en la herramienta de salvamento definitiva cuando Windows deja de iniciar, tiene pantalla azul o el usuario olvida la contraseña de su cuenta local.</p>
+    <p>Convierte a Dzulux Linux en una suite de salvamento forense profesional. Es la herramienta ideal cuando Windows no arranca, se queda en pantalla azul (BSOD), el disco duro tiene sectores dañados, o el usuario olvidó la contraseña de su cuenta local.</p>
 
-    <h3>¿Cómo usarlo?</h3>
-    <p>Abre <em>"Dzulux Rescue"</em> en el menú de aplicaciones o escribe en consola: <span class="code-pill">dzulux-rescue</span>.</p>
+    <h3>🛡️ ¿Por qué Dzulux lo hace más seguro? (El principio de Solo Lectura `ro`)</h3>
+    <p>Cuando un disco duro está fallando o Windows se corrompe, encender la computadora en Windows o montar el disco en modo normal de escritura (<span class="code-pill">rw</span>) activa utilidades destructivas como <em>chkdsk</em>, que frecuentemente eliminan fotos, documentos y carpetas enteras de forma irrecuperable. <strong>Dzulux monta la partición en Modo Seguro Solo Lectura (<span class="code-pill">ro</span>)</strong>, liberando los bloqueos de hibernación rápida de Windows sin alterar un solo byte de tus datos personales, garantizando que el 100% de tus archivos queden protegidos mientras los salvas.</p>
+
+    <h3>📖 Guía Paso a Paso: ¿Cómo rescatar tus archivos personales?</h3>
+    <ol class="step-list">
+      <li><strong>Paso 1:</strong> Arranca tu computadora con la memoria USB de Dzulux Linux y selecciona la opción 1 (Modo Gráfico).</li>
+      <li><strong>Paso 2:</strong> Abre el menú de aplicaciones y haz clic en <em>"Dzulux Rescue"</em> (o abre una terminal y escribe <span class="code-pill">sudo dzulux-rescue</span>).</li>
+      <li><strong>Paso 3:</strong> En el menú interactivo, selecciona la opción <strong>1) "Rescatar Archivos Personales"</strong>.</li>
+      <li><strong>Paso 4:</strong> El sistema escaneará tus unidades internas (M.2 NVMe, SSD, SATA, eMMC) y te mostrará una lista clara con el tamaño y formato de cada partición. Selecciona con las flechas del teclado la partición donde vive tu Windows o tus documentos.</li>
+      <li><strong>Paso 5:</strong> Dzulux montará la partición en <span class="code-pill">/mnt/windows_rescue</span> y abrirá automáticamente el explorador de archivos <strong>Thunar</strong> dentro de la carpeta <span class="code-pill">Users/</span> (donde están todas las cuentas y usuarios del equipo).</li>
+      <li><strong>Paso 6:</strong> Conecta una <strong>segunda memoria USB</strong> o disco duro externo en cualquier puerto libre de tu PC. Verás que aparece inmediatamente en la barra izquierda de Thunar.</li>
+      <li><strong>Paso 7:</strong> Entra a tu carpeta de usuario en Thunar y simplemente arrastra o copia tus carpetas críticas: <em>Escritorio, Documentos, Descargas, Imágenes, Vídeos y Música</em> hacia tu memoria USB externa.</li>
+      <li><strong>Paso 8:</strong> Al terminar de copiar tus archivos, regresa a la ventana de <em>Dzulux Rescue</em> y pulsa la opción <strong>4) "Desmontar Particiones de Rescate"</strong>. Esto libera las unidades para que puedas desconectar tus memorias USB con total seguridad sin corrupción de datos.</li>
+    </ol>
+
+    <h3>🔑 Guía Paso a Paso: ¿Cómo quitar o restablecer una contraseña olvidada de Windows?</h3>
+    <ol class="step-list">
+      <li>Inicia <em>Dzulux Rescue</em> y selecciona la opción <strong>2) "Quitar Contraseña Olvidada de Windows"</strong>.</li>
+      <li>El asistente escaneará tus discos, localizará la partición con Windows y montará el archivo de base de datos de cuentas <span class="code-pill">Windows/System32/config/SAM</span>.</li>
+      <li>Se ejecutará la utilidad oficial <span class="code-pill">chntpw</span>, desplegando la lista de todos los usuarios registrados (por ejemplo: <em>Administrator, Alfredo, Familia</em>).</li>
+      <li>Escribe el nombre o número del usuario que deseas desbloquear y presiona ENTER.</li>
+      <li>Presiona <span class="code-pill">1</span> para borrar la contraseña y dejarla completamente en blanco (sin contraseña).</li>
+      <li>Si la cuenta muestra la etiqueta <em>[LOCKED]</em>, presiona <span class="code-pill">2</span> para desbloquear la cuenta.</li>
+      <li>Presiona <span class="code-pill">q</span> para salir del editor y presiona <span class="code-pill">y</span> cuando te pregunte si deseas escribir los cambios en el disco.</li>
+      <li>Reinicia el equipo e inicia en Windows: entrarás directamente a tu escritorio sin que te solicite ninguna contraseña.</li>
+    </ol>
+
+    <h3>🩺 Guía Paso a Paso: Auditoría de Salud Física de Discos (S.M.A.R.T.)</h3>
+    <p>Selecciona la opción <strong>3) "Auditoría de Salud Física de Discos"</strong>. El asistente consultará los sensores de telemetría de tus unidades mediante <span class="code-pill">smartctl</span>:</p>
     <ul class="step-list">
-      <li><strong>🔑 1. Quitar Contraseña de Windows:</strong> Escanea tus particiones NTFS, localiza el archivo SAM de Windows y utiliza la utilidad <span class="code-pill">chntpw</span> para borrar o restablecer la contraseña de cualquier usuario local de Windows en menos de 10 segundos.</li>
-      <li><strong>📂 2. Rescatar Archivos Personales:</strong> Monta la partición de Windows en modo de solo lectura (para no empeorar errores de disco) y abre el explorador de archivos para que copies tus fotos y tareas a una memoria USB externa.</li>
-      <li><strong>🩺 3. Auditoría de Salud S.M.A.R.T. de Disco:</strong> Analiza los sensores internos de tu disco duro o SSD con <span class="code-pill">smartctl</span> para alertarte de sectores dañados o riesgo inminente de fallo físico.</li>
+      <li><strong>🟢 PASSED (Salud Perfecta):</strong> El disco no tiene sectores dañados y opera dentro de temperaturas normales (30°C a 48°C).</li>
+      <li><strong>⚠️ Sectores Reasignados (Reallocated Sectors > 0):</strong> Significa que la superficie magnética o los bloques flash tienen daño físico. El disco está en riesgo de morir pronto. Se aconseja rescatar los archivos inmediatamente y reemplazar la unidad.</li>
+      <li><strong>🔴 FAILED:</strong> El disco tiene un fallo físico terminal. Debe clonarse o rescatarse antes de que deje de responder por completo.</li>
     </ul>
+
+    <div class="revert-box">
+      <strong>Desmontaje Seguro:</strong> Recuerda siempre seleccionar la opción 4 (<span class="code-pill">Desmontar Particiones de Rescate</span>) antes de apagar la computadora o desconectar tus discos de almacenamiento.
+    </div>
   </div>
 
   <!-- Gestor de Batería con Wi-Fi -->

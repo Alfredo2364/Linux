@@ -5,6 +5,10 @@
 base
 linux
 linux-firmware
+intel-ucode
+amd-ucode
+mkinitcpio
+mkinitcpio-archiso
 
 # Firmware Especializado
 sof-firmware

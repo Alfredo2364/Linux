@@ -185,7 +185,7 @@ ATENCIÓN: Todos los archivos previos se perderán definitivamente." 12 70
     parted -s "${CHOSEN_DISK}" set 1 esp on
     parted -s "${CHOSEN_DISK}" mkpart "DZULUX_ROOT" ext4 513MiB 100%
 
-    if echo "${CHOSEN_DISK}" | grep -q "nvme"; then
+    if echo "${CHOSEN_DISK}" | grep -qE "nvme|mmcblk"; then
         BOOT_PART="${CHOSEN_DISK}p1"
         ROOT_PART="${CHOSEN_DISK}p2"
     else
@@ -196,12 +196,27 @@ ATENCIÓN: Todos los archivos previos se perderán definitivamente." 12 70
     mkfs.fat -F32 "${BOOT_PART}"
 fi
 
+# Detección de almacenamiento soldado de 32 GB (eMMC / SSD pequeño)
+DISK_SIZE_BYTES=$(lsblk -b -n -d -o SIZE "${CHOSEN_DISK}" 2>/dev/null || echo "100000000000")
+USE_BTRFS_COMPRESSION=0
+
+if [ "$DISK_SIZE_BYTES" -le 38000000000 ] || echo "${CHOSEN_DISK}" | grep -q "mmcblk"; then
+    USE_BTRFS_COMPRESSION=1
+fi
+
 # Formatear partición ROOT para Dzulux
 umount -R /mnt 2>/dev/null || true
-mkfs.ext4 -F -L "Dzulux" "${ROOT_PART}"
 
-# Montar para instalación
-mount "${ROOT_PART}" /mnt
+if [ "$USE_BTRFS_COMPRESSION" -eq 1 ]; then
+    # Almacenamiento modesto / 32 GB eMMC: Btrfs con compresión zstd para ahorrar 50% de espacio y proteger la memoria flash
+    mkfs.btrfs -f -L "Dzulux" "${ROOT_PART}"
+    mount -o compress=zstd:1,noatime,space_cache=v2 "${ROOT_PART}" /mnt
+else
+    # Almacenamiento estándar: ext4 con noatime y 1% de espacio reservado
+    mkfs.ext4 -F -m 1 -L "Dzulux" "${ROOT_PART}"
+    mount -o noatime "${ROOT_PART}" /mnt
+fi
+
 mkdir -p /mnt/boot
 mount "${BOOT_PART}" /mnt/boot
 
@@ -241,6 +256,10 @@ if cat /sys/class/dmi/id/sys_vendor 2>/dev/null | grep -iq "Apple"; then
     HARDWARE_SUMMARY+="• Equipo Apple Mac detectado: Se habilitará soporte de teclado Mac y firmware Wi-Fi Broadcom.\n"
 fi
 
+if [ "$USE_BTRFS_COMPRESSION" -eq 1 ]; then
+    HARDWARE_SUMMARY+="• Memoria eMMC / 32 GB detectada: Se activará compresión transparente Btrfs (zstd) y optimización de escritura para dejar +25 GB libres y proteger la memoria soldada.\n"
+fi
+
 HARDWARE_SUMMARY+="• Audio: PipeWire con SOF-Firmware para soporte de bocinas y micrófonos modernos.\n"
 HARDWARE_SUMMARY+="• Detección Dual Boot: os-prober activo para reconocer Windows / macOS en GRUB.\n"
 
@@ -256,7 +275,7 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     echo "XXX\nCopiando el núcleo del sistema Dzulux y paquetes esenciales...\nXXX"
     
     if command -v pacstrap >/dev/null 2>&1; then
-        pacstrap -K /mnt base base-devel linux linux-firmware linux-headers networkmanager pipewire wireplumber zram-generator tlp grub efibootmgr os-prober dosfstools mtools ntfs-3g sudo openssh ufw tmux net-tools btop micro fastfetch
+        pacstrap -K /mnt base base-devel linux linux-firmware linux-headers networkmanager pipewire wireplumber zram-generator btrfs-progs pacman-contrib tlp grub efibootmgr os-prober dosfstools mtools ntfs-3g sudo openssh ufw tmux net-tools btop micro fastfetch
     else
         rsync -aAXv --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} / /mnt/
     fi
@@ -322,13 +341,19 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     fi
 
     # Configurar zRAM y optimizaciones para equipos y laptops de bajo rendimiento
-    mkdir -p /mnt/etc/systemd /mnt/etc/sysctl.d
+    mkdir -p /mnt/etc/systemd /mnt/etc/sysctl.d /mnt/etc/systemd/journald.conf.d
     if [ -f /etc/systemd/zram-generator.conf ]; then
         cp /etc/systemd/zram-generator.conf /mnt/etc/systemd/
     fi
     if [ -f /etc/sysctl.d/99-dzulux-lowspec.conf ]; then
         cp /etc/sysctl.d/99-dzulux-lowspec.conf /mnt/etc/sysctl.d/
     fi
+    if [ -f /etc/systemd/journald.conf.d/00-dzulux-storage.conf ]; then
+        cp /etc/systemd/journald.conf.d/00-dzulux-storage.conf /mnt/etc/systemd/journald.conf.d/
+    fi
+
+    # Habilitar mantenimiento automático de caché pacman para proteger espacio en discos de 32 GB
+    arch-chroot /mnt systemctl enable paccache.timer 2>/dev/null || true
 
     echo "100"; sleep 1
     echo "XXX\n¡Instalación completada exitosamente!\nXXX"

@@ -76,18 +76,18 @@ jobs:
       - name: Empaquetar ISO + Guía PDF en Archivo ZIP
         run: |
           sudo apt-get update && sudo apt-get install -y zip
-          mkdir -p paquete_distribucion/Dzulux-Linux-1.0-Beta
+          mkdir -p paquete_distribucion/Dzulux-Linux-1.1-Beta
           
-          cp output/*.iso paquete_distribucion/Dzulux-Linux-1.0-Beta/
+          cp output/*.iso paquete_distribucion/Dzulux-Linux-1.1-Beta/
           if [ -f output/Guia_y_Agradecimientos_Dzulux.pdf ]; then
-            cp output/Guia_y_Agradecimientos_Dzulux.pdf paquete_distribucion/Dzulux-Linux-1.0-Beta/
+            cp output/Guia_y_Agradecimientos_Dzulux.pdf paquete_distribucion/Dzulux-Linux-1.1-Beta/
           fi
           if [ -f output/sha256sum.txt ]; then
-            cp output/sha256sum.txt paquete_distribucion/Dzulux-Linux-1.0-Beta/
+            cp output/sha256sum.txt paquete_distribucion/Dzulux-Linux-1.1-Beta/
           fi
           
           cd paquete_distribucion
-          zip -0 -r ../output/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip Dzulux-Linux-1.0-Beta
+          zip -0 -r ../output/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip Dzulux-Linux-1.1-Beta
           cd ..
           
           # Verificación automática de tamaño para cumplir con el límite de 2 GiB de GitHub Release
@@ -109,25 +109,25 @@ jobs:
       - name: Subir Paquete Completo como Artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: Dzulux-Linux-1.0-Beta-Paquete-Completo
+          name: Dzulux-Linux-1.1-Beta-Paquete-Completo
           path: output/
           retention-days: 14
 
       - name: Publicar Release Oficial y Enlace de Descarga Directa (1 Clic)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v1.0-beta"
+          tag_name: "v1.1-beta"
           files: output/*
-          name: "Dzulux Linux 1.0 (Beta) - Descarga Oficial"
+          name: "Dzulux Linux 1.1 (Beta) - Descarga Oficial"
           body: |
-            # ⚡ Dzulux Linux v1.0 (Beta)
+            # ⚡ Dzulux Linux v1.1 (Beta)
             **Diseñado y Creado por Alfredo Dzul**
 
             ---
             ### 📥 Descarga Directa (1 Clic):
-            * 📦 [**Descargar Paquete Completo [ISO + Guía PDF] (Recomendado)**](https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip)
-            * 💿 [**Descargar Solo Imagen ISO (.iso)**](https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso)
-            * 📄 [**Descargar Solo Guía y Agradecimientos en PDF**](https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf)
+            * 📦 [**Descargar Paquete Completo [ISO + Guía PDF] (Recomendado)**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip)
+            * 💿 [**Descargar Solo Imagen ISO (.iso)**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/dzulux-1.1-beta-x86_64.iso)
+            * 📄 [**Descargar Solo Guía y Agradecimientos en PDF**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Guia_y_Agradecimientos_Dzulux.pdf)
 
             ---
             ### 🚀 Características Principales:

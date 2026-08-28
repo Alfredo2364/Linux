@@ -18,7 +18,7 @@ NC='\033[0m'
 clear
 echo -e "${CYAN}${BOLD}"
 echo "  ================================================================"
-echo "     DZULUX LINUX - DIAGNÓSTICO DE HARDWARE (BETA)"
+echo "     DZULUX LINUX - DIAGNÓSTICO DE HARDWARE (BETA 1.1)"
 echo "     Diseñado por Alfredo Dzul"
 echo "  ================================================================"
 echo -e "${NC}"

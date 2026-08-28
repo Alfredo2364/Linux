@@ -18,14 +18,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Dzulux-Linux-1.0-Beta-Paquete-Completo.zip">
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip">
     <img src="https://img.shields.io/badge/📥%20DESCARGAR%20DZULUX%20LINUX%20(1%20CLIC)-PAQUETE%20COMPLETO%20[ISO%20+%20GUÍA%20PDF]-00f2fe?style=for-the-badge&logo=linux&logoColor=black" alt="Descargar Dzulux Linux"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/dzulux-1.0-beta-x86_64.iso">💿 Descargar solo archivo .ISO</a> &nbsp;•&nbsp; 
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.0-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/dzulux-1.1-beta-x86_64.iso">💿 Descargar solo archivo .ISO</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
   <a href="https://alfredo2364.github.io/Linux/">🌐 Ver Sitio Web Oficial</a>
 </p>
 
@@ -141,8 +141,8 @@ No necesitas instalar Linux ni configurar herramientas complejas en tu equipo:
 2. Ve a la pestaña **Actions** en tu repositorio de GitHub.
 3. El flujo de trabajo `Compilar ISO y Paquete de Dzulux Linux` se iniciará automáticamente.
 4. Al finalizar la compilación, encontrarás en la sección de **Artifacts** o **Releases** el paquete comprimido:
-   * 📦 **`Dzulux-Linux-1.0-Beta-Paquete-Completo.zip`**, que incluye:
-     * 💿 La imagen del sistema: **`dzulux-1.0-beta-x86_64.iso`**
+   * 📦 **`Dzulux-Linux-1.1-Beta-Paquete-Completo.zip`**, que incluye:
+     * 💿 La imagen del sistema: **`dzulux-1.1-beta-x86_64.iso`**
      * 📄 La **`Guía y Agradecimientos en PDF`** escrita y firmada por **Alfredo Dzul** con instrucciones de booteo y primeros pasos.
      * 🔒 El archivo de sumas de comprobación **`sha256sum.txt`**.
 
@@ -195,5 +195,5 @@ Conecta la USB al equipo, enciéndelo presionando la tecla de arranque (`F12`, `
 ---
 
 <p align="center">
-  <i>Dzulux Linux 1.0 (Beta) — Hecho con pasión por el software libre y el control total de tu equipo.</i>
+  <i>Dzulux Linux 1.1 (Beta) — Hecho con pasión por el software libre y el control total de tu equipo.</i>
 </p>

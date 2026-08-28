@@ -2,7 +2,7 @@
 # ==============================================================================
 # dzulux-installer - Instalador Guiado Paso a Paso de Dzulux Linux
 # Creado y Diseñado por Alfredo Dzul
-# Versión: 1.0 (BETA) - Soporte Completo Dual Boot (Windows / macOS / Linux)
+# Versión: 1.1 (BETA) - Soporte Completo Dual Boot (Windows / macOS / Linux)
 # ==============================================================================
 
 set -euo pipefail
@@ -27,7 +27,7 @@ fi
 # ------------------------------------------------------------------------------
 # 1. BIENVENIDA Y NOTA DE VERSIÓN BETA
 # ------------------------------------------------------------------------------
-$UI --title "Dzulux Linux 1.0 (Beta) - Diseñado por Alfredo Dzul" --msgbox \
+$UI --title "Dzulux Linux 1.1 (Beta) - Diseñado por Alfredo Dzul" --msgbox \
 "¡Bienvenido al instalador oficial de Dzulux Linux!\n\n\
 Creado y diseñado por: Alfredo Dzul.\n\n\
 NOTA IMPORTANTE (ESTADO BETA):\n\
@@ -392,7 +392,7 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
 
     # Si es edición Lite, configurar XFCE sin sombras ni composiciones pesadas de fábrica
     if [ "$IS_LOW_SPEC" -eq 1 ] && [ "$SYSTEM_MODE" == "1" ]; then
-        echo "Dzulux Linux 1.0 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
+        echo "Dzulux Linux 1.1 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
         mkdir -p /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
         cat << 'EOF_LITE' > /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -418,7 +418,7 @@ umount -R /mnt 2>/dev/null || true
 # 7. MENSAJE FINAL
 # ------------------------------------------------------------------------------
 $UI --title "¡FELICITACIONES! - DZULUX LINUX INSTALADO" --msgbox \
-"Dzulux Linux 1.0 (Beta) ha sido instalado con éxito en tu equipo.\n\n\
+"Dzulux Linux 1.1 (Beta) ha sido instalado con éxito en tu equipo.\n\n\
 Detalles de la instalación:\n\
 • Modo seleccionado: ${MODE_NAME}\n\
 • Tipo de instalación: $([ "$INSTALL_TYPE" == "1" ] && echo "Dual Boot (con Windows/Mac)" || echo "Disco Completo")\n\

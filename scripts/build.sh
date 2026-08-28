@@ -51,6 +51,12 @@ fi
 mkdir -p "$OUT_DIR"
 mkdir -p "$WORK_DIR"
 
+echo -e "${GREEN}==> Configurando enlaces de inicio gráfico automático (XFCE / LightDM)...${NC}"
+mkdir -p "${PROFILE_DIR}/airootfs/etc/systemd/system/multi-user.target.wants"
+ln -sf /usr/lib/systemd/system/graphical.target "${PROFILE_DIR}/airootfs/etc/systemd/system/default.target"
+ln -sf /usr/lib/systemd/system/lightdm.service "${PROFILE_DIR}/airootfs/etc/systemd/system/display-manager.service"
+ln -sf /usr/lib/systemd/system/NetworkManager.service "${PROFILE_DIR}/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service"
+
 echo -e "${GREEN}==> Iniciando compilación de la imagen ISO con mkarchiso...${NC}"
 mkarchiso -v -w "$WORK_DIR" -o "$OUT_DIR" "$PROFILE_DIR"
 

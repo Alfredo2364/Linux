@@ -29,6 +29,11 @@ jobs:
       - name: Compilar Dzulux Linux ISO (mkarchiso)
         run: |
           mkdir -p output /tmp/archiso-work
+          # Configurar enlaces simbólicos nativos para inicio gráfico automático (como Ubuntu y Fedora)
+          mkdir -p iso-profile/airootfs/etc/systemd/system/multi-user.target.wants
+          ln -sf /usr/lib/systemd/system/graphical.target iso-profile/airootfs/etc/systemd/system/default.target
+          ln -sf /usr/lib/systemd/system/lightdm.service iso-profile/airootfs/etc/systemd/system/display-manager.service
+          ln -sf /usr/lib/systemd/system/NetworkManager.service iso-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
           mkarchiso -v -w /tmp/archiso-work -o output iso-profile 2>&1 | tee /tmp/mkarchiso.log
           cd output
           sha256sum *.iso > sha256sum.txt

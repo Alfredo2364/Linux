@@ -1,0 +1,12 @@
+#!/bin/sh
+# .xinitrc - Lanzador de XFCE de Dzulux Linux
+# Disenado y Creado por Alfredo Dzul
+
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+    for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
+        [ -x "$f" ] && . "$f"
+    done
+    unset f
+fi
+
+exec startxfce4

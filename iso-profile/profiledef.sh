@@ -18,7 +18,14 @@ airootfs_image_tool_options=('-comp' 'xz' '-Xbcj' 'x86' '-b' '1M' '-Xdict-size' 
 
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
+  ["/etc/gshadow"]="0:0:400"
+  ["/etc/sudoers.d"]="0:0:750"
+  ["/etc/sudoers.d/liveuser"]="0:0:440"
   ["/root"]="0:0:750"
+  ["/home/liveuser"]="1000:1000:755"
+  ["/home/liveuser/Desktop"]="1000:1000:755"
+  ["/home/liveuser/Desktop/dzulux-installer.desktop"]="1000:1000:755"
+  ["/home/liveuser/Desktop/hw-detect.desktop"]="1000:1000:755"
   ["/usr/local/bin/dzulux-installer"]="0:0:755"
   ["/usr/local/bin/hw-detect"]="0:0:755"
   ["/usr/local/bin/switch-mode"]="0:0:755"

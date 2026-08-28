@@ -6,23 +6,29 @@
 
 set -euo pipefail
 
-# Crear grupo autologin si no existe
+# Asegurar grupo autologin
 groupadd -r autologin 2>/dev/null || true
 
-# Crear usuario liveuser si no existe con todos los privilegios
+# Asegurar usuario liveuser y grupos
 if ! id -u liveuser >/dev/null 2>&1; then
-    useradd -m -g users -G wheel,audio,video,input,storage,power,network,autologin -s /bin/bash liveuser
+    useradd -m -u 1000 -g users -G wheel,audio,video,input,storage,power,network,autologin -s /bin/bash liveuser
+else
+    usermod -aG wheel,audio,video,input,storage,power,network,autologin liveuser 2>/dev/null || true
 fi
 
-# Configurar contraseña: 'dzulux' y también permitir inicio sin contraseña
+# Desbloquear contraseñas para permitir entrar con Enter o con dzulux
+passwd -d liveuser 2>/dev/null || true
+passwd -d root 2>/dev/null || true
 echo "liveuser:dzulux" | chpasswd 2>/dev/null || true
 echo "root:dzulux" | chpasswd 2>/dev/null || true
 passwd -d liveuser 2>/dev/null || true
 passwd -d root 2>/dev/null || true
 
-# Copiar configuraciones de skel
+# Asegurar propiedad completa de /home/liveuser
+mkdir -p /home/liveuser/Desktop
 cp -rf /etc/skel/. /home/liveuser/ 2>/dev/null || true
-chown -R liveuser:users /home/liveuser/
+chown -R 1000:1000 /home/liveuser 2>/dev/null || true
+chmod 755 /home/liveuser 2>/dev/null || true
 
 # Sudo 100% sin contraseña para liveuser y root
 mkdir -p /etc/sudoers.d
@@ -38,10 +44,8 @@ fi
 # Iniciar gestor de redes
 systemctl start NetworkManager.service 2>/dev/null || true
 
-# Gestión de Modo Gráfico vs Modo Terminal
+# Si se seleccionó Modo CLI en el arranque de GRUB, desactivar LightDM
 if grep -q "system_mode=cli" /proc/cmdline; then
     systemctl stop lightdm.service 2>/dev/null || true
-    systemctl set-default multi-user.target 2>/dev/null || true
-else
-    systemctl start lightdm.service 2>/dev/null || true
+    systemctl mask lightdm.service 2>/dev/null || true
 fi

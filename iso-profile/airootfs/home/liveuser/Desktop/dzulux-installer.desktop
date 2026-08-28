@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Instalar Dzulux Linux
+GenericName=Instalador del Sistema
+Comment=Instala Dzulux Linux en tu equipo de forma guiada y explicada paso a paso
+Exec=xfce4-terminal -e "sudo dzulux-installer"
+Icon=system-software-install
+Terminal=false
+Categories=System;
+StartupNotify=true

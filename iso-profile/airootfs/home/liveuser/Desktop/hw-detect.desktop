@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Diagnóstico de Hardware
+GenericName=Diagnóstico de Sistema
+Comment=Analiza y reporta los componentes de tu equipo (CPU, GPU, batería, audio)
+Exec=xfce4-terminal -e "hw-detect"
+Icon=preferences-system
+Terminal=false
+Categories=System;
+StartupNotify=true

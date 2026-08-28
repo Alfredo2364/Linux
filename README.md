@@ -83,19 +83,47 @@ Dzulux está preparado para convivir en paz con el sistema que trajo tu equipo:
   3. `Windows Boot Manager (o el sistema que trajo tu equipo)`
 * **En el menú de la memoria USB Live**: Incluso antes de instalar nada, la USB te ofrece la opción directa de arrancar el Windows o sistema existente en tu disco duro si necesitas acceder a él sin retirar la memoria.
 
+### 4. 🚀 Salvavidas para Laptops de Gama Baja y Memoria Soldada de 32 GB (eMMC)
+* **Detección Automática de Hardware Modesto**: El instalador evalúa el procesador (Intel Celeron, Pentium, Atom, AMD Athlon básico de 2 núcleos) y restringe opciones pesadas para instalar de forma segura **Dzulux Lite** (~380 MB de RAM en reposo, compositor de sombras desactivado y respuesta instantánea a 60 FPS).
+* **Compresión Btrfs Transparente (zstd:1)**: En equipos con discos soldados de 32 GB (HP Stream, Lenovo IdeaPad 1, Cloudbooks), donde Windows se satura por falta de espacio, Dzulux comprime el sistema reduciendo su huella a solo **~3.5 GB**, dejando más de **26 GB libres** para tus documentos.
+* **zRAM Integrado**: Duplica la memoria útil comprimiendo páginas inactivas directamente en RAM para eliminar los congelamientos en laptops con 2 GB o 4 GB.
+* **Protección de Vida Útil de Memoria Flash**: Montaje con opción `noatime` y servicio `paccache.timer` para auto-limpiar paquetes obsoletos y evitar el desgaste prematuro de chips eMMC.
+
 ---
 
-## 🛠️ Herramientas Propias de Dzulux
+## 🛠️ La Suite Exclusiva de Herramientas Dzulux
 
-Dzulux Linux incorpora utilidades desarrolladas específicamente para simplificar tu experiencia:
+Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles en terminal y con lanzador oficial en el menú de aplicaciones de XFCE):
 
-| Herramienta | Comando | Descripción |
-| :--- | :--- | :--- |
-| **Instalador Guiado** | `dzulux-installer` | Asistente paso a paso que **explica de forma clara y detallada** cada opción (modo dual boot, particiones, modo gráfico o terminal). |
-| **Alternador de Modo** | `switch-mode` | Cambia entre entorno gráfico y modo consola en vivo (`switch-mode gui`, `switch-mode cli`, `switch-mode default gui`). |
-| **Diagnóstico de Hardware** | `hw-detect` | Escanea y reporta el estado de tu GPU (Intel/AMD/NVIDIA), batería de laptop, servidor de audio y compatibilidad Mac. |
-| **Información del Sistema** | `fastfetch` | Muestra los datos de hardware del equipo acompañados del logo oficial y la firma de **Alfredo Dzul**. |
-| **Pantalla de Bienvenida** | `dzulux-welcome` | Guía rápida que se despliega al abrir la terminal para orientarte en tus primeros pasos. |
+| Herramienta | Comando | Lanzador | Descripción |
+| :--- | :--- | :---: | :--- |
+| **Instalador Guiado** | `dzulux-installer` | 📋 | Asistente paso a paso con soporte Dual Boot real, detección de eMMC y selector automático de **Dzulux Lite** para Celeron/Athlon. |
+| **Motor de Rendimiento** | `dzulux-performance` | ⚡ | Audita tu CPU y ofrece perfiles: *Oficina Inteligente* (cero lag y silencioso), *Game Booster* puro y *Gamer Sin Límites* (con OBS/Discord blindados y congelador de apps). |
+| **Descarga de Drivers** | `dzulux-drivers` | 🎮 | Escanea tu hardware real (GPU NVIDIA/AMD/Intel, Wi-Fi Broadcom/Realtek, audio SOF, batería) y descarga los controladores oficiales en 1 clic sin engordar la ISO. |
+| **Tienda de Software** | `dzulux-apps` | 🛍️ | Centro de instalación rápida en 1 clic para Steam, Discord, VS Code, LibreOffice, Obsidian, Chrome y Brave con Flathub preconfigurado. |
+| **Puntos de Restauración** | `dzulux-snapshots` | 🛡️ | Crea capturas instantáneas del sistema en 1 segundo con Btrfs (0 MB de espacio) con reversión desde el menú de arranque GRUB. |
+| **Rescate de Windows** | `dzulux-rescue` | 🚑 | Elimina contraseñas olvidadas de Windows en 10 segundos con `chntpw`, rescata archivos de discos dañados y audita la salud S.M.A.R.T. del disco. |
+| **Gestor de Batería** | `dzulux-battery` | 🔋 | Ahorro de energía para laptops con Wi-Fi configurable (Modo Productivo mantiene internet activo para entregar tareas, y Modo Emergencia Extrema). |
+| **Modo Privacidad** | `dzulux-stealth` | 🕵️ | Protección en redes Wi-Fi públicas: asigna una dirección MAC aleatoria, activa DNS seguro anti-malware (Quad9/Cloudflare) y activa firewall estricto. |
+| **Gestor de Estilos** | `dzulux-looks` | 🎨 | Cambia entre tema Cyberpunk Dark, **Estilo Windows 10** (con barra inferior y Menú de Inicio con buscador y categorías) o Modo Minimal Flat. |
+| **Alternador de Modo** | `switch-mode` | 🔄 | Cambia en vivo entre escritorio gráfico y modo terminal (`switch-mode gui`, `switch-mode cli`, `switch-mode lowspec on/off`). |
+| **Diagnóstico de Hardware** | `hw-detect` | 🖥️ | Escanea y reporta el estado de tu GPU (Intel/AMD/NVIDIA), batería de laptop, servidor de audio y compatibilidad Mac. |
+| **Información del Sistema** | `fastfetch` | ⚡ | Muestra los datos de hardware del equipo acompañados del logo oficial y la firma de **Alfredo Dzul**. |
+| **Pantalla de Bienvenida** | `dzulux-welcome` | 🚀 | Guía rápida que se despliega al abrir la terminal para orientarte en tus primeros pasos. |
+
+---
+
+## 🔥 Novedades y Parches de la Versión 1.1 (Beta)
+
+* **Asistente Inteligente de Controladores (`dzulux-drivers`)**: Descarga dinámica al vuelo según el hardware específico, logrando que la imagen ISO se mantenga en **1.69 GB** (muy por debajo del límite de 2 GiB de GitHub Releases).
+* **Edición "Dzulux Lite" con Detección de CPU**: Si el instalador detecta procesadores Intel Celeron, Pentium, Atom o AMD Athlon (<= 2 núcleos), limita las opciones a la versión Lite con optimizaciones para erradicar congelamientos.
+* **Menú de Inicio estilo Windows 10 en `dzulux-looks`**: Integración de Whisker Menu en la barra inferior con buscador instantáneo, cuadrícula de aplicaciones categorizadas y tecla `Super` vinculada.
+* **Dzulux Performance Engine (`dzulux-performance`)**: Auditoría de CPU por gama, perfil de oficina silencioso y modo streaming blindado para OBS Studio y Discord con congelador de procesos secundarios (`SIGSTOP`/`SIGCONT`).
+* **Suite de Emergencia y Rescate (`dzulux-rescue`)**: Quitado de contraseñas de Windows en 10 segundos y auditoría de salud de disco S.M.A.R.T.
+* **Tienda Curada (`dzulux-apps`)**: Acceso inmediato a aplicaciones populares con repositorio oficial y Flatpak.
+* **Escudo Wi-Fi Público (`dzulux-stealth`)**: Anonimato con MAC cambiante y DNS cifrado anti-rastreo.
+* **Gestor de Batería con Wi-Fi (`dzulux-battery`)**: Resuelve la necesidad de ahorrar energía sin quedarse sin internet para enviar trabajos escolares o laborales.
+* **Soporte Avanzado para Memorias Soldadas de 32 GB (eMMC)**: Particionado con Btrfs zstd:1, reduciendo la instalación a solo ~3.5 GB y dejando más de 26 GB libres.
 
 ---
 

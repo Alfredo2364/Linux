@@ -21,6 +21,8 @@ show_help() {
     echo "  gui          Inicia el Entorno Gráfico (XFCE) en esta sesión."
     echo "  cli          Regresa al Modo Terminal / Consola pura."
     echo "  status       Muestra el modo actual y el modo de arranque predeterminado."
+    echo "  lowspec on   Desactiva efectos visuales para máxima velocidad en PCs/laptops modestas."
+    echo "  lowspec off  Restaura efectos visuales completos."
     echo "  default gui  Configura el Modo Gráfico como el inicio por defecto al encender."
     echo "  default cli  Configura el Modo Terminal como el inicio por defecto al encender."
     echo ""
@@ -59,6 +61,18 @@ case "$ACTION" in
         else
             echo -e "${RED}Opción no válida. Usa 'switch-mode default gui' o 'switch-mode default cli'.${NC}"
             exit 1
+        fi
+        ;;
+    lowspec)
+        STATUS="${2:-on}"
+        if [ "$STATUS" == "on" ]; then
+            echo -e "${GREEN}Activando Modo Ultra Fluido para equipos y laptops modestos...${NC}"
+            xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null || true
+            echo -e "  * Efectos y sombras de ventanas desactivados para cero lag."
+            echo -e "  * Máxima velocidad de respuesta en CPU Celeron/Pentium/Atom."
+        else
+            echo -e "${CYAN}Restaurando efectos visuales completos...${NC}"
+            xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
         fi
         ;;
     *)

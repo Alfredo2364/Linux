@@ -37,6 +37,7 @@ acpid
 upower
 brightnessctl
 thermald
+zram-generator
 libinput
 xf86-input-libinput
 

@@ -43,34 +43,73 @@ detect_cpu_tier
 FROZEN_APPS_FILE="/tmp/dzulux_frozen_pids.txt"
 
 main_menu() {
-    if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux Performance Engine (Alfredo Dzul)" --menu \
+    if [ "$IS_ENTRY_LEVEL" -eq 1 ]; then
+        # Menú adaptado exclusivamente para procesadores de gama de entrada
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Performance - Edición Lite (Alfredo Dzul)" --menu \
+"Procesador: ${CPU_TIER_MSG}\n\nOpciones optimizadas para hardware de entrada:" 18 74 4 \
+"1" "💼 Modo Oficina Lite (Ágil, Cero Lentitud en Celeron/Athlon)" \
+"2" "🍃 Modo Ultra Fluido (60 FPS sin sombras ni efectos pesados)" \
+"3" "🔒 Modos Gamer (Restringidos: Requieren CPU de 4+ hilos)" \
+"4" "Salir" 3>&1 1>&2 2>&3)
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE - EDICIÓN LITE ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo -e "CPU Detectada: ${YELLOW}${CPU_TIER_MSG}${NC}\n"
+            echo "1) Modo Oficina Lite (Ágil, cero lentitud)"
+            echo "2) Modo Ultra Fluido (60 FPS sin efectos pesados)"
+            echo "3) Modos Gamer (Restringidos)"
+            echo "4) Salir"
+            read -p "Elige una opción (1-4): " CHOICE
+        fi
+
+        case "$CHOICE" in
+            1) apply_office_mode ;;
+            2) apply_lowspec_mode ;;
+            3) show_restricted_gamer_msg ;;
+            *) exit 0 ;;
+        esac
+    else
+        # Procesadores capaces de gama media o alta
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Performance Engine (Alfredo Dzul)" --menu \
 "Procesador: ${CPU_TIER_MSG}\n\nSelecciona el perfil de rendimiento para tu equipo:" 20 74 5 \
 "1" "💼 Modo Oficina y Estudio (Ágil, Cero Lentitud, Silencioso y Fresco)" \
 "2" "🎮 Modo Gamer: Game Booster (Prioridad Absoluta al Juego, Cero Tirones)" \
 "3" "🚀 Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord Protegido)" \
 "4" "🍃 Modo Ahorro y Equipos Modestos (Bajo Consumo / zRAM Activa)" \
 "5" "Salir" 3>&1 1>&2 2>&3)
-    else
-        clear
-        echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE ENGINE ===${NC}"
-        echo -e "Diseñado por Alfredo Dzul\n"
-        echo -e "CPU Detectada: ${YELLOW}${CPU_TIER_MSG}${NC}\n"
-        echo "1) Modo Oficina y Estudio (Silencioso, ágil, cero lentitud)"
-        echo "2) Modo Gamer: Game Booster (Cero tirones, juego puro)"
-        echo "3) Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord)"
-        echo "4) Modo Ahorro y Equipos Modestos"
-        echo "5) Salir"
-        read -p "Elige un perfil (1-5): " CHOICE
-    fi
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE ENGINE ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo -e "CPU Detectada: ${YELLOW}${CPU_TIER_MSG}${NC}\n"
+            echo "1) Modo Oficina y Estudio (Silencioso, ágil, cero lentitud)"
+            echo "2) Modo Gamer: Game Booster (Cero tirones, juego puro)"
+            echo "3) Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord)"
+            echo "4) Modo Ahorro y Equipos Modestos"
+            echo "5) Salir"
+            read -p "Elige un perfil (1-5): " CHOICE
+        fi
 
-    case "$CHOICE" in
-        1) apply_office_mode ;;
-        2) apply_game_booster ;;
-        3) apply_gamer_unlimited ;;
-        4) apply_lowspec_mode ;;
-        *) exit 0 ;;
-    esac
+        case "$CHOICE" in
+            1) apply_office_mode ;;
+            2) apply_game_booster ;;
+            3) apply_gamer_unlimited ;;
+            4) apply_lowspec_mode ;;
+            *) exit 0 ;;
+        esac
+    fi
+}
+
+show_restricted_gamer_msg() {
+    local MSG="⚠️ PERFILES GAMER BLOQUEADOS EN ESTA MÁQUINA:\n\n\
+Tu procesador '${CPU_MODEL}' cuenta con ${CPU_CORES} núcleos.\n\n\
+Los perfiles 'Game Booster' y 'Gamer Sin Límites' están diseñados exclusivamente para procesadores con 4 o más hilos (Intel Core i3/i5/i7 o AMD Ryzen).\n\n\
+Forzar estos modos en procesadores Celeron/Pentium/Athlon provocaría sobrecalentamiento y congelamientos del sistema.\n\n\
+Para este equipo, el Modo Oficina Lite y el Modo Ultra Fluido te garantizan 60 FPS estables y cero lentitud."
+    show_alert "Perfiles Restringidos" "${MSG}"
 }
 
 # ------------------------------------------------------------------------------

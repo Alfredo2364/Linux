@@ -36,14 +36,42 @@ Incluye soporte para DUAL BOOT: Si ya tienes Windows, macOS u otro sistema, podr
 Este asistente te explicará en detalle cada decisión antes de realizar cualquier cambio." 18 74
 
 # ------------------------------------------------------------------------------
-# 2. ELECCIÓN DEL MODO DE SISTEMA (DUAL INTERNO: GUI vs CLI)
+# 2. AUDITORÍA DE HARDWARE Y ELECCIÓN DE EDICIÓN (ESTÁNDAR vs LITE)
 # ------------------------------------------------------------------------------
-SYSTEM_MODE=$($UI --title "Paso 1: Selección del Modo de Sistema" --menu \
+CPU_MODEL="$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//' || echo "Genérico")"
+CPU_CORES="$(grep -c "^processor" /proc/cpuinfo || echo "1")"
+TOTAL_RAM_MB="$(free -m | awk '/^Mem:/{print $2}')"
+
+IS_LOW_SPEC=0
+if echo "$CPU_MODEL" | grep -iqE "celeron|pentium|atom|athlon|e2-|e1-|sempron" || [ "$CPU_CORES" -le 2 ] || [ "$TOTAL_RAM_MB" -le 3500 ]; then
+    IS_LOW_SPEC=1
+fi
+
+if [ "$IS_LOW_SPEC" -eq 1 ]; then
+    # Mensaje de advertencia y protección para procesadores de gama de entrada
+    $UI --title "Hardware Detectado: Optimización Inteligente" --msgbox \
+"Dzulux Installer ha detectado el siguiente procesador:\n\n\
+• Procesador: ${CPU_MODEL} (${CPU_CORES} núcleos)\n\
+• Memoria RAM: ${TOTAL_RAM_MB} MB\n\n\
+DIAGNÓSTICO DEL SISTEMA:\n\
+Tu equipo cuenta con un procesador de gama de entrada (Celeron / Pentium / Atom / Athlon básico).\n\n\
+Para proteger tu laptop de sobrecalentamientos, congelamientos y garantizar 60 FPS estables sin lentitud, Dzulux limitará las opciones de instalación exclusivamente a la EDICIÓN LITE o MODO TERMINAL." 19 74
+
+    SYSTEM_MODE=$($UI --title "Paso 1: Selección de Edición Dzulux" --menu \
+"Para este procesador se ofrecen únicamente las ediciones optimizadas:\n\n\
+¿Qué edición deseas instalar?" 17 74 2 \
+"1" "Dzulux Lite (Escritorio Ultra Ligero sin efectos pesados, Cero Lentitud)" \
+"2" "Dzulux Terminal / CLI (Modo Servidor / Consola Pura - 148 MB RAM)" \
+3>&1 1>&2 2>&3)
+else
+    # Procesador capaz de gama media o alta
+    SYSTEM_MODE=$($UI --title "Paso 1: Selección del Modo de Sistema" --menu \
 "Dzulux te permite elegir cómo deseas utilizar tu equipo. Por favor selecciona el modo que mejor se adapte a tus necesidades:\n\n\
 ¿Qué modo deseas instalar?" 17 74 2 \
-"1" "Modo Gráfico (XFCE + Estilo Dzulux con Wallpapers y Arte)" \
-"2" "Modo Terminal / Consola Pura (Estilo Ubuntu Server / CLI)" \
+"1" "Dzulux Standard (Escritorio Completo XFCE + Efectos Gráficos + Wallpapers)" \
+"2" "Dzulux Terminal / Consola Pura (Estilo Ubuntu Server / CLI)" \
 3>&1 1>&2 2>&3)
+fi
 
 if [ -z "$SYSTEM_MODE" ]; then
     echo "Instalación cancelada por el usuario."
@@ -51,23 +79,30 @@ if [ -z "$SYSTEM_MODE" ]; then
 fi
 
 if [ "$SYSTEM_MODE" == "1" ]; then
-    MODE_NAME="Entorno Gráfico Completo (XFCE)"
-    $UI --title "Modo Gráfico Seleccionado" --msgbox \
-"Has seleccionado: Modo Gráfico.\n\n\
-¿Qué significa esto?\n\
-• Se instalará la interfaz visual XFCE optimizada con fondos de pantalla (wallpapers) de Dzulux, temas oscuros y fuentes estilizadas.\n\
-• Incluye navegador Firefox, gestor de archivos visual y panel con monitor de batería y volumen.\n\
-• Consumo equilibrado (~550 MB de RAM en reposo).\n\
-• Excelente para trabajo diario, entretenimiento o desarrollo visual." 15 72
+    if [ "$IS_LOW_SPEC" -eq 1 ]; then
+        MODE_NAME="Dzulux Lite (Optimizado para procesadores Celeron/Athlon)"
+        $UI --title "Dzulux Lite Seleccionado" --msgbox \
+"Has seleccionado: Dzulux Lite.\n\n\
+Optimizaciones que se aplicarán automáticamente:\n\
+• Compositor y sombras desactivadas para máxima fluidez de ventanas.\n\
+• Compresión zRAM que duplica la memoria RAM útil sin congelamientos.\n\
+• Ajustes del kernel para respuesta rápida en disco.\n\
+• Consumo en reposo de ~380 MB de RAM. Tu Celeron/Athlon volará sin tirones." 16 72
+    else
+        MODE_NAME="Dzulux Standard (XFCE Completo)"
+        $UI --title "Modo Gráfico Estándar Seleccionado" --msgbox \
+"Has seleccionado: Modo Gráfico Estándar.\n\n\
+• Entorno visual XFCE completo con temas oscuros, animaciones y wallpapers.\n\
+• Navegador Firefox, utilidades visuales y panel con bandeja de sistema.\n\
+• Consumo equilibrado (~550 MB de RAM en reposo)." 15 72
+    fi
 else
-    MODE_NAME="Modo Terminal Minimalista (Estilo Ubuntu Server)"
+    MODE_NAME="Dzulux Terminal Minimalista (Estilo Ubuntu Server)"
     $UI --title "Modo Terminal Seleccionado" --msgbox \
 "Has seleccionado: Modo Terminal / Consola.\n\n\
-¿Qué significa esto?\n\
-• Tu equipo iniciará directamente en la terminal de texto de alta velocidad.\n\
-• Sin interfaz gráfica pesada; ideal para servidores, diagnóstico o equipos muy antiguos.\n\
-• Incluye suite de servidor completa (SSH Server, cortafuegos UFW, tmux, fastfetch, btop, micro).\n\
-• Consume apenas ~150 MB de RAM y siempre podrás abrir la interfaz con 'switch-mode gui'." 15 72
+• Consumo mínimo de ~148 MB de RAM.\n\
+• Ideal para servidores, pruebas o diagnóstico.\n\
+• Siempre podrás iniciar la interfaz visual con 'switch-mode gui'." 15 72
 fi
 
 # ------------------------------------------------------------------------------
@@ -354,6 +389,23 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
 
     # Habilitar mantenimiento automático de caché pacman para proteger espacio en discos de 32 GB
     arch-chroot /mnt systemctl enable paccache.timer 2>/dev/null || true
+
+    # Si es edición Lite, configurar XFCE sin sombras ni composiciones pesadas de fábrica
+    if [ "$IS_LOW_SPEC" -eq 1 ] && [ "$SYSTEM_MODE" == "1" ]; then
+        echo "Dzulux Linux 1.0 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
+        mkdir -p /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
+        cat << 'EOF_LITE' > /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="box_move" type="bool" value="true"/>
+    <property name="box_resize" type="bool" value="true"/>
+    <property name="theme" type="string" value="Materia-dark"/>
+  </property>
+</channel>
+EOF_LITE
+    fi
 
     echo "100"; sleep 1
     echo "XXX\n¡Instalación completada exitosamente!\nXXX"

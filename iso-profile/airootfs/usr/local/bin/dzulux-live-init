@@ -6,19 +6,29 @@
 
 set -euo pipefail
 
-# Crear usuario liveuser si no existe
+# Crear grupo autologin si no existe
+groupadd -r autologin 2>/dev/null || true
+
+# Crear usuario liveuser si no existe con todos los privilegios
 if ! id -u liveuser >/dev/null 2>&1; then
-    useradd -m -g users -G wheel,audio,video,input,storage,power,network -s /bin/bash liveuser
-    passwd -d liveuser >/dev/null 2>&1 || true
+    useradd -m -g users -G wheel,audio,video,input,storage,power,network,autologin -s /bin/bash liveuser
 fi
+
+# Configurar contraseña: 'dzulux' y también permitir inicio sin contraseña
+echo "liveuser:dzulux" | chpasswd 2>/dev/null || true
+echo "root:dzulux" | chpasswd 2>/dev/null || true
+passwd -d liveuser 2>/dev/null || true
+passwd -d root 2>/dev/null || true
 
 # Copiar configuraciones de skel
 cp -rf /etc/skel/. /home/liveuser/ 2>/dev/null || true
 chown -R liveuser:users /home/liveuser/
 
-# Sudo sin contraseña para liveuser y root
+# Sudo 100% sin contraseña para liveuser y root
+mkdir -p /etc/sudoers.d
 echo "liveuser ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/liveuser
-chmod 440 /etc/sudoers.d/liveuser
+echo "root ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/root
+chmod 440 /etc/sudoers.d/* 2>/dev/null || true
 
 # Si se detectó hardware de laptop (batería), habilitar TLP
 if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Controladores Adicionales Dzulux
+GenericName=Gestor de Controladores
+Comment=Detecta tu hardware y descarga controladores para GPU, Wi-Fi, audio y batería
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-drivers
+Icon=preferences-system
+Terminal=false
+Categories=System;Settings;HardwareSettings;
+Keywords=driver;controlador;gpu;nvidia;wifi;audio;bateria;

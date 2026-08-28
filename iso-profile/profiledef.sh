@@ -21,5 +21,6 @@ file_permissions=(
   ["/usr/local/bin/hw-detect"]="0:0:755"
   ["/usr/local/bin/switch-mode"]="0:0:755"
   ["/usr/local/bin/dzulux-welcome"]="0:0:755"
+  ["/usr/local/bin/dzulux-drivers"]="0:0:755"
   ["/usr/local/bin/dzulux-live-init"]="0:0:755"
 )

@@ -79,6 +79,8 @@ xfce4-pulseaudio-plugin
 xfce4-terminal
 thunar
 thunar-archive-plugin
+gvfs
+tumbler
 file-roller
 mousepad
 firefox
@@ -89,6 +91,8 @@ materia-gtk-theme
 papirus-icon-theme
 inter-font
 ttf-jetbrains-mono-nerd
+ttf-dejavu
+noto-fonts-emoji
 
 # Utilidades de Terminal
 archlinux-keyring

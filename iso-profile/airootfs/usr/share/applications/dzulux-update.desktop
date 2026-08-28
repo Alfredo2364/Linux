@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Actualizador del Sistema
+GenericName=Actualizador de Sistema
+Comment=Descarga y aplica los ultimos parches y herramientas oficiales de Dzulux desde GitHub
+Exec=xfce4-terminal -T "Dzulux Actualizador del Sistema" -e "dzulux-update"
+Icon=system-software-update
+Terminal=false
+Categories=System;Settings;PackageManager;
+Keywords=update;actualizar;parche;sistema;upgrade;dzulux;
+StartupNotify=true

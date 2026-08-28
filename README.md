@@ -106,6 +106,7 @@ Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles
 | **Gestor de Batería** | `dzulux-battery` | 🔋 | Ahorro de energía para laptops con Wi-Fi configurable (Modo Productivo mantiene internet activo para entregar tareas, y Modo Emergencia Extrema). |
 | **Modo Privacidad** | `dzulux-stealth` | 🕵️ | Protección en redes Wi-Fi públicas: asigna una dirección MAC aleatoria, activa DNS seguro anti-malware (Quad9/Cloudflare) y activa firewall estricto. |
 | **Gestor de Estilos** | `dzulux-looks` | 🎨 | Cambia entre tema Cyberpunk Dark, **Estilo Windows 10** (con barra inferior y Menú de Inicio con buscador y categorías) o Modo Minimal Flat. |
+| **Actualizador Oficial** | `dzulux-update` | 🔄 | Descarga directamente los últimos scripts, parches y herramientas oficiales de Dzulux desde GitHub sin reinstalar el sistema. |
 | **Alternador de Modo** | `switch-mode` | 🔄 | Cambia en vivo entre escritorio gráfico y modo terminal (`switch-mode gui`, `switch-mode cli`, `switch-mode lowspec on/off`). |
 | **Diagnóstico de Hardware** | `hw-detect` | 🖥️ | Escanea y reporta el estado de tu GPU (Intel/AMD/NVIDIA), batería de laptop, servidor de audio y compatibilidad Mac. |
 | **Información del Sistema** | `fastfetch` | ⚡ | Muestra los datos de hardware del equipo acompañados del logo oficial y la firma de **Alfredo Dzul**. |
@@ -115,6 +116,7 @@ Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles
 
 ## 🔥 Novedades y Parches de la Versión 1.1 (Beta)
 
+* **Actualizador del Sistema en Vivo (`dzulux-update`)**: Permite que cuando subas actualizaciones o mejoras al repositorio de GitHub, cualquier usuario ejecute este comando y descargue directamente la última versión de scripts, temas y parches sin reinstalar el sistema operativo.
 * **Asistente Inteligente de Controladores (`dzulux-drivers`)**: Descarga dinámica al vuelo según el hardware específico, logrando que la imagen ISO se mantenga en **1.69 GB** (muy por debajo del límite de 2 GiB de GitHub Releases).
 * **Edición "Dzulux Lite" con Detección de CPU**: Si el instalador detecta procesadores Intel Celeron, Pentium, Atom o AMD Athlon (<= 2 núcleos), limita las opciones a la versión Lite con optimizaciones para erradicar congelamientos.
 * **Menú de Inicio estilo Windows 10 en `dzulux-looks`**: Integración de Whisker Menu en la barra inferior con buscador instantáneo, cuadrícula de aplicaciones categorizadas y tecla `Super` vinculada.

@@ -554,10 +554,29 @@
     </div>
   </div>
 
+  <!-- Actualizador del Sistema en Vivo -->
+  <h2>🔄 14. Actualizador del Sistema en Vivo (`dzulux-update`)</h2>
+  <div class="tool-card cyan">
+    <h3>¿Para qué sirve?</h3>
+    <p>Permite que cada vez que Alfredo Dzul suba una mejora, corrección o nueva herramienta al repositorio oficial de GitHub, tu computadora pueda descargarla e instalarla directamente sin necesidad de volver a flashear la USB ni reinstalar el sistema.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre <em>"Dzulux Actualizador del Sistema"</em> en el menú o escribe en terminal: <span class="code-pill">dzulux-update</span> (o de forma rápida: <span class="code-pill">dzulux-update --quick</span>).</p>
+    <ul class="step-list">
+      <li><strong>1. Actualizar Suite Dzulux:</strong> Descarga al instante las últimas versiones de todos los scripts oficiales, lanzadores del menú y configuraciones maestras directamente desde la rama principal de GitHub.</li>
+      <li><strong>2. Actualizar Sistema Completo:</strong> Sincroniza las herramientas Dzulux y además actualiza todos los paquetes base de Arch Linux (`pacman -Syu`).</li>
+      <li><strong>3. Comprobar Versión de ISO:</strong> Consulta la API de GitHub Releases y te avisa si hay una nueva versión de ISO lista para descargar a tu carpeta de Descargas.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>Seguridad Automática:</strong> Antes de aplicar cualquier actualización, <span class="code-pill">dzulux-update</span> crea automáticamente un punto de restauración Btrfs (Snapshot) de seguridad para que siempre puedas revertir el estado si lo deseas.
+    </div>
+  </div>
+
   <div class="page-break"></div>
 
   <!-- Solución de Problemas Frecuentes (FAQ / Troubleshooting) -->
-  <h2>❓ 14. Solución de Problemas Frecuentes (FAQ)</h2>
+  <h2>❓ 15. Solución de Problemas Frecuentes (FAQ)</h2>
   <div class="tool-card purple">
     <h3>1. ¿Qué hago si la terminal o una ventana me pide contraseña?</h3>
     <p>En el entorno Live de Dzulux, el usuario es <span class="code-pill">liveuser</span> y la contraseña es <span class="code-pill">dzulux</span>. También puedes simplemente <strong>presionar ENTER</strong> (dejar la clave en blanco). Para comandos de administrador ejecuta <span class="code-pill">sudo &lt;comando&gt;</span> y no te pedirá contraseña.</p>
@@ -573,7 +592,7 @@
   </div>
 
   <!-- Tabla Maestra de Referencia Rápida -->
-  <h2>📌 15. Tabla Maestra de Comandos y Referencia Rápida</h2>
+  <h2>📌 16. Tabla Maestra de Comandos y Referencia Rápida</h2>
   <table>
     <thead>
       <tr>
@@ -587,6 +606,11 @@
         <td><span class="code-pill">dzulux-installer</span></td>
         <td>Instala Dzulux (Dual Boot o Limpio; auto-detecta Celeron para Dzulux Lite).</td>
         <td>Cancelar con la tecla ESC antes de confirmar el particionado.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-update</span></td>
+        <td>Descarga al instante los últimos parches y herramientas oficiales de GitHub.</td>
+        <td>Crea un Snapshot de seguridad previo automáticamente antes de actualizar.</td>
       </tr>
       <tr>
         <td><span class="code-pill">dzulux-performance</span></td>
@@ -647,7 +671,7 @@
   </table>
 
   <!-- Atajos de Teclado Útiles -->
-  <h2>⌨️ 16. Atajos de Teclado Esenciales</h2>
+  <h2>⌨️ 17. Atajos de Teclado Esenciales</h2>
   <table>
     <thead>
       <tr>

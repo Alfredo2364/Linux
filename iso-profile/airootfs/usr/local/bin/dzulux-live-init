@@ -30,6 +30,15 @@ cp -rf /etc/skel/. /home/liveuser/ 2>/dev/null || true
 chown -R 1000:1000 /home/liveuser 2>/dev/null || true
 chmod 755 /home/liveuser 2>/dev/null || true
 
+# Replicar temas y panel XFCE a nivel de sistema en tiempo de ejecución
+if [ -d /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml ]; then
+    mkdir -p /etc/xdg/xfce4/xfconf/xfce-perchannel-xml /etc/xdg/xfce4/panel
+    cp -rf /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/* /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/ 2>/dev/null || true
+    if [ -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc ]; then
+        cp -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc /etc/xdg/xfce4/panel/ 2>/dev/null || true
+    fi
+fi
+
 # Sudo 100% sin contraseña para liveuser y root
 mkdir -p /etc/sudoers.d
 echo "liveuser ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/liveuser

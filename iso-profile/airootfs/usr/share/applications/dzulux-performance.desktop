@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Rendimiento y Perfiles
+GenericName=Gestor de Rendimiento
+Comment=Alterna entre Modo Oficina, Game Booster y Gamer Sin Límites (Streaming protegido)
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-performance
+Icon=utilities-system-monitor
+Terminal=false
+Categories=Settings;HardwareSettings;System;
+Keywords=performance;rendimiento;gamer;booster;streaming;obs;oficina;cpu;

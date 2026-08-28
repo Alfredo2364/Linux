@@ -28,5 +28,6 @@ file_permissions=(
   ["/usr/local/bin/dzulux-battery"]="0:0:755"
   ["/usr/local/bin/dzulux-stealth"]="0:0:755"
   ["/usr/local/bin/dzulux-looks"]="0:0:755"
+  ["/usr/local/bin/dzulux-performance"]="0:0:755"
   ["/usr/local/bin/dzulux-live-init"]="0:0:755"
 )

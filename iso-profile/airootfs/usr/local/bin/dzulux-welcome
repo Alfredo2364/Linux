@@ -32,6 +32,7 @@ echo -e "  • ${GREEN}${BOLD}dzulux-rescue${NC}     -> Quitar contraseñas de W
 echo -e "  • ${GREEN}${BOLD}dzulux-battery${NC}    -> Ahorro inteligente de batería con Wi-Fi configurable"
 echo -e "  • ${GREEN}${BOLD}dzulux-stealth${NC}    -> Escudo de privacidad para Wi-Fi públicos (MAC aleatoria)"
 echo -e "  • ${GREEN}${BOLD}dzulux-looks${NC}      -> Alternar entre tema Cyberpunk y estilo Windows"
+echo -e "  • ${GREEN}${BOLD}dzulux-performance${NC}-> Perfiles de CPU: Oficina, Game Booster y Streaming Sin Límites"
 echo -e "  • ${GREEN}${BOLD}switch-mode${NC}       -> Alternar entre Modo Gráfico (gui) y Terminal (cli)"
 echo -e "  • ${GREEN}${BOLD}nmtui${NC}             -> Conectar a Wi-Fi en terminal"
 echo ""

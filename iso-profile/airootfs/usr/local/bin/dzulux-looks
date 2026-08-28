@@ -25,7 +25,7 @@ main_menu() {
         CHOICE=$($UI --title "Dzulux Looks - Personalización Visual (Alfredo Dzul)" --menu \
 "Elige la apariencia y disposición de escritorio que prefieras:" 16 70 4 \
 "1" "🌌 Dzulux Cyberpunk Dark (Panel superior moderno, tema oscuro neón)" \
-"2" "🪟 Estilo Windows Clásico (Barra inferior, menú inicio a la izquierda)" \
+"2" "🪟 Estilo Windows 10 (Menú de inicio con buscador, categorías y apps)" \
 "3" "⚡ Modo Minimal Flat (Cero efectos, ultra veloz para laptops modestas)" \
 "4" "Salir" 3>&1 1>&2 2>&3)
     else
@@ -33,7 +33,7 @@ main_menu() {
         echo -e "${CYAN}${BOLD}=== DZULUX LOOKS - ESTILOS VISUALES ===${NC}"
         echo -e "Diseñado por Alfredo Dzul\n"
         echo "1) Dzulux Cyberpunk Dark (Predeterminado)"
-        echo "2) Estilo Windows Clásico (Barra inferior)"
+        echo "2) Estilo Windows 10 (Menú de inicio con buscador y categorías)"
         echo "3) Modo Minimal Flat (Ultra veloz)"
         echo "4) Salir"
         read -p "Elige una opción (1-4): " CHOICE
@@ -57,12 +57,44 @@ set_cyberpunk() {
 }
 
 set_windows_style() {
-    # Mover el panel XFCE a la parte inferior
+    # Mover el panel XFCE a la parte inferior (altura 40px estilo Windows 10)
     xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=8;x=0;y=0" 2>/dev/null || true
-    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 38 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 40 2>/dev/null || true
     xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
     xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
-    show_msg "¡Estilo Windows activado! Barra de tareas colocada abajo al estilo clásico."
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
+
+    # Configurar Menú de Inicio estilo Windows 10 (Whisker Menu con buscador y categorías de apps)
+    mkdir -p "${HOME}/.config/xfce4/panel"
+    for wrc in "${HOME}/.config/xfce4/panel/whiskermenu-"*.rc; do
+        if [ -f "$wrc" ]; then
+            cat << 'EOF' > "$wrc"
+favorites=firefox.desktop,thunar.desktop,xfce4-terminal.desktop,dzulux-apps.desktop,dzulux-drivers.desktop,dzulux-rescue.desktop
+button-title=Inicio
+button-icon=org.xfce.panel.whiskermenu
+show-button-title=false
+show-button-icon=true
+category-icon-size=1
+item-icon-size=2
+hover-switch-category=true
+position-search-alternate=true
+position-commands-alternate=true
+position-categories-alternate=true
+view-as-icons=true
+show-description=true
+show-category-name=true
+EOF
+        fi
+    done
+
+    # Vincular la tecla Windows / Super para abrir el menú de inicio al instante
+    xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -n -t string -s "xfce4-popup-whiskermenu" 2>/dev/null || \
+    xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -s "xfce4-popup-whiskermenu" 2>/dev/null || true
+
+    # Reiniciar panel para aplicar el cambio visual
+    xfce4-panel --restart 2>/dev/null || true
+
+    show_msg "¡Estilo Windows 10 activado!\n\n• Barra de tareas colocada abajo.\n• Menú de inicio tipo Windows 10 con buscador de apps y categorías.\n• Presiona la tecla Windows en tu teclado para abrir el menú en cualquier momento."
 }
 
 set_minimal_flat() {

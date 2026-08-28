@@ -1,22 +1,13 @@
-# ~/.bashrc - Configuración de shell para Dzulux Linux
-# Diseñado por Alfredo Dzul
-
-# Si no es interactiva, no hacer nada
+# ~/.bashrc - Dzulux Linux
 [[ $- != *i* ]] && return
 
-# Aliases útiles
 alias ls='ls --color=auto'
-alias ll='ls -la --color=auto'
+alias ll='ls -la'
 alias grep='grep --color=auto'
-alias installer='sudo dzulux-installer'
-alias hw='hw-detect'
-alias update='sudo pacman -Syu'
 
-# Prompt estilizado y moderno
-PS1='\[\033[01;36m\]dzulux\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-
-# Mostrar bienvenida en terminal interactiva si no está dentro de script
-if [ -z "${DZULUX_SILENT:-}" ]; then
-    export DZULUX_SILENT=1
-    dzulux-welcome
+# Mostrar bienvenida y Fastfetch al abrir la terminal
+if [ -f /usr/local/bin/dzulux-welcome ]; then
+    dzulux-welcome 2>/dev/null || true
+elif [ -f /usr/local/bin/fastfetch ]; then
+    fastfetch 2>/dev/null || true
 fi

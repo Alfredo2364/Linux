@@ -34,6 +34,7 @@ SUB_ACTION="${2:-}"
 case "$ACTION" in
     gui)
         echo -e "${GREEN}Iniciando Entorno Gráfico de Dzulux (LightDM / XFCE)...${NC}"
+        sudo systemctl unmask lightdm display-manager 2>/dev/null || true
         sudo systemctl start lightdm
         ;;
     cli)

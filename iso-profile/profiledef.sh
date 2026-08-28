@@ -25,6 +25,7 @@ file_permissions=(
   ["/home/liveuser"]="1000:1000:755"
   ["/home/liveuser/Desktop"]="1000:1000:755"
   ["/home/liveuser/Desktop/dzulux-installer.desktop"]="1000:1000:755"
+  ["/home/liveuser/Desktop/dzulux-rescue.desktop"]="1000:1000:755"
   ["/home/liveuser/Desktop/hw-detect.desktop"]="1000:1000:755"
   ["/usr/local/bin/dzulux-installer"]="0:0:755"
   ["/usr/local/bin/hw-detect"]="0:0:755"

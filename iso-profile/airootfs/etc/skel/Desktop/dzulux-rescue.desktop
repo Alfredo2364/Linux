@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Rescue
+GenericName=Rescate de Archivos y Windows
+Comment=Quita contraseñas de Windows olvidadas, rescata archivos y audita la salud del disco
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-rescue
+Icon=help-browser
+Terminal=false
+Categories=System;Security;Utility;
+Keywords=rescue;windows;password;recuperar;archivos;smart;disco;

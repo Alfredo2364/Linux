@@ -81,6 +81,7 @@ thunar-archive-plugin
 file-roller
 mousepad
 firefox
+polkit-gnome
 
 # Apariencia y Fuentes
 materia-gtk-theme
@@ -89,6 +90,9 @@ inter-font
 ttf-jetbrains-mono-nerd
 
 # Utilidades de Terminal
+archlinux-keyring
+xdg-user-dirs
+jq
 bash-completion
 zsh
 fastfetch

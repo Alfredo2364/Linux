@@ -105,6 +105,18 @@ fi
 # Eliminar duplicados de la lista de paquetes
 UNIQUE_PKGS=($(printf "%s\n" "${PKG_LIST[@]}" | sort -u))
 
+if [ "${#UNIQUE_PKGS[@]}" -eq 0 ]; then
+    if [ -n "$UI" ]; then
+        $UI --title "Hardware Optimizado" --msgbox \
+"¡Excelente!\n\nTu equipo ya cuenta con todos los controladores necesarios dentro del núcleo de Dzulux Linux.\n\nNo se requieren controladores propietarios adicionales para tu hardware." 12 70
+    else
+        clear
+        echo -e "${GREEN}${BOLD}✓ ¡Excelente! Tu equipo ya cuenta con todos los controladores necesarios dentro del núcleo de Dzulux Linux.${NC}"
+        echo "No se requieren controladores propietarios adicionales para tu hardware."
+    fi
+    exit 0
+fi
+
 # 3. Preguntar al usuario antes de proceder
 if [ -n "$UI" ]; then
     if ! $UI --title "Asistente de Controladores - Dzulux Linux" \

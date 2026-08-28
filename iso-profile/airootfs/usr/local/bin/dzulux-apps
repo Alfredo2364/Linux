@@ -83,6 +83,7 @@ install_dev() {
     init_flatpak
     sudo pacman -Sy --needed --noconfirm code docker docker-compose nodejs npm python python-pip git 2>/dev/null || true
     sudo systemctl enable --now docker.service 2>/dev/null || true
+    sudo usermod -aG docker "$USER" 2>/dev/null || true
     show_success "Entorno de Desarrollo (VS Code, Docker, Node.js, Python, Git)"
 }
 

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Cambiar Modo de Sistema
+GenericName=Alternar entre Gráfico y Terminal
+Comment=Cambia dinámicamente entre escritorio gráfico XFCE y consola terminal CLI
+Exec=xfce4-terminal -e /usr/local/bin/switch-mode
+Icon=preferences-desktop
+Terminal=false
+Categories=System;Settings;
+Keywords=switch;mode;gui;cli;terminal;grafico;consola;

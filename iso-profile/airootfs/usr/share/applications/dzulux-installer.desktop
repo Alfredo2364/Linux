@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Instalar Dzulux Linux
+GenericName=Instalador del Sistema
+Comment=Instala Dzulux Linux en tu disco duro o SSD con soporte Dual Boot
+Exec=xfce4-terminal -e "sudo /usr/local/bin/dzulux-installer"
+Icon=system-software-install
+Terminal=false
+Categories=System;Settings;
+Keywords=install;installer;instalar;dzulux;setup;

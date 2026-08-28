@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Bienvenida a Dzulux
+GenericName=Guía y Comandos Rápidos
+Comment=Muestra información del sistema y comandos útiles de la suite Dzulux
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-welcome
+Icon=help-about
+Terminal=false
+Categories=System;Utility;
+Keywords=welcome;bienvenida;ayuda;dzulux;comandos;

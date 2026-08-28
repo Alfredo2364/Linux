@@ -34,6 +34,29 @@ jobs:
           ln -sf /usr/lib/systemd/system/graphical.target iso-profile/airootfs/etc/systemd/system/default.target
           ln -sf /usr/lib/systemd/system/lightdm.service iso-profile/airootfs/etc/systemd/system/display-manager.service
           ln -sf /usr/lib/systemd/system/NetworkManager.service iso-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+
+          # Preservar todas las cuentas de sistema base (dbus, nobody, systemd, etc.) e inyectar usuario liveuser estático
+          mkdir -p iso-profile/airootfs/etc
+          cat /etc/passwd > iso-profile/airootfs/etc/passwd
+          grep -q "^liveuser:" iso-profile/airootfs/etc/passwd || echo "liveuser:x:1000:1000:Dzulux Live User:/home/liveuser:/bin/bash" >> iso-profile/airootfs/etc/passwd
+
+          cat /etc/group > iso-profile/airootfs/etc/group
+          grep -q "^autologin:" iso-profile/airootfs/etc/group || echo "autologin:x:984:liveuser" >> iso-profile/airootfs/etc/group
+          grep -q "^liveuser:" iso-profile/airootfs/etc/group || echo "liveuser:x:1000:" >> iso-profile/airootfs/etc/group
+          for g in wheel video audio input storage power network users adm; do
+            if grep -q "^${g}:" iso-profile/airootfs/etc/group; then
+              sed -i "/^${g}:/ { /,liveuser/! s/$/,liveuser/; s/:,/:/ }" iso-profile/airootfs/etc/group
+            fi
+          done
+
+          cat /etc/shadow > iso-profile/airootfs/etc/shadow
+          sed -i 's/^root:[^:]*:/root::/' iso-profile/airootfs/etc/shadow
+          grep -q "^liveuser:" iso-profile/airootfs/etc/shadow || echo "liveuser::14871::::::" >> iso-profile/airootfs/etc/shadow
+
+          cat /etc/gshadow > iso-profile/airootfs/etc/gshadow
+          grep -q "^autologin:" iso-profile/airootfs/etc/gshadow || echo "autologin:!::liveuser" >> iso-profile/airootfs/etc/gshadow
+          grep -q "^liveuser:" iso-profile/airootfs/etc/gshadow || echo "liveuser:!::" >> iso-profile/airootfs/etc/gshadow
+
           mkarchiso -v -w /tmp/archiso-work -o output iso-profile 2>&1 | tee /tmp/mkarchiso.log
           cd output
           sha256sum *.iso > sha256sum.txt

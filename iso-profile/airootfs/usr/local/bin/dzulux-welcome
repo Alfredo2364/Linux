@@ -33,6 +33,8 @@ echo -e "  • ${GREEN}${BOLD}dzulux-battery${NC}    -> Ahorro inteligente de ba
 echo -e "  • ${GREEN}${BOLD}dzulux-stealth${NC}    -> Escudo de privacidad para Wi-Fi públicos (MAC aleatoria)"
 echo -e "  • ${GREEN}${BOLD}dzulux-looks${NC}      -> Alternar entre tema Cyberpunk y estilo Windows"
 echo -e "  • ${GREEN}${BOLD}dzulux-performance${NC}-> Perfiles de CPU: Oficina, Game Booster y Streaming Sin Límites"
+echo -e "  • ${GREEN}${BOLD}dzulux-update${NC}     -> Actualizador OTA del sistema y herramientas desde GitHub"
+echo -e "  • ${GREEN}${BOLD}hw-detect${NC}         -> Diagnóstico y auditoría completa de hardware"
 echo -e "  • ${GREEN}${BOLD}switch-mode${NC}       -> Alternar entre Modo Gráfico (gui) y Terminal (cli)"
 echo -e "  • ${GREEN}${BOLD}nmtui${NC}             -> Conectar a Wi-Fi en terminal"
 echo ""

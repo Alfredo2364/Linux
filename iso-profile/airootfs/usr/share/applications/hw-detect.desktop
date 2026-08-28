@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Auditoría de Hardware
+GenericName=Diagnóstico de Componentes
+Comment=Escaneo profundo de procesador, GPU, memoria RAM, discos y batería
+Exec=xfce4-terminal -e /usr/local/bin/hw-detect
+Icon=hwinfo
+Terminal=false
+Categories=System;Utility;
+Keywords=hardware;cpu;gpu;ram;temperatura;bateria;diagnostico;

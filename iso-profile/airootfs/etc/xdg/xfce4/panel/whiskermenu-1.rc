@@ -1,0 +1,14 @@
+favorites=firefox.desktop,thunar.desktop,xfce4-terminal.desktop,dzulux-apps.desktop,dzulux-drivers.desktop,dzulux-rescue.desktop,dzulux-installer.desktop
+button-title=Inicio
+button-icon=org.xfce.panel.whiskermenu
+show-button-title=true
+show-button-icon=true
+category-icon-size=1
+item-icon-size=2
+hover-switch-category=true
+position-search-alternate=true
+position-commands-alternate=true
+position-categories-alternate=true
+view-as-icons=true
+show-description=true
+show-category-name=true

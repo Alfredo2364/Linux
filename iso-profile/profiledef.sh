@@ -23,6 +23,7 @@ file_permissions=(
   ["/etc/sudoers.d/liveuser"]="0:0:440"
   ["/root"]="0:0:750"
   ["/home/liveuser"]="1000:1000:755"
+  ["/home/liveuser/.config"]="1000:1000:755"
   ["/home/liveuser/Desktop"]="1000:1000:755"
   ["/home/liveuser/Desktop/dzulux-installer.desktop"]="1000:1000:755"
   ["/home/liveuser/Desktop/dzulux-rescue.desktop"]="1000:1000:755"

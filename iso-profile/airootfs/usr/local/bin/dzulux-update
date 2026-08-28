@@ -110,6 +110,10 @@ actualizar_suite() {
         "dzulux-snapshots.desktop"
         "dzulux-stealth.desktop"
         "dzulux-update.desktop"
+        "dzulux-installer.desktop"
+        "dzulux-welcome.desktop"
+        "hw-detect.desktop"
+        "switch-mode.desktop"
     )
 
     mkdir -p /usr/share/applications

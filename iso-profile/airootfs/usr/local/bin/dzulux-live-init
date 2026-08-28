@@ -44,6 +44,11 @@ fi
 # Iniciar gestor de redes
 systemctl start NetworkManager.service 2>/dev/null || true
 
+# Iniciar Bluetooth si se detecta adaptador inalámbrico
+if command -v rfkill >/dev/null 2>&1 && rfkill list bluetooth 2>/dev/null | grep -q "bluetooth"; then
+    systemctl start bluetooth.service 2>/dev/null || true
+fi
+
 # Si se seleccionó Modo CLI en el arranque de GRUB, desactivar LightDM y aislar multi-user.target
 if grep -q "system_mode=cli" /proc/cmdline; then
     systemctl stop lightdm.service display-manager.service 2>/dev/null || true

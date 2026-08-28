@@ -255,8 +255,8 @@ else
     mount -o noatime "${ROOT_PART}" /mnt
 fi
 
-mkdir -p /mnt/boot
-mount "${BOOT_PART}" /mnt/boot
+mkdir -p /mnt/boot/efi
+mount "${BOOT_PART}" /mnt/boot/efi
 
 # ------------------------------------------------------------------------------
 # 4. CONFIGURACIÓN DE USUARIO Y EQUIPO
@@ -338,8 +338,12 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     fi
 
     echo "60"; sleep 1
-    echo "XXX\nConfigurando identidad, usuario '${USERNAME}', teclado y localización...\nXXX"
+    echo "XXX\nConfigurando identidad, usuario '${USERNAME}', teclado y claves de seguridad...\nXXX"
     
+    # Inicializar claves maestras de pacman limpias para el disco duro
+    arch-chroot /mnt pacman-key --init 2>/dev/null || true
+    arch-chroot /mnt pacman-key --populate archlinux 2>/dev/null || true
+
     echo "${HOSTNAME}" > /mnt/etc/hostname
 
     # Localización y teclado en español
@@ -381,6 +385,15 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
 
     sed -i '/GRUB_DISABLE_OS_PROBER/d' /mnt/etc/default/grub 2>/dev/null || true
     echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub
+
+    echo "80"; sleep 1
+    echo "XXX\nReconstruyendo el Kernel (Initramfs) para arranque desde Disco Duro...\nXXX"
+    
+    # Eliminar configuraciones exclusivas del Live USB que rompen el arranque en disco
+    rm -f /mnt/etc/mkinitcpio.conf.d/archiso.conf 2>/dev/null || true
+    
+    # Reconstruir initramfs
+    arch-chroot /mnt mkinitcpio -P 2>/dev/null || true
 
     echo "85"; sleep 1
     echo "XXX\nInstalando temas, wallpapers y generando menú de arranque GRUB...\nXXX"

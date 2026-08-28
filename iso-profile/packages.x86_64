@@ -26,7 +26,7 @@ vulkan-radeon
 libva-mesa-driver
 vulkan-intel
 intel-media-driver
-nvidia-open
+nvidia
 nvidia-utils
 nvidia-settings
 nvidia-prime

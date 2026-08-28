@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-looks - Gestor de Estilos Visuales y Disposición de Escritorio
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+main_menu() {
+    if [ -n "$UI" ]; then
+        CHOICE=$($UI --title "Dzulux Looks - Personalización Visual (Alfredo Dzul)" --menu \
+"Elige la apariencia y disposición de escritorio que prefieras:" 16 70 4 \
+"1" "🌌 Dzulux Cyberpunk Dark (Panel superior moderno, tema oscuro neón)" \
+"2" "🪟 Estilo Windows Clásico (Barra inferior, menú inicio a la izquierda)" \
+"3" "⚡ Modo Minimal Flat (Cero efectos, ultra veloz para laptops modestas)" \
+"4" "Salir" 3>&1 1>&2 2>&3)
+    else
+        clear
+        echo -e "${CYAN}${BOLD}=== DZULUX LOOKS - ESTILOS VISUALES ===${NC}"
+        echo -e "Diseñado por Alfredo Dzul\n"
+        echo "1) Dzulux Cyberpunk Dark (Predeterminado)"
+        echo "2) Estilo Windows Clásico (Barra inferior)"
+        echo "3) Modo Minimal Flat (Ultra veloz)"
+        echo "4) Salir"
+        read -p "Elige una opción (1-4): " CHOICE
+    fi
+
+    case "$CHOICE" in
+        1) set_cyberpunk ;;
+        2) set_windows_style ;;
+        3) set_minimal_flat ;;
+        *) exit 0 ;;
+    esac
+}
+
+set_cyberpunk() {
+    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=6;x=0;y=0" 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+    show_msg "¡Estilo Dzulux Cyberpunk Dark activado con éxito!"
+}
+
+set_windows_style() {
+    # Mover el panel XFCE a la parte inferior
+    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=8;x=0;y=0" 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 38 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
+    show_msg "¡Estilo Windows activado! Barra de tareas colocada abajo al estilo clásico."
+}
+
+set_minimal_flat() {
+    xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/box_move -s true 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/box_resize -s true 2>/dev/null || true
+    show_msg "¡Modo Minimal Flat activado! Todos los efectos desactivados para máxima velocidad de respuesta."
+}
+
+show_msg() {
+    local M="$1"
+    if [ -n "$UI" ]; then
+        $UI --title "Apariencia Actualizada" --msgbox "${M}" 10 65
+    else
+        echo -e "\n${GREEN}${BOLD}✓ ${M}${NC}\n"
+        read -p "Presiona ENTER para continuar..." _
+    fi
+    main_menu
+}
+
+main_menu

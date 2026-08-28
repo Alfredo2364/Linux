@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux App Hub
+GenericName=Tienda de Aplicaciones
+Comment=Instala Steam, Discord, VS Code, LibreOffice y navegadores con 1 clic
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-apps
+Icon=system-software-install
+Terminal=false
+Categories=System;PackageManager;Utility;
+Keywords=software;app;tienda;programas;steam;discord;office;

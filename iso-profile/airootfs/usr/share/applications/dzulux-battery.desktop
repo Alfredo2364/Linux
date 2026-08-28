@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Ahorro de Batería
+GenericName=Gestor de Energía
+Comment=Modos de ahorro de batería para laptop con Wi-Fi configurable
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-battery
+Icon=battery
+Terminal=false
+Categories=Settings;HardwareSettings;Utility;
+Keywords=bateria;energia;ahorro;laptop;wifi;

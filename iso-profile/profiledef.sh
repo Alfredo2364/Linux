@@ -22,5 +22,11 @@ file_permissions=(
   ["/usr/local/bin/switch-mode"]="0:0:755"
   ["/usr/local/bin/dzulux-welcome"]="0:0:755"
   ["/usr/local/bin/dzulux-drivers"]="0:0:755"
+  ["/usr/local/bin/dzulux-apps"]="0:0:755"
+  ["/usr/local/bin/dzulux-snapshots"]="0:0:755"
+  ["/usr/local/bin/dzulux-rescue"]="0:0:755"
+  ["/usr/local/bin/dzulux-battery"]="0:0:755"
+  ["/usr/local/bin/dzulux-stealth"]="0:0:755"
+  ["/usr/local/bin/dzulux-looks"]="0:0:755"
   ["/usr/local/bin/dzulux-live-init"]="0:0:755"
 )

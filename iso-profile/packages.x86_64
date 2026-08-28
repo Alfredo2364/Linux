@@ -105,6 +105,9 @@ pciutils
 usbutils
 lshw
 inxi
+chntpw
+smartmontools
+flatpak
 
 # Suite Servidor y Redes
 openssh

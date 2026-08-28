@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Modo Privacidad (Stealth)
+GenericName=Escudo de Red
+Comment=Protege tu navegación en Wi-Fi públicos con MAC aleatoria y DNS seguro
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-stealth
+Icon=security-high
+Terminal=false
+Categories=System;Security;Network;
+Keywords=privacy;seguridad;wifi;vpn;dns;mac;

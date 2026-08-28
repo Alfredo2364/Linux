@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Estilos Visuales (Looks)
+GenericName=Personalización de Escritorio
+Comment=Cambia entre estilo Cyberpunk, estilo Windows y modo ligero con 1 clic
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-looks
+Icon=preferences-desktop-theme
+Terminal=false
+Categories=Settings;DesktopSettings;
+Keywords=theme;tema;estilo;windows;looks;apariencia;

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dzulux Snapshots
+GenericName=Puntos de Restauración
+Comment=Crea puntos de restauración instantáneos del sistema antes de actualizar
+Exec=xfce4-terminal -e /usr/local/bin/dzulux-snapshots
+Icon=document-save
+Terminal=false
+Categories=System;Archiving;Utility;
+Keywords=backup;snapshot;restaurar;btrfs;seguridad;

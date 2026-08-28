@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-snapshots - Gestor de Puntos de Restauración Instantáneos
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+SNAPSHOT_DIR="/.snapshots"
+sudo mkdir -p "${SNAPSHOT_DIR}"
+
+is_btrfs() {
+    [ "$(stat -f -c %T /)" = "btrfs" ]
+}
+
+main_menu() {
+    if [ -n "$UI" ]; then
+        CHOICE=$($UI --title "Dzulux Snapshots - Puntos de Restauración" --menu \
+"Protege tu sistema antes de actualizar o modificar archivos:\n(Diseñado por Alfredo Dzul)" 16 70 4 \
+"1" "📸 Crear Nuevo Punto de Restauración Instantáneo" \
+"2" "📋 Ver Puntos de Restauración Existentes" \
+"3" "⏪ Revertir / Restaurar Sistema a un Punto Anterior" \
+"4" "Salir" 3>&1 1>&2 2>&3)
+    else
+        clear
+        echo -e "${CYAN}${BOLD}=== DZULUX SNAPSHOTS - PUNTOS DE RESTAURACIÓN ===${NC}"
+        echo -e "Diseñado por Alfredo Dzul\n"
+        echo "1) Crear Nuevo Punto de Restauración Instantáneo"
+        echo "2) Ver Puntos de Restauración Existentes"
+        echo "3) Revertir Sistema a un Punto Anterior"
+        echo "4) Salir"
+        read -p "Elige una opción (1-4): " CHOICE
+    fi
+
+    case "$CHOICE" in
+        1) create_snapshot ;;
+        2) list_snapshots ;;
+        3) restore_snapshot ;;
+        *) exit 0 ;;
+    esac
+}
+
+create_snapshot() {
+    local NAME="snapshot_$(date +%Y%m%d_%H%M%S)"
+    if is_btrfs; then
+        sudo btrfs subvolume snapshot -r / "${SNAPSHOT_DIR}/${NAME}"
+        MSG="¡Punto de restauración Btrfs '${NAME}' creado en 1 segundo!\n\nEspacio ocupado: ~0 MB (Copy-on-Write).\nPuedes volver a este punto exacto cuando quieras."
+    else
+        # Modo compatibilidad ext4
+        sudo mkdir -p "${SNAPSHOT_DIR}/${NAME}"
+        sudo rsync -a --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/.snapshots/*"} /etc /var/log /root "${SNAPSHOT_DIR}/${NAME}/"
+        MSG="Punto de respaldo de configuración '${NAME}' creado con éxito en ${SNAPSHOT_DIR}/${NAME}."
+    fi
+
+    if [ -n "$UI" ]; then
+        $UI --title "Punto Creado" --msgbox "${MSG}" 14 70
+    else
+        echo -e "\n${GREEN}${BOLD}${MSG}${NC}\n"
+    fi
+    main_menu
+}
+
+list_snapshots() {
+    local LIST
+    LIST="$(sudo ls -lh "${SNAPSHOT_DIR}" 2>/dev/null || echo "No hay puntos guardados aún.")"
+    if [ -n "$UI" ]; then
+        $UI --title "Puntos de Restauración Disponibles" --msgbox "${LIST}" 16 70
+    else
+        clear
+        echo -e "${CYAN}${BOLD}Puntos de Restauración Guardados:${NC}\n"
+        echo "${LIST}"
+        echo ""
+        read -p "Presiona ENTER para volver al menú..." _
+    fi
+    main_menu
+}
+
+restore_snapshot() {
+    if is_btrfs; then
+        local MSG="Para revertir a un punto anterior con Btrfs:\n1. Reinicia tu equipo.\n2. En el menú de arranque GRUB, selecciona 'Dzulux Snapshots'.\n3. Elige la fecha que deseas restaurar y el sistema iniciará en ese estado exacto."
+    else
+        local MSG="Para restaurar archivos de configuración, revisa la carpeta /.snapshots/"
+    fi
+
+    if [ -n "$UI" ]; then
+        $UI --title "Cómo Restaurar" --msgbox "${MSG}" 14 70
+    else
+        echo -e "\n${YELLOW}${MSG}${NC}\n"
+        read -p "Presiona ENTER para volver..." _
+    fi
+    main_menu
+}
+
+main_menu

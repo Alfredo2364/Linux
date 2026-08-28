@@ -2,31 +2,32 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Guía de Inicio y Agradecimientos - Dzulux Linux (Beta)</title>
+  <title>Manual Oficial de Usuario y Arquitectura - Dzulux Linux 1.1 (Beta)</title>
   <style>
     @page {
       size: A4;
-      margin: 20mm 15mm 20mm 15mm;
+      margin: 16mm 14mm 16mm 14mm;
     }
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
       color: #1e293b;
       background-color: #ffffff;
-      line-height: 1.5;
-      font-size: 11pt;
+      line-height: 1.55;
+      font-size: 10pt;
       margin: 0;
       padding: 0;
     }
     .header {
-      background: linear-gradient(135deg, #0a0e17 0%, #1e293b 100%);
+      background: linear-gradient(135deg, #050b14 0%, #0d1b2a 50%, #1b263b 100%);
       color: #ffffff;
-      padding: 24px;
+      padding: 22px 26px;
       border-radius: 12px;
       margin-bottom: 20px;
       border-bottom: 4px solid #00f2fe;
+      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.15);
     }
     .logo-title {
-      font-size: 28pt;
+      font-size: 26pt;
       font-weight: 900;
       letter-spacing: 2px;
       margin: 0;
@@ -36,35 +37,49 @@
       color: #00f2fe;
     }
     .subtitle {
-      font-size: 12pt;
+      font-size: 11pt;
       color: #94a3b8;
       margin-top: 4px;
       margin-bottom: 12px;
       font-weight: 500;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
     }
     .badge {
       display: inline-block;
-      background-color: #0f172a;
-      border: 1px solid #334155;
+      background-color: #030712;
+      border: 1px solid #1e293b;
       color: #00f2fe;
       padding: 4px 12px;
       border-radius: 6px;
-      font-size: 9pt;
+      font-size: 8.5pt;
       font-weight: 700;
       font-family: monospace;
+      margin-right: 8px;
+    }
+    .badge-alt {
+      background-color: #064e3b;
+      color: #34d399;
+      border-color: #059669;
     }
     h2 {
       color: #0f172a;
-      font-size: 14pt;
+      font-size: 13.5pt;
       border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 6px;
+      padding-bottom: 5px;
       margin-top: 22px;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    h3 {
+      color: #1e293b;
+      font-size: 11.5pt;
+      margin-top: 14px;
+      margin-bottom: 6px;
     }
     .letter-box {
       background-color: #f8fafc;
-      border-left: 4px solid #4364f7;
+      border-left: 4px solid #00f2fe;
       padding: 14px 18px;
       border-radius: 0 8px 8px 0;
       margin-bottom: 18px;
@@ -81,12 +96,12 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 14px 0;
-      font-size: 10pt;
+      margin: 12px 0;
+      font-size: 9pt;
     }
     th, td {
       border: 1px solid #cbd5e1;
-      padding: 8px 10px;
+      padding: 7px 9px;
       text-align: left;
     }
     th {
@@ -101,15 +116,50 @@
       border-radius: 4px;
       font-family: 'Courier New', Courier, monospace;
       font-weight: bold;
-      color: #0369a1;
-      font-size: 9.5pt;
+      color: #0284c7;
+      font-size: 9pt;
     }
-    .card {
+    .tool-card {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      border-left: 4px solid #3b82f6;
+    }
+    .tool-card.green {
+      border-left-color: #10b981;
+    }
+    .tool-card.purple {
+      border-left-color: #8b5cf6;
+    }
+    .tool-card.amber {
+      border-left-color: #f59e0b;
+    }
+    .tool-card.cyan {
+      border-left-color: #06b6d4;
+    }
+    .tool-card.red {
+      border-left-color: #ef4444;
+    }
+    .step-list {
+      margin: 6px 0;
+      padding-left: 20px;
+    }
+    .step-list li {
+      margin-bottom: 4px;
+    }
+    .revert-box {
+      background-color: #f0fdf4;
+      border-left: 3px solid #22c55e;
+      padding: 8px 12px;
+      margin-top: 8px;
+      border-radius: 0 6px 6px 0;
+      font-size: 9pt;
+      color: #15803d;
+    }
+    .revert-box strong {
+      color: #166534;
     }
     .warning {
       background-color: #fffbeb;
@@ -117,13 +167,13 @@
       padding: 10px 14px;
       border-radius: 0 6px 6px 0;
       margin: 12px 0;
-      font-size: 10pt;
+      font-size: 9.5pt;
     }
     .page-break {
       page-break-after: always;
     }
     .footer {
-      margin-top: 30px;
+      margin-top: 24px;
       border-top: 1px solid #e2e8f0;
       padding-top: 10px;
       text-align: center;
@@ -134,109 +184,357 @@
 </head>
 <body>
 
-  <!-- Encabezado con Identidad de Dzulux -->
+  <!-- Encabezado con Identidad Oficial de Dzulux -->
   <div class="header">
     <div class="logo-title">DZUL<span>UX</span> LINUX</div>
-    <div class="subtitle">SISTEMA OPERATIVO DUAL (GRÁFICO / TERMINAL) • BASE ARCH LINUX</div>
-    <div class="badge">DISEÑADO Y CREADO POR ALFREDO DZUL</div>
+    <div class="subtitle">MANUAL OFICIAL DE USUARIO, ARQUITECTURA Y REFERENCIA TÉCNICA</div>
+    <div>
+      <span class="badge">VERSIÓN 1.1 BETA</span>
+      <span class="badge badge-alt">ARQUITECTURA x86_64</span>
+      <span class="badge">DISEÑADO Y CREADO POR ALFREDO DZUL</span>
+    </div>
   </div>
 
-  <!-- Sección 1: Agradecimientos -->
+  <!-- Agradecimientos -->
   <h2>💖 Agradecimientos y Bienvenida</h2>
   <div class="letter-box">
-    "Estimado usuario y compañero de la comunidad tecnológica:<br><br>
-    Quiero expresarte mi más sincero y profundo agradecimiento por descargar y darle una oportunidad a <strong>Dzulux Linux</strong>. Este sistema operativo nace del deseo de tener una plataforma verdaderamente equilibrada: con la potencia y solidez de un servidor moderno, pero con la accesibilidad y elegancia visual de un entorno de escritorio rápido y universal.<br><br>
-    Ha sido diseñado poniendo especial atención en que funcione en cualquier computadora: ya sea tu laptop de diario con control inteligente de batería, una PC de escritorio con tarjetas Intel, AMD o NVIDIA, o incluso una computadora Apple Mac con chips Intel y Wi-Fi Broadcom.<br><br>
-    Espero de corazón que esta herramienta te sea de gran utilidad en tus proyectos, estudios, desarrollo o uso cotidiano. ¡Gracias por formar parte de este viaje!"
-    <div class="author-sign">— Alfredo Dzul (Creador de Dzulux Linux)</div>
+    "Estimado usuario y apasionado de la tecnología:<br><br>
+    Quiero agradecerte sinceramente por descargar y confiar en <strong>Dzulux Linux 1.1 (Beta)</strong>. Esta distribución nace con un propósito claro: demostrar que un sistema operativo puede ser sumamente potente y completo sin necesidad de ser pesado, saturado o inaccesible.<br><br>
+    Cada componente de esta versión ha sido diseñado pensando en los problemas reales que enfrentamos a diario: laptops de bajos recursos que se congelan con otros sistemas, equipos con discos soldados de 32 GB donde Windows se queda sin espacio, o la necesidad de jugar y transmitir en directo sin perder cuadros. Esta guía fue escrita para que tengas el dominio absoluto de tu equipo.<br><br>
+    ¡Gracias por ser parte fundamental de Dzulux Linux!"
+    <div class="author-sign">— Alfredo Dzul (Creador y Diseñador de Dzulux Linux)</div>
   </div>
 
   <div class="warning">
-    <strong>⚠️ Aviso de Versión BETA:</strong> Dzulux Linux 1.1 se encuentra en fase beta activa de desarrollo. Si encuentras algún comportamiento inesperado o deseas proponer mejoras, tu opinión es sumamente valiosa en: <u>https://github.com/Alfredo2364/Linux/issues</u>.
+    <strong>⚠️ Nota de Estado BETA 1.1:</strong> Dzulux Linux se encuentra en fase activa de desarrollo. Si encuentras algún comportamiento inesperado o deseas sugerir mejoras, tu reporte es bienvenido en: <u>https://github.com/Alfredo2364/Linux/issues</u>.
   </div>
 
-  <!-- Sección 2: Grabado de la Memoria USB -->
-  <h2>💾 Paso 1: ¿Cómo grabar la imagen ISO en una USB?</h2>
-  <p>Para probar o instalar Dzulux Linux en un equipo físico, necesitas grabar el archivo <strong>.iso</strong> que viene en este paquete en una memoria USB (de al menos 4 GB):</p>
-  <ul>
-    <li><strong>Ventoy (La opción más recomendada)</strong>: Instala Ventoy en tu memoria USB una sola vez y luego simplemente copia y pega el archivo <span class="code-pill">dzulux-1.1-beta-x86_64.iso</span> dentro de la USB.</li>
-    <li><strong>Rufus (Windows)</strong>: Abre Rufus, selecciona tu memoria USB, elige el archivo ISO de Dzulux y presiona <em>Empezar</em> (en modo ISO o DD).</li>
-    <li><strong>BalenaEtcher (Windows / Mac / Linux)</strong>: Selecciona <em>Flash from file</em>, elige la ISO, tu USB y presiona <em>Flash!</em>.</li>
+  <!-- Grabado de USB y Arranque -->
+  <h2>💾 1. Grabado en USB y Arranque del Sistema</h2>
+  <p>Para utilizar Dzulux Linux, graba el archivo <span class="code-pill">dzulux-1.1-beta-x86_64.iso</span> en una memoria USB de al menos 4 GB:</p>
+  <ul class="step-list">
+    <li><strong>Ventoy (Recomendado):</strong> Instala Ventoy en tu USB una sola vez y simplemente arrastra el archivo <span class="code-pill">dzulux-1.1-beta-x86_64.iso</span> dentro de la memoria.</li>
+    <li><strong>Rufus (Windows):</strong> Selecciona tu memoria USB, elige la imagen ISO y pulsa <em>Empezar</em> (en modo ISO o DD).</li>
+    <li><strong>BalenaEtcher (Mac / Windows / Linux):</strong> Haz clic en <em>Flash from file</em>, selecciona la ISO y tu USB.</li>
+  </ul>
+  <p>Conecta la memoria a tu equipo y enciéndelo presionando la tecla de arranque (<strong>F12, F11, F8</strong> en PC; o manteniendo presionada la tecla <strong>Option / Alt</strong> en computadoras Apple Mac). En el menú de inicio podrás elegir:</p>
+  <ul class="step-list">
+    <li><strong>Dzulux Linux (Modo Gráfico):</strong> Escritorio visual XFCE optimizado (~550 MB de RAM).</li>
+    <li><strong>Dzulux Linux (Modo Terminal / Server CLI):</strong> Consola de alta velocidad (~148 MB de RAM).</li>
+    <li><strong>Windows Boot Manager:</strong> Para entrar directamente a tu sistema Windows instalado sin retirar la USB.</li>
   </ul>
 
-  <!-- Salto de página para que quede como un libro/guía perfecto -->
+  <!-- Salto de Página para inicio de la Suite -->
   <div class="page-break"></div>
 
-  <!-- Sección 3: Arranque y Modo Dual -->
-  <h2>🔄 Paso 2: Menú de Inicio y Modo Dual</h2>
-  <p>Conecta la memoria USB al equipo y enciéndelo presionando la tecla de selección de arranque (<strong>F12</strong>, <strong>F11</strong> o <strong>F8</strong> en PC; o manteniendo presionada la tecla <strong>Option / Alt</strong> en Mac). Verás el menú oficial de Dzulux con las siguientes opciones:</p>
+  <!-- Instalación y Dzulux Lite -->
+  <h2>⚙️ 2. Instalador Guiado y Detección de Silicio (`dzulux-installer`)</h2>
+  <div class="tool-card cyan">
+    <h3>¿Para qué sirve?</h3>
+    <p>Instala Dzulux Linux en tu disco con soporte para <strong>Dual Boot</strong> (convivir con Windows o Mac sin borrar tus datos) o instalación limpia.</p>
+    
+    <h3>¿Cómo usarlo?</h3>
+    <ul class="step-list">
+      <li><strong>En el Escritorio:</strong> Haz doble clic en el icono <em>"Instalar Dzulux Linux"</em>.</li>
+      <li><strong>En la Terminal:</strong> Ejecuta <span class="code-pill">sudo dzulux-installer</span>.</li>
+    </ul>
 
-  <div class="card">
-    <strong>1. Dzulux Linux (Modo Gráfico / Desktop):</strong><br>
-    Inicia directamente el entorno visual moderno basado en XFCE personalizado con tema oscuro, fuentes estilizadas y wallpapers oficiales. Consumo aproximado de solo 550 MB de RAM.
+    <h3>🛡️ Detección Inteligente de Hardware y Edición "Dzulux Lite":</h3>
+    <p>El instalador evalúa automáticamente tu procesador y memoria RAM:</p>
+    <ul class="step-list">
+      <li><strong>Si detecta un procesador modesto (Intel Celeron, Pentium, Atom, AMD Athlon &le; 2 núcleos, o &le; 3.5 GB RAM):</strong> El instalador restringe las opciones pesadas y configura automáticamente la edición <strong>Dzulux Lite</strong> (con compositor de sombras desactivado y compresión zRAM para erradicar congelamientos y garantizar 60 FPS estables).</li>
+      <li><strong>Si detecta almacenamiento eMMC de 32 GB soldado:</strong> Formatea automáticamente en <strong>Btrfs con compresión transparente zstd:1</strong>, ocupando solo <strong>~3.5 GB</strong> de sistema y dejando <strong>más de 26 GB libres</strong> para tus archivos.</li>
+      <li><strong>Si detecta un procesador de gama media/alta:</strong> Desbloquea la edición <strong>Dzulux Standard</strong> con temas visuales completos y aceleración gráfica.</li>
+    </ul>
   </div>
 
-  <div class="card">
-    <strong>2. Dzulux Linux (Modo Terminal / Servidor CLI):</strong><br>
-    Inicia en modo consola pura de alta velocidad, inspirado en la estabilidad y herramientas de <em>Ubuntu Server</em> (incluye OpenSSH, UFW, tmux, fastfetch y nmtui). Consume apenas 150 MB de RAM.
+  <!-- Alternancia de Modos Operativos -->
+  <h2>🔄 3. Alternancia entre Entorno Gráfico y Servidor (`switch-mode`)</h2>
+  <div class="tool-card purple">
+    <h3>¿Para qué sirve?</h3>
+    <p>Permite alternar en caliente entre el escritorio visual XFCE y el modo consola pura estilo <em>Ubuntu Server</em> sin necesidad de reiniciar la computadora.</p>
+    
+    <h3>¿Cómo usarlo?</h3>
+    <ul class="step-list">
+      <li><span class="code-pill">switch-mode gui</span> : Inicia y pasa de inmediato al escritorio visual XFCE.</li>
+      <li><span class="code-pill">switch-mode cli</span> : Cierra la sesión gráfica y regresa a la consola pura de alta velocidad.</li>
+      <li><span class="code-pill">switch-mode default gui</span> : Establece que tu PC siempre inicie en modo gráfico.</li>
+      <li><span class="code-pill">switch-mode default cli</span> : Establece que tu PC inicie como servidor en consola (ideal para servidores SSH o equipos de desarrollo).</li>
+      <li><span class="code-pill">switch-mode lowspec on/off</span> : Activa o desactiva los efectos de ventanas para acelerar chips gráficos antiguos.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir?</strong> Si cambiaste al modo consola y quieres regresar al escritorio visual, simplemente escribe <span class="code-pill">switch-mode gui</span> y presiona ENTER.
+    </div>
   </div>
 
-  <div class="card">
-    <strong>3. Iniciar Windows Boot Manager (Disco Local):</strong><br>
-    Te permite arrancar directamente el Windows o sistema que ya tienes instalado en tu disco duro si necesitas usarlo sin desconectar la USB.
+  <!-- Gestor de Estilos Visuales y Menú Windows 10 -->
+  <h2>🎨 4. Gestor de Apariencia y Menú Windows 10 (`dzulux-looks`)</h2>
+  <div class="tool-card green">
+    <h3>¿Para qué sirve?</h3>
+    <p>Cambia el diseño y la disposición de tu escritorio en 1 clic para adaptarse a tu estilo de trabajo o familiaridad.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre el menú de aplicaciones y busca <em>"Dzulux Estilos Visuales"</em> o escribe en terminal: <span class="code-pill">dzulux-looks</span>.</p>
+    
+    <ul class="step-list">
+      <li><strong>1. Dzulux Cyberpunk Dark (Predeterminado):</strong> Barra superior moderna, acentos neón cian, iconos Papirus y transparencias sutiles.</li>
+      <li><strong>2. Estilo Windows 10:</strong> Mueve la barra de tareas a la parte inferior (40 px), coloca el <strong>Menú de Inicio con buscador en tiempo real</strong> y categorías organizadas, y vincula la <strong>tecla Windows (Super)</strong> en tu teclado físico para abrir y cerrar el menú al instante.</li>
+      <li><strong>3. Modo Minimal Flat:</strong> Elimina sombras y efectos para ofrecer la máxima tasa de respuesta en equipos antiguos.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir?</strong> Ejecuta nuevamente <span class="code-pill">dzulux-looks</span> y elige la opción 1 (*Dzulux Cyberpunk Dark*). El sistema devolverá el panel a la parte superior y restaurará el tema oficial.
+    </div>
   </div>
 
-  <!-- Sección 4: Instalación y Dual Boot -->
-  <h2>⚙️ Paso 3: Instalación con Soporte Dual Boot</h2>
-  <p>Para instalar Dzulux en tu disco duro, solo abre el acceso directo en el escritorio o escribe en la terminal:</p>
-  <p><span class="code-pill">sudo dzulux-installer</span></p>
+  <div class="page-break"></div>
 
-  <p>El instalador es completamente interactivo y te preguntará cómo deseas configurarlo:</p>
-  <ul>
-    <li><strong>Modo Dual Boot (Recomendado si ya tienes Windows o Mac)</strong>: Mantiene intacto tu sistema operativo original. Dzulux se instalará en una partición dedicada compartiendo la partición EFI de arranque. Al reiniciar, podrás elegir cada vez si quieres entrar a Dzulux o a Windows/Mac.</li>
-    <li><strong>Modo Limpio</strong>: Reemplaza todo el disco para uso exclusivo de Dzulux Linux.</li>
-  </ul>
+  <!-- Motor de Rendimiento -->
+  <h2>⚡ 5. Motor de Rendimiento y Streaming (`dzulux-performance`)</h2>
+  <div class="tool-card amber">
+    <h3>¿Para qué sirve?</h3>
+    <p>Audita tu procesador y adapta el comportamiento de los núcleos de CPU, memoria RAM y tarjetas gráficas según la actividad que estés realizando.</p>
 
-  <!-- Sección 5: Comandos Rápidos -->
-  <h2>📋 Resumen de Comandos Rápidos</h2>
+    <h3>¿Cómo usarlo?</h3>
+    <p>Lánzalo desde el menú de aplicaciones (<em>"Dzulux Rendimiento y Perfiles"</em>) o ejecutando <span class="code-pill">dzulux-performance</span>.</p>
+
+    <ul class="step-list">
+      <li><strong>💼 Modo Oficina y Estudio:</strong> Optimiza el gobernador de la CPU a modo suave (`schedutil`). El sistema responde de inmediato para abrir documentos y navegar, manteniendo los ventiladores silenciosos y temperaturas bajas.</li>
+      <li><strong>🎮 Modo Gamer (Game Booster):</strong> Fija frecuencias estables de fábrica en el procesador (sin caídas de reloj), limpia la memoria caché inactiva de RAM y fuerza el uso de la GPU potente en laptops con gráficos híbridos NVIDIA/AMD.</li>
+      <li><strong>🚀 Modo Gamer Sin Límites (Streaming Protegido):</strong> Diseñado especialmente para quienes juegan y transmiten en <strong>OBS Studio, Discord o Twitch</strong>. Otorga prioridad de tiempo real (`renice -10`) a los codificadores de video para que el directo jamás pierda cuadros (*dropped frames*).</li>
+      <li><strong>💤 Congelador de Aplicaciones Secundarias (App Sleeper):</strong> El modo Sin Límites pone en pausa temporal (`SIGSTOP`) programas no esenciales abiertos de fondo (como suites de oficina o clientes de descargas) para liberar el 100% de los hilos de CPU para tu juego.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir?</strong> Al salir de tu juego o transmisión, abre <span class="code-pill">dzulux-performance</span> y elige la opción 1 (*Modo Oficina*). Todas las aplicaciones que estaban dormidas se despiertan (`SIGCONT`) automáticamente en el mismo instante donde las dejaste.
+    </div>
+  </div>
+
+  <!-- Descargador Dinámico de Controladores -->
+  <h2>🎮 6. Asistente de Controladores al Vuelo (`dzulux-drivers`)</h2>
+  <div class="tool-card cyan">
+    <h3>¿Para qué sirve?</h3>
+    <p>Permite que la imagen ISO se mantenga ultra compacta (<strong>1.69 GB</strong>, cumpliendo con el límite de 2 GiB de GitHub) mientras garantiza soporte total para cualquier tarjeta de video, audio y Wi-Fi sobre la marcha.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <ul class="step-list">
+      <li>Conéctate a una red Wi-Fi (usa el icono de red en la bandeja o escribe <span class="code-pill">nmtui</span> en terminal).</li>
+      <li>Abre <em>"Controladores Adicionales Dzulux"</em> en el menú o escribe <span class="code-pill">dzulux-drivers</span>.</li>
+      <li>El asistente escaneará tu máquina e identificará si requieres controladores específicos:
+        <ul>
+          <li><strong>GPU NVIDIA:</strong> Descarga e instala `nvidia-open`, `nvidia-utils` y `nvidia-prime`.</li>
+          <li><strong>Intel:</strong> Activa aceleración de video por hardware VA-API (`intel-media-driver`).</li>
+          <li><strong>AMD:</strong> Instala soporte Vulkan Radeon (`vulkan-radeon`).</li>
+          <li><strong>Laptops:</strong> Configura la suite de ahorro de energía **TLP**, Sound Open Firmware (SOF) para micrófonos y controladores Wi-Fi Broadcom.</li>
+        </ul>
+      </li>
+      <li>Confirma con <strong>SÍ</strong> y el sistema descargará e iniciará los servicios con un solo clic.</li>
+    </ul>
+  </div>
+
+  <!-- Tienda Curada App Hub -->
+  <h2>🛍️ 7. Centro de Software en 1 Clic (`dzulux-apps`)</h2>
+  <div class="tool-card green">
+    <h3>¿Para qué sirve?</h3>
+    <p>Instala aplicaciones populares y herramientas de trabajo sin tener que memorizar comandos ni lidiar con dependencias.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Ejecuta <span class="code-pill">dzulux-apps</span> o pulsa en <em>"Dzulux App Hub"</em> en el menú de aplicaciones.</p>
+    <ul class="step-list">
+      <li><strong>💼 Oficina y Estudio:</strong> LibreOffice Fresh, Visor PDF Evince y Obsidian.</li>
+      <li><strong>🎮 Juegos y Multimedia:</strong> Steam, Heroic Games Launcher (Epic Games / GOG), Discord, Spotify y VLC.</li>
+      <li><strong>🛠️ Programación:</strong> Visual Studio Code, Docker, NodeJS, Python y Git.</li>
+      <li><strong>🌐 Navegadores:</strong> Google Chrome, Brave Browser y Chromium.</li>
+      <li><strong>🎨 Diseño Gráfico:</strong> GIMP, Inkscape, Krita y Blender.</li>
+    </ul>
+    <p><em>Nota: Configura automáticamente la tienda Flathub para darte acceso a miles de programas actualizados.</em></p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Puntos de Restauración Instantáneos -->
+  <h2>🛡️ 8. Puntos de Restauración Instantáneos (`dzulux-snapshots`)</h2>
+  <div class="tool-card purple">
+    <h3>¿Para qué sirve?</h3>
+    <p>Aprovecha el sistema de archivos moderno **Btrfs** para sacar una "foto" instantánea de tu sistema en **1 segundo** sin consumir espacio en disco. Si una actualización o cambio de archivos llega a fallar, puedes volver al estado de ayer en segundos.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre <em>"Dzulux Snapshots"</em> desde el menú o ejecuta en terminal: <span class="code-pill">dzulux-snapshots</span>.</p>
+    <ul class="step-list">
+      <li><strong>1. Crear Nuevo Punto:</strong> Toma una captura de seguridad inmediata antes de modificar archivos del sistema o actualizar paquetes.</li>
+      <li><strong>2. Ver Puntos Existentes:</strong> Lista todas las capturas con fecha y hora exacta.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir el sistema completo?</strong> Si tu sistema no inicia correctamente tras un cambio, reinicia tu equipo, entra al menú de arranque GRUB, selecciona <em>"Dzulux Snapshots"</em> y elige la fecha a la que deseas regresar. Tu sistema arrancará intacto.
+    </div>
+  </div>
+
+  <!-- Suite de Rescate de Windows -->
+  <h2>🚑 9. Herramienta de Rescate de Windows y Discos (`dzulux-rescue`)</h2>
+  <div class="tool-card red">
+    <h3>¿Para qué sirve?</h3>
+    <p>Convierte a Dzulux en la herramienta de emergencia definitiva para salvar computadoras cuando Windows se rompe, se infecta o el usuario olvida su contraseña.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre <em>"Dzulux Rescue"</em> en el menú o escribe en terminal: <span class="code-pill">dzulux-rescue</span>.</p>
+    <ul class="step-list">
+      <li><strong>🔑 Quitar Contraseña de Windows:</strong> Localiza la partición de Windows y utiliza la utilidad <span class="code-pill">chntpw</span> para borrar o restablecer la contraseña de cualquier usuario local de Windows en menos de 10 segundos.</li>
+      <li><strong>📂 Rescate de Archivos:</strong> Monta las particiones NTFS de Windows en modo de solo lectura seguro y abre el explorador de archivos para que puedas copiar tus fotos, tareas y documentos a otra memoria USB.</li>
+      <li><strong>🩺 Auditoría S.M.A.R.T. de Disco:</strong> Revisa el estado de salud físico de tus discos duros y unidades SSD para alertarte de sectores reasignados o fallos inminentes.</li>
+    </ul>
+  </div>
+
+  <!-- Gestor de Batería con Wi-Fi -->
+  <h2>🔋 10. Gestor Inteligente de Batería (`dzulux-battery`)</h2>
+  <div class="tool-card green">
+    <h3>¿Para qué sirve?</h3>
+    <p>Extiende la duración de la batería de tu laptop adaptándose a si necesitas enviar documentos urgentes por internet o si estás sin conexión.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre <em>"Dzulux Ahorro de Batería"</em> en el menú o ejecuta: <span class="code-pill">dzulux-battery</span>.</p>
+    <ul class="step-list">
+      <li><strong>📶 Modo Productivo (Wi-Fi Activo):</strong> Apaga el Bluetooth (que gasta mucha energía), regula el brillo al 40% y optimiza el procesador, <strong>pero mantiene tu Wi-Fi 100% encendido</strong> para que puedas enviar tareas, correos o subir archivos sin interrupciones.</li>
+      <li><strong>🚨 Modo Emergencia Extrema:</strong> Para cuando te queda 3% de batería y necesitas terminar un texto localmente (apaga todas las antenas y reduce brillo al 15%).</li>
+      <li><strong>⚙️ Modo Personalizado:</strong> Casillas interactivas para que elijas qué componentes apagar.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir?</strong> Ejecuta <span class="code-pill">dzulux-battery</span> y selecciona la opción 4 (*Restaurar Modo Normal*). Todas las conexiones y el brillo se restablecerán de inmediato.
+    </div>
+  </div>
+
+  <!-- Modo Privacidad Stealth -->
+  <h2>🕵️ 11. Escudo de Privacidad en Redes Públicas (`dzulux-stealth`)</h2>
+  <div class="tool-card amber">
+    <h3>¿Para qué sirve?</h3>
+    <p>Protege tu identidad y navegación al conectarte al Wi-Fi de cafeterías, bibliotecas, escuelas o aeropuertos.</p>
+
+    <h3>¿Cómo usarlo?</h3>
+    <p>Abre <em>"Dzulux Modo Privacidad"</em> o escribe en terminal: <span class="code-pill">dzulux-stealth</span>.</p>
+    <ul class="step-list">
+      <li><strong>1. Activar Escudo Stealth:</strong> Asigna una <strong>dirección MAC aleatoria</strong> a tu tarjeta Wi-Fi para que nadie pueda rastrear tu computadora, activa <strong>DNS cifrado anti-malware</strong> (Quad9 / Cloudflare) y pone el cortafuegos UFW en modo estricto bloqueando escaneos de red local.</li>
+      <li><strong>3. Comprobar Estado:</strong> Muestra tu dirección MAC actual, servidores DNS y estado del cortafuegos.</li>
+    </ul>
+
+    <div class="revert-box">
+      <strong>¿Cómo revertir?</strong> Ejecuta <span class="code-pill">dzulux-stealth</span> y elige la opción 2 (*Desactivar Escudo*). Tu tarjeta de red se reconectará con su configuración original.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Tabla Maestra de Referencia Rápida -->
+  <h2>📌 12. Tabla Maestra de Comandos y Referencia Rápida</h2>
   <table>
     <thead>
       <tr>
         <th>Comando</th>
-        <th>¿Para qué sirve?</th>
+        <th>Función Principal</th>
+        <th>¿Cómo Revertir o Cambiar?</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><span class="code-pill">dzulux-installer</span></td>
-        <td>Inicia el instalador interactivo paso a paso.</td>
+        <td>Instala Dzulux (Dual Boot o Limpio; auto-detecta Celeron para Dzulux Lite).</td>
+        <td>Permite cancelar con la tecla ESC antes de confirmar el particionado.</td>
       </tr>
       <tr>
-        <td><span class="code-pill">switch-mode gui</span></td>
-        <td>Inicia el entorno de escritorio gráfico XFCE.</td>
+        <td><span class="code-pill">dzulux-performance</span></td>
+        <td>Alterna entre Modo Oficina, Game Booster y Streaming Sin Límites.</td>
+        <td>Seleccionar opción 1 (Oficina) para restaurar frecuencias y despertar apps.</td>
       </tr>
       <tr>
-        <td><span class="code-pill">switch-mode cli</span></td>
-        <td>Regresa a la terminal / consola pura.</td>
+        <td><span class="code-pill">dzulux-looks</span></td>
+        <td>Cambia entre tema Cyberpunk, Estilo Windows 10 y Modo Minimal Flat.</td>
+        <td>Volver a ejecutar y seleccionar el Estilo 1 (Cyberpunk Dark).</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-drivers</span></td>
+        <td>Escanea y descarga controladores de GPU, Wi-Fi, audio y batería.</td>
+        <td>Instala paquetes oficiales de pacman; desinstalables con pacman -R.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-apps</span></td>
+        <td>Tienda curada para instalar Steam, Discord, VS Code, Office y browsers.</td>
+        <td>Desinstalable desde terminal con pacman -R o flatpak uninstall.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-snapshots</span></td>
+        <td>Crea puntos de restauración instantáneos con el sistema Btrfs.</td>
+        <td>Reiniciar el equipo y elegir la fecha en el menú de arranque GRUB.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-rescue</span></td>
+        <td>Quita contraseñas de Windows (SAM) y rescata archivos dañados.</td>
+        <td>Desmonta las particiones automáticamente de forma segura al salir.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-battery</span></td>
+        <td>Perfiles de ahorro para laptop (Modo Productivo mantiene Wi-Fi activo).</td>
+        <td>Elegir opción 4 (Restaurar Modo Normal) para habilitar brillo y conexiones.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-stealth</span></td>
+        <td>Activa MAC aleatoria, DNS cifrado anti-rastreo y firewall estricto.</td>
+        <td>Elegir opción 2 (Desactivar Escudo) para restaurar red estándar.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">switch-mode</span></td>
+        <td>Alterna en caliente entre Modo Gráfico (gui) y Modo Servidor (cli).</td>
+        <td>Ejecutar switch-mode gui para volver al escritorio en cualquier momento.</td>
       </tr>
       <tr>
         <td><span class="code-pill">nmtui</span></td>
-        <td>Configura y conecta redes Wi-Fi mediante interfaz visual en consola.</td>
-      </tr>
-      <tr>
-        <td><span class="code-pill">hw-detect</span></td>
-        <td>Muestra el diagnóstico de tus tarjetas gráficas, audio y batería.</td>
+        <td>Conector y gestor visual de redes Wi-Fi en terminal.</td>
+        <td>Menú visual interactivo con teclas de flechas y ENTER.</td>
       </tr>
       <tr>
         <td><span class="code-pill">fastfetch</span></td>
-        <td>Despliega el resumen de componentes y la firma de Alfredo Dzul.</td>
+        <td>Muestra el resumen de hardware y la firma oficial de Alfredo Dzul.</td>
+        <td>Informativo de solo lectura.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Atajos de Teclado Útiles -->
+  <h2>⌨️ 13. Atajos de Teclado Esenciales</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Atajo</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">Tecla Windows (Super)</span></td>
+        <td>Abre o cierra el Menú de Inicio (en Estilo Windows 10 y Whisker Menu).</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">Ctrl + Alt + T</span></td>
+        <td>Abre la terminal de comandos instantáneamente.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">Alt + F4</span></td>
+        <td>Cierra la ventana activa.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">Alt + Espacio</span></td>
+        <td>Menú de control de ventana (maximizar, minimizar, mover).</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">Teclas Fn + Brillo / Volumen</span></td>
+        <td>Regulación directa de brillo de pantalla y volumen de altavoces.</td>
       </tr>
     </tbody>
   </table>
 
   <div class="footer">
-    <strong>Dzulux Linux 1.1 (Beta)</strong> — Creado y Diseñado con dedicación por <strong>Alfredo Dzul</strong>.<br>
-    Repositorio Oficial y Soporte: <u>https://github.com/Alfredo2364/Linux</u>
+    <strong>Dzulux Linux 1.1 (Beta)</strong> — Manual Oficial creado y diseñado por <strong>Alfredo Dzul</strong>.<br>
+    Repositorio Oficial y Comunidad: <u>https://github.com/Alfredo2364/Linux</u> • Sitio Web: <u>https://alfredo2364.github.io/Linux/</u>
   </div>
 
 </body>

@@ -1,0 +1,5 @@
+# Archivos compilados y temporales
+output/
+*.iso
+*.zip
+*.log

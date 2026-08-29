@@ -12,7 +12,7 @@ NC='\033[0m'
 
 clear
 if command -v fastfetch >/dev/null 2>&1; then
-    fastfetch
+    fastfetch --logo none
 else
     cat /etc/motd
 fi

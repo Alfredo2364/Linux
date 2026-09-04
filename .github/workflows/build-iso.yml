@@ -37,7 +37,11 @@ jobs:
           cd dzulux-server-build
           chmod +x auto/*
           sudo lb clean
-          sudo lb config
+          if ! sudo lb config 2>&1 | tee config.log; then
+            echo "--- CONFIG FAILED. LOG OUTPUT: ---"
+            cat config.log
+            exit 1
+          fi
           if ! sudo lb build 2>&1 | tee build.log; then
             echo "--- BUILD FAILED. LOG OUTPUT: ---"
             cat build.log

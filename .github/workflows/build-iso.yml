@@ -1,4 +1,4 @@
-name: Compilar ISO y Paquete de Dzulux Linux
+name: Compilar ISOs de Dzulux Linux V2 (Ubuntu/Debian)
 
 on:
   push:
@@ -7,140 +7,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-iso:
-    name: Compilar Dzulux Linux en Contenedor Nativo
+  build-server-iso:
+    name: Compilar Dzulux Server (Modo CLI)
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:base
-      options: --privileged
-
-    steps:
-      - name: Actualizar Repositorios e Instalar Dependencias de Compilación
-        run: |
-          pacman-key --init
-          pacman-key --populate archlinux
-          sed -i '/\[multilib\]/,/Include/ s/^#//' /etc/pacman.conf
-          echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-          pacman -Syu --noconfirm git archiso grub syslinux dosfstools libisoburn mtools squashfs-tools which
-
-      - name: Clonar Repositorio
-        uses: actions/checkout@v4
-
-      - name: Compilar Dzulux Linux ISO (mkarchiso)
-        run: |
-          mkdir -p output /tmp/archiso-work
-          # Configurar enlaces simbólicos nativos para inicio gráfico automático (como Ubuntu y Fedora)
-          mkdir -p iso-profile/airootfs/etc/systemd/system/multi-user.target.wants
-          ln -sf /usr/lib/systemd/system/graphical.target iso-profile/airootfs/etc/systemd/system/default.target
-          ln -sf /usr/lib/systemd/system/lightdm.service iso-profile/airootfs/etc/systemd/system/display-manager.service
-          ln -sf /usr/lib/systemd/system/NetworkManager.service iso-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
-
-          mkarchiso -v -w /tmp/archiso-work -o output iso-profile 2>&1 | tee /tmp/mkarchiso.log
-          cd output
-          sha256sum *.iso > sha256sum.txt
-          ls -lh
-
-      - name: Reportar registro detallado en caso de fallo
-        if: failure()
-        run: |
-          if [ -f /tmp/mkarchiso.log ]; then
-            echo "### ❌ Registro de la compilación:" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 100 /tmp/mkarchiso.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Guardar Artefacto de ISO
-        uses: actions/upload-artifact@v4
-        with:
-          name: dzulux-iso-raw
-          path: output/
-          retention-days: 7
-
-  package-and-release:
-    name: Generar Guía PDF, Crear Paquete ZIP y Publicar Descarga
-    needs: build-iso
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Clonar Repositorio
         uses: actions/checkout@v4
 
-      - name: Descargar ISO Compilada
-        uses: actions/download-artifact@v4
-        with:
-          name: dzulux-iso-raw
-          path: output/
-
-      - name: Generar Guía y Agradecimientos en PDF
+      - name: Preparar Entorno de Compilación (Ubuntu Base)
         run: |
-          chmod +x scripts/generate-pdf.sh
-          ./scripts/generate-pdf.sh "$PWD/output/Guia_y_Agradecimientos_Dzulux.pdf" || true
+          echo "==== INICIANDO COMPILACIÓN DE DZULUX SERVER ===="
+          echo "Aquí se inyectarán los scripts destructivos para cambiar 'Ubuntu' a 'Dzulux'"
+          echo "1. Reemplazando /etc/os-release..."
+          echo "2. Reemplazando /etc/hostname..."
+          echo "3. Eliminando MOTD por defecto..."
+          echo "4. Empaquetando ISO de Server..."
+          # Próximamente: Comandos reales de debootstrap / live-build
 
-      - name: Empaquetar ISO + Guía PDF en Archivo ZIP
+  build-desktop-iso:
+    name: Compilar Dzulux Desktop (Modo GUI)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Entorno de Compilación (Ubuntu Base + XFCE)
         run: |
-          sudo apt-get update && sudo apt-get install -y zip
-          mkdir -p paquete_distribucion/Dzulux-Linux-1.1-Beta
-          
-          cp output/*.iso paquete_distribucion/Dzulux-Linux-1.1-Beta/
-          if [ -f output/Guia_y_Agradecimientos_Dzulux.pdf ]; then
-            cp output/Guia_y_Agradecimientos_Dzulux.pdf paquete_distribucion/Dzulux-Linux-1.1-Beta/
-          fi
-          if [ -f output/sha256sum.txt ]; then
-            cp output/sha256sum.txt paquete_distribucion/Dzulux-Linux-1.1-Beta/
-          fi
-          
-          cd paquete_distribucion
-          zip -0 -r ../output/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip Dzulux-Linux-1.1-Beta
-          cd ..
-          
-          # Verificación automática de tamaño para cumplir con el límite de 2 GiB de GitHub Release
-          for f in output/*; do
-            if [ -f "$f" ]; then
-              FSIZE=$(stat -c%s "$f")
-              echo "Archivo: $f -> $FSIZE bytes"
-              if [ "$FSIZE" -ge 2147483640 ]; then
-                echo "⚠️ El archivo $f excede 2 GiB ($FSIZE bytes). Dividiendo en partes para permitir la subida..."
-                split -b 1800M "$f" "${f}.part"
-                rm "$f"
-              fi
-            fi
-          done
-
-          echo "==> Contenido final del paquete de descarga:"
-          ls -lh output/
-
-      - name: Subir Paquete Completo como Artefacto
-        uses: actions/upload-artifact@v4
-        with:
-          name: Dzulux-Linux-1.1-Beta-Paquete-Completo
-          path: output/
-          retention-days: 14
-
-      - name: Publicar Release Oficial y Enlace de Descarga Directa (1 Clic)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v1.1-beta"
-          files: output/*
-          name: "Dzulux Linux 1.1 (Beta) - Descarga Oficial"
-          body: |
-            # ⚡ Dzulux Linux v1.1 (Beta)
-            **Diseñado y Creado por Alfredo Dzul**
-
-            ---
-            ### 📥 Descarga Directa (1 Clic):
-            * 📦 [**Descargar Paquete Completo [ISO + Guía PDF] (Recomendado)**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip)
-            * 💿 [**Descargar Solo Imagen ISO (.iso)**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/dzulux-1.1-beta-x86_64.iso)
-            * 📄 [**Descargar Solo Guía y Agradecimientos en PDF**](https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Guia_y_Agradecimientos_Dzulux.pdf)
-
-            ---
-            ### 🚀 Características Principales:
-            * **Concepto Dual**: Arranque en Modo Gráfico (XFCE personalizado) o Modo Terminal de alto rendimiento (estilo Ubuntu Server).
-            * **Soporte Dual Boot Completo**: Convivencia con Windows Boot Manager o macOS sin borrar datos.
-            * **Controladores Universales**: Intel (Mesa/Vulkan), AMD Radeon y NVIDIA (DKMS + Prime).
-            * **Laptops & Apple Mac**: Wi-Fi Broadcom, audio PipeWire con SOF-Firmware y gestión de batería con TLP.
-            * **Instalador Explicativo**: `dzulux-installer` paso a paso en español.
-          draft: false
-          prerelease: true
+          echo "==== INICIANDO COMPILACIÓN DE DZULUX DESKTOP ===="
+          echo "Instalando entorno gráfico, drivers NVIDIA, y apps..."
+          # Próximamente: Comandos reales de debootstrap / live-build

@@ -18,16 +18,27 @@
   <!-- Background Canvas -->
   <rect width="100%" height="100%" fill="#0a0e17" rx="16" />
 
-  <!-- Logo Emblem: Geometric Monogram "D" + "Z" infused with Linux Arch Peak -->
-  <g transform="translate(65, 32)">
-    <!-- Base Triangle Arch Peak -->
-    <path d="M 80 15 L 150 145 L 120 145 L 80 75 L 40 145 L 10 145 Z" fill="url(#gradDzul)" filter="url(#glowDzul)" />
+  <!-- Logo Emblem: Monogram "D" with extended right leg (Dzulux V2) -->
+  <g transform="translate(60, 32)">
+    <!-- Base "D" shape with extended right leg -->
+    <path d="M 30 140 L 30 20 L 90 20 C 145 20 165 55 165 80 C 165 105 145 140 90 140 L 30 140 L 190 140" 
+          fill="none" 
+          stroke="url(#gradDzul)" 
+          stroke-width="26" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          filter="url(#glowDzul)" />
     
-    <!-- Stylized "Z" Accent in Cyan -->
-    <path d="M 50 85 L 110 85 L 60 135 L 115 135" fill="none" stroke="url(#gradNeon)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-
-    <!-- Center Tech Core Dot -->
-    <circle cx="80" cy="42" r="7" fill="#ffffff" />
+    <!-- Stylized Cyan Tech Accent on the leg -->
+    <path d="M 120 140 L 190 140" 
+          fill="none" 
+          stroke="url(#gradNeon)" 
+          stroke-width="10" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+          
+    <!-- Center Tech Core Dot inside the D -->
+    <circle cx="75" cy="80" r="10" fill="#00f2fe" filter="url(#glowDzul)" />
   </g>
 
   <!-- Typography -->

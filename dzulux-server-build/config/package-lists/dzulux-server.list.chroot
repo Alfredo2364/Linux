@@ -19,6 +19,7 @@ parted
 btrfs-progs
 ntfs-3g
 dosfstools
+syslinux-utils
 efibootmgr
 grub-efi-amd64
 grub-pc-bin

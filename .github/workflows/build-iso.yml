@@ -35,9 +35,10 @@ jobs:
       - name: Compilar Dzulux Server ISO (live-build)
         run: |
           cd dzulux-server-build
+          chmod +x auto/*
           sudo lb clean
           sudo lb config
-          sudo lb build 2>&1 | tee ../build-server.log
+          sudo lb build
 
       - name: Guardar ISO Generada
         uses: actions/upload-artifact@v4

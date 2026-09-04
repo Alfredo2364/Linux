@@ -38,7 +38,11 @@ jobs:
           chmod +x auto/*
           sudo lb clean
           sudo lb config
-          sudo lb build 2>&1 | tee build.log || true
+          if ! sudo lb build 2>&1 | tee build.log; then
+            echo "--- BUILD FAILED. LOG OUTPUT: ---"
+            cat build.log
+            exit 1
+          fi
 
       - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4

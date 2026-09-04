@@ -13,14 +13,12 @@ dialog
 zram-tools
 ufw
 openssh-server
-chntpw
 smartmontools
 rsync
 parted
 btrfs-progs
 ntfs-3g
 dosfstools
-efisystempath
 efibootmgr
 grub-efi-amd64
 grub-pc-bin

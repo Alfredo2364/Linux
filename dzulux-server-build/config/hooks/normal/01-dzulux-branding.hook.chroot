@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -e
+
+echo "Configurando Branding de Dzulux Server..."
+
+echo "dzulux" > /etc/hostname
+echo "127.0.0.1 localhost dzulux" > /etc/hosts
+
+# Reescribir os-release
+cat <<EOF > /etc/os-release
+PRETTY_NAME="Dzulux Linux 2.0 (Beta)"
+NAME="Dzulux Linux"
+VERSION_ID="2.0"
+VERSION="2.0 (Beta)"
+ID=dzulux
+ID_LIKE=ubuntu
+HOME_URL="https://alfredo2364.github.io/Linux/"
+EOF
+
+# Eliminar MOTD de Ubuntu Server y vincular nuestro dzulux-welcome
+rm -rf /etc/update-motd.d/*
+cat <<EOF > /etc/update-motd.d/00-dzulux-welcome
+#!/bin/sh
+/usr/local/bin/dzulux-welcome
+EOF
+chmod +x /etc/update-motd.d/00-dzulux-welcome
+
+# Cambiar texto de login tty
+echo "Dzulux Linux 2.0 Server \\\n \\\l
+" > /etc/issue
+
+# Configurar ZRAM por defecto para equipos viejos
+echo -e "ALGO=zstd\nPERCENT=50" > /etc/default/zramswap
+systemctl enable zramswap.service || true
+
+# Activar firewall UFW pero permitiendo SSH
+ufw allow ssh || true
+
+# Configurar Auto-Login en CLI
+mkdir -p /etc/systemd/system/getty@tty1.service.d/
+cat <<EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear %I \\\
+EOF

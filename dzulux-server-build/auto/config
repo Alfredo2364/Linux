@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+lb config noauto \
+    --mode ubuntu \
+    --distribution noble \
+    --architectures amd64 \
+    --archive-areas "main restricted universe multiverse" \
+    --iso-application "Dzulux Server (CLI)" \
+    --iso-publisher "Alfredo Dzul" \
+    --iso-volume "DZULUX_SERVER" \
+    --linux-packages "linux-image linux-headers" \
+    --bootappend-live "boot=casper quiet splash nomodeset system_mode=cli" \
+    ""

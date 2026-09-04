@@ -15,15 +15,36 @@ jobs:
       - name: Clonar Repositorio
         uses: actions/checkout@v4
 
-      - name: Preparar Entorno de Compilación (Ubuntu Base)
+      - name: Instalar Dependencias de Compilación
         run: |
-          echo "==== INICIANDO COMPILACIÓN DE DZULUX SERVER ===="
-          echo "Aquí se inyectarán los scripts destructivos para cambiar 'Ubuntu' a 'Dzulux'"
-          echo "1. Reemplazando /etc/os-release..."
-          echo "2. Reemplazando /etc/hostname..."
-          echo "3. Eliminando MOTD por defecto..."
-          echo "4. Empaquetando ISO de Server..."
-          # Próximamente: Comandos reales de debootstrap / live-build
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo
+
+      - name: Inyectar Herramientas Dzulux al Servidor
+        run: |
+          echo "Copiando herramientas maestras al entorno del servidor..."
+          mkdir -p dzulux-server-build/config/includes.chroot/usr/local/bin
+          cp -r dzulux-tools/* dzulux-server-build/config/includes.chroot/usr/local/bin/
+          chmod +x dzulux-server-build/config/includes.chroot/usr/local/bin/*
+          
+          echo "Eliminando herramientas gráficas (Gaming/Apps) de la versión Servidor..."
+          rm -f dzulux-server-build/config/includes.chroot/usr/local/bin/dzulux-gaming
+          rm -f dzulux-server-build/config/includes.chroot/usr/local/bin/dzulux-apps
+          rm -f dzulux-server-build/config/includes.chroot/usr/local/bin/dzulux-looks
+
+      - name: Compilar Dzulux Server ISO (live-build)
+        run: |
+          cd dzulux-server-build
+          sudo lb clean
+          sudo lb config
+          sudo lb build 2>&1 | tee ../build-server.log
+
+      - name: Guardar ISO Generada
+        uses: actions/upload-artifact@v4
+        with:
+          name: dzulux-server-iso
+          path: dzulux-server-build/*.iso
+          retention-days: 7
 
   build-desktop-iso:
     name: Compilar Dzulux Desktop (Modo GUI)

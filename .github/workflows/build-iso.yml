@@ -38,13 +38,15 @@ jobs:
           chmod +x auto/*
           sudo lb clean
           sudo lb config
-          sudo lb build
+          sudo lb build 2>&1 | tee build.log || true
 
-      - name: Guardar ISO Generada
+      - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4
         with:
-          name: dzulux-server-iso
-          path: dzulux-server-build/*.iso
+          name: dzulux-server-artifacts
+          path: |
+            dzulux-server-build/*.iso
+            dzulux-server-build/build.log
           retention-days: 7
 
   build-desktop-iso:

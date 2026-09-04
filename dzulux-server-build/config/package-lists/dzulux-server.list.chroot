@@ -8,7 +8,7 @@ curl
 wget
 git
 htop
-fastfetch
+neofetch
 dialog
 zram-tools
 ufw

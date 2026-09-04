@@ -10,6 +10,7 @@ lb config noauto \
     --iso-application "Dzulux Server (CLI)" \
     --iso-publisher "Alfredo Dzul" \
     --iso-volume "DZULUX_SERVER" \
+    --binary-images iso-hybrid \
     --linux-packages "linux-image linux-headers" \
     --bootappend-live "boot=casper quiet splash nomodeset system_mode=cli" \
     ""

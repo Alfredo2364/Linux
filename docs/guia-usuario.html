@@ -595,7 +595,7 @@
     <p>Abre <em>"Dzulux Actualizador del Sistema"</em> en el menú o escribe en terminal: <span class="code-pill">dzulux-update</span> (o de forma rápida: <span class="code-pill">dzulux-update --quick</span>).</p>
     <ul class="step-list">
       <li><strong>1. Actualizar Suite Dzulux:</strong> Descarga al instante las últimas versiones de todos los scripts oficiales, lanzadores del menú y configuraciones maestras directamente desde la rama principal de GitHub.</li>
-      <li><strong>2. Actualizar Sistema Completo:</strong> Sincroniza las herramientas Dzulux y además actualiza todos los paquetes base de Arch Linux (`pacman -Syu`).</li>
+      <li><strong>2. Actualizar Sistema Completo:</strong> Sincroniza las herramientas Dzulux y además actualiza todos los paquetes base de Ubuntu/Debian (`apt update && apt upgrade`).</li>
       <li><strong>3. Comprobar Versión de ISO:</strong> Consulta la API de GitHub Releases y te avisa si hay una nueva versión de ISO lista para descargar a tu carpeta de Descargas.</li>
     </ul>
 
@@ -619,7 +619,7 @@
     <p>Reinicia tu equipo y en el menú de arranque GRUB selecciona la tercera opción: <strong>"🛡️ Dzulux Linux (Modo Gráficos Seguros / Apple Mac & NVIDIA Safe)"</strong>. Esta opción arranca con controladores genéricos seguros (<span class="code-pill">nomodeset</span>) para permitirte entrar al sistema y descargar los controladores correctos con <span class="code-pill">dzulux-drivers</span>.</p>
 
     <h3>4. ¿Cómo actualizo el sistema a los últimos paquetes?</h3>
-    <p>Abre la terminal y escribe <span class="code-pill">sudo pacman -Syu</span>. Al ser una base Arch Linux, recibirás siempre las versiones más recientes y optimizadas de tus aplicaciones.</p>
+    <p>Abre la terminal y escribe <span class="code-pill">sudo apt update && sudo apt upgrade</span>. Al ser una base Ubuntu LTS, recibirás estabilidad total y las versiones más pulidas de tus aplicaciones.</p>
   </div>
 
   <!-- Tabla Maestra de Referencia Rápida -->

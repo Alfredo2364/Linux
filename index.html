@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dzulux Linux — Sistema Operativo Dual de Alto Rendimiento</title>
-  <meta name="description" content="Dzulux Linux es una distribución basada en Arch Linux, equilibrada, con arranque Dual (Gráfico / Terminal) y compatibilidad universal para PC, Laptops y Mac. Creado y diseñado por Alfredo Dzul.">
+  <meta name="description" content="Dzulux Linux es una distribución basada en Ubuntu y Debian LTS, equilibrada, con 2 versiones especializadas (Desktop / Server CLI) y compatibilidad universal para PC, Laptops y Mac. Creado y diseñado por Alfredo Dzul.">
   <link rel="icon" type="image/svg+xml" href="artwork/dzulux-logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1132,7 +1132,7 @@
       </div>
 
       <h1 class="hero-title">
-        El Poder de Arch Linux.<br>
+        El Poder de Ubuntu y Debian LTS.<br>
         <span class="gradient-text">El Equilibrio que Siempre Buscaste.</span>
       </h1>
 
@@ -1142,14 +1142,24 @@
 
       <!-- Cuadro de Descarga Principal al Estilo Ubuntu (1 Clic) -->
       <div class="download-card">
-        <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip" class="btn-download-hero">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Descargar Dzulux Linux 1.1 (Beta)
-        </a>
+        <div class="hero-buttons">
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-desktop-2.0-beta-x86_64.zip" class="btn btn-primary" onclick="triggerDownloadConfetti(event, this)">
+            <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Descargar Dzulux Desktop (GUI)
+          </a>
+          <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-server-2.0-beta-x86_64.zip" class="btn btn-secondary">
+            <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            Descargar Dzulux Server (CLI)
+          </a>
+        </div>
 
         <div class="download-meta-tags">
           <span class="meta-tag">📦 Paquete Completo (ISO + Guía PDF)</span>

@@ -11,10 +11,10 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Estado-BETA-yellow?style=for-the-badge&logo=shield" alt="Estado Beta"/>
-  <img src="https://img.shields.io/badge/Base-Arch%20Linux-1793d1?style=for-the-badge&logo=arch-linux" alt="Arch Linux"/>
+  <img src="https://img.shields.io/badge/Base-Ubuntu_y_Debian-E95420?style=for-the-badge&logo=ubuntu" alt="Ubuntu"/>
   <img src="https://img.shields.io/badge/Arquitectura-x86__64-brightgreen?style=for-the-badge" alt="x86_64"/>
   <img src="https://img.shields.io/badge/Diseño-Alfredo%20Dzul-00f2fe?style=for-the-badge" alt="Alfredo Dzul"/>
-  <img src="https://img.shields.io/badge/Modo-Dual%20(GUI%20%7C%20CLI)-blueviolet?style=for-the-badge" alt="Dual Mode"/>
+  <img src="https://img.shields.io/badge/ISOs-Desktop_y_Server-blueviolet?style=for-the-badge" alt="Dual Mode"/>
 </p>
 
 <p align="center">
@@ -24,8 +24,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/dzulux-1.1-beta-x86_64.iso">💿 Descargar solo archivo .ISO</a> &nbsp;•&nbsp; 
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-desktop-2.0-beta-x86_64.iso">💿 Descargar ISO (Dzulux Desktop)</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-server-2.0-beta-x86_64.iso">🖥️ Descargar ISO (Dzulux Server)</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
   <a href="https://alfredo2364.github.io/Linux/">🌐 Ver Sitio Web Oficial</a>
 </p>
 

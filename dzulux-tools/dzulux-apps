@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-apps - Centro de Instalación Curada de Aplicaciones (App Hub)
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+# Inicializar Flathub si flatpak está disponible
+init_flatpak() {
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+    fi
+}
+
+main_menu() {
+    if [ -n "$UI" ]; then
+        CHOICE=$($UI --title "Dzulux App Hub - Tienda de Software (Alfredo Dzul)" --menu \
+"Selecciona una categoría de aplicaciones para instalar con 1 clic:" 18 70 6 \
+"1" "💼 Oficina y Estudio (LibreOffice, Obsidian, Lector PDF)" \
+"2" "🎮 Juegos y Multimedia (Steam, Heroic, Discord, Spotify, VLC)" \
+"3" "🛠️ Desarrollo y Código (VS Code, Git, Docker, Node, Python)" \
+"4" "🌐 Navegadores Web (Brave, Google Chrome, Chromium)" \
+"5" "🎨 Diseño y Gráficos (GIMP, Inkscape, Krita, Blender)" \
+"6" "Salir" 3>&1 1>&2 2>&3)
+    else
+        clear
+        echo -e "${CYAN}${BOLD}=== DZULUX APP HUB - TIENDA DE APLICACIONES ===${NC}"
+        echo -e "Diseñado por Alfredo Dzul\n"
+        echo "1) Oficina y Estudio"
+        echo "2) Juegos y Multimedia"
+        echo "3) Desarrollo y Código"
+        echo "4) Navegadores Web"
+        echo "5) Diseño y Gráficos"
+        echo "6) Salir"
+        read -p "Elige una opción (1-6): " CHOICE
+    fi
+
+    case "$CHOICE" in
+        1) install_office ;;
+        2) install_games ;;
+        3) install_dev ;;
+        4) install_browsers ;;
+        5) install_design ;;
+        *) exit 0 ;;
+    esac
+}
+
+install_office() {
+    init_flatpak
+    sudo pacman -Sy --needed --noconfirm libreoffice-fresh evince 2>/dev/null || true
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak install -y flathub md.obsidian.Obsidian 2>/dev/null || true
+    fi
+    show_success "Suite de Oficina (LibreOffice, Visor PDF y Obsidian)"
+}
+
+install_games() {
+    init_flatpak
+    sudo pacman -Sy --needed --noconfirm steam vlc 2>/dev/null || true
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak install -y flathub com.discordapp.Discord com.heroicgameslauncher.hgl com.spotify.Client 2>/dev/null || true
+    fi
+    show_success "Juegos y Multimedia (Steam, Discord, Heroic Games, Spotify, VLC)"
+}
+
+install_dev() {
+    init_flatpak
+    sudo pacman -Sy --needed --noconfirm code docker docker-compose nodejs npm python python-pip git 2>/dev/null || true
+    sudo systemctl enable --now docker.service 2>/dev/null || true
+    sudo usermod -aG docker "$USER" 2>/dev/null || true
+    show_success "Entorno de Desarrollo (VS Code, Docker, Node.js, Python, Git)"
+}
+
+install_browsers() {
+    init_flatpak
+    sudo pacman -Sy --needed --noconfirm chromium 2>/dev/null || true
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak install -y flathub com.brave.Browser com.google.Chrome 2>/dev/null || true
+    fi
+    show_success "Navegadores Web (Chromium, Brave Browser, Google Chrome)"
+}
+
+install_design() {
+    init_flatpak
+    sudo pacman -Sy --needed --noconfirm gimp inkscape 2>/dev/null || true
+    if command -v flatpak >/dev/null 2>&1; then
+        flatpak install -y flathub org.kde.krita org.blender.Blender 2>/dev/null || true
+    fi
+    show_success "Suite de Diseño (GIMP, Inkscape, Krita, Blender)"
+}
+
+show_success() {
+    local APP_NAME="$1"
+    if [ -n "$UI" ]; then
+        $UI --title "Instalación Completada" --msgbox \
+"¡${APP_NAME} ha sido instalado con éxito en tu sistema Dzulux!\n\n\
+Ya puedes encontrar las aplicaciones en el menú de inicio de XFCE." 12 70
+    else
+        echo -e "\n${GREEN}${BOLD}✓ ¡${APP_NAME} instalado exitosamente!${NC}\n"
+    fi
+    main_menu
+}
+
+main_menu

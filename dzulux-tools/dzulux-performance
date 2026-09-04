@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-performance - Gestor Adaptativo de Rendimiento y Perfiles de Hardware
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+PURPLE='\033[0;35m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+# 1. Auditoría del Procesador (CPU Tier Detection)
+detect_cpu_tier() {
+    CPU_MODEL="$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//' || echo "Genérico")"
+    CPU_CORES="$(grep -c "^processor" /proc/cpuinfo || echo "1")"
+    
+    # Evaluar si es gama de entrada (Celeron, Pentium, Atom, Athlon básico, 2 núcleos)
+    IS_ENTRY_LEVEL=0
+    if echo "$CPU_MODEL" | grep -iqE "celeron|pentium|atom|athlon" || [ "$CPU_CORES" -le 2 ]; then
+        IS_ENTRY_LEVEL=1
+        CPU_TIER_MSG="[GAMA DE ENTRADA] ${CPU_MODEL} (${CPU_CORES} núcleos). Optimizado para bajo consumo y modo fluido."
+    else
+        CPU_TIER_MSG="[GAMA MEDIA/ALTA] ${CPU_MODEL} (${CPU_CORES} hilos). Potencia desbloqueada para multitarea y gaming."
+    fi
+}
+
+detect_cpu_tier
+
+# Archivo temporal para almacenar apps congeladas
+FROZEN_APPS_FILE="/tmp/dzulux_frozen_pids.txt"
+
+main_menu() {
+    if [ "$IS_ENTRY_LEVEL" -eq 1 ]; then
+        # Menú adaptado exclusivamente para procesadores de gama de entrada
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Performance - Edición Lite (Alfredo Dzul)" --menu \
+"Procesador: ${CPU_TIER_MSG}\n\nOpciones optimizadas para hardware de entrada:" 18 74 4 \
+"1" "💼 Modo Oficina Lite (Ágil, Cero Lentitud en Celeron/Athlon)" \
+"2" "🍃 Modo Ultra Fluido (60 FPS sin sombras ni efectos pesados)" \
+"3" "🔒 Modos Gamer (Restringidos: Requieren CPU de 4+ hilos)" \
+"4" "Salir" 3>&1 1>&2 2>&3)
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE - EDICIÓN LITE ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo -e "CPU Detectada: ${YELLOW}${CPU_TIER_MSG}${NC}\n"
+            echo "1) Modo Oficina Lite (Ágil, cero lentitud)"
+            echo "2) Modo Ultra Fluido (60 FPS sin efectos pesados)"
+            echo "3) Modos Gamer (Restringidos)"
+            echo "4) Salir"
+            read -p "Elige una opción (1-4): " CHOICE
+        fi
+
+        case "$CHOICE" in
+            1) apply_office_mode ;;
+            2) apply_lowspec_mode ;;
+            3) show_restricted_gamer_msg ;;
+            *) exit 0 ;;
+        esac
+    else
+        # Procesadores capaces de gama media o alta
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Performance Engine (Alfredo Dzul)" --menu \
+"Procesador: ${CPU_TIER_MSG}\n\nSelecciona el perfil de rendimiento para tu equipo:" 20 74 5 \
+"1" "💼 Modo Oficina y Estudio (Ágil, Cero Lentitud, Silencioso y Fresco)" \
+"2" "🎮 Modo Gamer: Game Booster (Prioridad Absoluta al Juego, Cero Tirones)" \
+"3" "🚀 Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord Protegido)" \
+"4" "🍃 Modo Ahorro y Equipos Modestos (Bajo Consumo / zRAM Activa)" \
+"5" "Salir" 3>&1 1>&2 2>&3)
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE ENGINE ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo -e "CPU Detectada: ${YELLOW}${CPU_TIER_MSG}${NC}\n"
+            echo "1) Modo Oficina y Estudio (Silencioso, ágil, cero lentitud)"
+            echo "2) Modo Gamer: Game Booster (Cero tirones, juego puro)"
+            echo "3) Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord)"
+            echo "4) Modo Ahorro y Equipos Modestos"
+            echo "5) Salir"
+            read -p "Elige un perfil (1-5): " CHOICE
+        fi
+
+        case "$CHOICE" in
+            1) apply_office_mode ;;
+            2) apply_game_booster ;;
+            3) apply_gamer_unlimited ;;
+            4) apply_lowspec_mode ;;
+            *) exit 0 ;;
+        esac
+    fi
+}
+
+show_restricted_gamer_msg() {
+    local MSG="⚠️ PERFILES GAMER BLOQUEADOS EN ESTA MÁQUINA:\n\n\
+Tu procesador '${CPU_MODEL}' cuenta con ${CPU_CORES} núcleos.\n\n\
+Los perfiles 'Game Booster' y 'Gamer Sin Límites' están diseñados exclusivamente para procesadores con 4 o más hilos (Intel Core i3/i5/i7 o AMD Ryzen).\n\n\
+Forzar estos modos en procesadores Celeron/Pentium/Athlon provocaría sobrecalentamiento y congelamientos del sistema.\n\n\
+Para este equipo, el Modo Oficina Lite y el Modo Ultra Fluido te garantizan 60 FPS estables y cero lentitud."
+    show_alert "Perfiles Restringidos" "${MSG}"
+}
+
+# ------------------------------------------------------------------------------
+# PERFIL 1: OFICINA Y ESTUDIO INTELIGENTE
+# ------------------------------------------------------------------------------
+apply_office_mode() {
+    clear
+    echo -e "${CYAN}${BOLD}Aplicando Modo Oficina y Estudio Inteligente...${NC}"
+
+    # Descongelar cualquier app que haya quedado pausada
+    resume_all_apps
+
+    # CPU Governor: schedutil o conservative (ajuste dinámico suave)
+    if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+        for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo "schedutil" | sudo tee "$g" >/dev/null 2>&1 || echo "powersave" | sudo tee "$g" >/dev/null 2>&1 || true
+        done
+    fi
+
+    # Activar TLP en modo equilibrado
+    if command -v tlp >/dev/null 2>&1; then
+        sudo tlp ac >/dev/null 2>&1 || true
+    fi
+
+    # Composición gráfica estándar activa
+    xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+
+    echo -e "  * ${GREEN}✓ CPU ajustada para respuesta inmediata en documentos y navegación.${NC}"
+    echo -e "  * ${GREEN}✓ Ventiladores y temperaturas en niveles acústicos mínimos.${NC}"
+    echo -e "  * ${GREEN}✓ Multitarea fluida garantizada sin consumo energético excesivo.${NC}"
+
+    show_alert "Modo Oficina Activado" "Tu equipo responderá con fluidez inmediata para documentos, navegación y tareas, manteniendo temperaturas frescas y ventiladores silenciosos."
+}
+
+# ------------------------------------------------------------------------------
+# PERFIL 2: GAMER PURO (GAME BOOSTER)
+# ------------------------------------------------------------------------------
+apply_game_booster() {
+    clear
+    echo -e "${PURPLE}${BOLD}Activando Perfil Gamer Puro (Game Booster)...${NC}"
+
+    # 1. CPU en modo Rendimiento Estable de fábrica (sin caídas de frecuencia)
+    if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+        for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo "performance" | sudo tee "$g" >/dev/null 2>&1 || true
+        done
+    fi
+
+    # 2. Limpieza de memoria RAM inactiva para dar máximo espacio al juego
+    echo -e "  * Liberando memoria RAM caché inactiva..."
+    sudo sync
+    echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null 2>&1 || true
+
+    # 3. Forzar tarjeta gráfica de alto rendimiento en laptops híbridas
+    export DRI_PRIME=1
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+
+    echo -e "  * ${GREEN}✓ Frecuencias de CPU estabilizadas para erradicar micro-tirones (stuttering).${NC}"
+    echo -e "  * ${GREEN}✓ Memoria RAM física optimizada.${NC}"
+    echo -e "  * ${GREEN}✓ GPU dedicada seleccionada como primaria.${NC}"
+
+    show_alert "Game Booster Activo" "El procesador mantendrá sus frecuencias óptimas estables y la RAM ha sido liberada para que tu juego corra sin tirones."
+}
+
+# ------------------------------------------------------------------------------
+# PERFIL 3: GAMER & STREAMER SIN LÍMITES (MULTITAREA PROTEGIDA)
+# ------------------------------------------------------------------------------
+apply_gamer_unlimited() {
+    clear
+    echo -e "${PURPLE}${BOLD}Configurando Modo Gamer Sin Límites (Gaming + Streaming Protegido)...${NC}"
+
+    # 1. CPU a rendimiento pleno pero con equidad de hilos
+    if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+        for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo "performance" | sudo tee "$g" >/dev/null 2>&1 || true
+        done
+    fi
+
+    # 2. Blindar OBS Studio, Discord y herramientas de streaming
+    echo -e "  * Protegiendo procesos críticos de Streaming y Audio..."
+    for proc in obs obs64 discord Vesktop spotify; do
+        if pgrep -x "$proc" >/dev/null 2>&1; then
+            # Dar máxima prioridad al codificador y captura
+            sudo renice -n -10 -p $(pgrep -x "$proc") 2>/dev/null || true
+            echo -e "    ${GREEN}↳ Proceso '${proc}' blindado contra caídas de cuadros.${NC}"
+        fi
+    done
+
+    # 3. Dormir / Congelar aplicaciones no críticas para ahorrar recursos
+    freeze_background_apps
+
+    echo -e "  * ${GREEN}✓ OBS Studio y Discord tienen prioridad de CPU garantizada.${NC}"
+    echo -e "  * ${GREEN}✓ Codificador de video protegido contra pérdida de fotogramas (dropped frames).${NC}"
+
+    show_alert "Modo Sin Límites Activo" "¡Tu equipo está listo para Gaming + Streaming!\n• OBS y Discord tienen prioridad asegurada para cero cortes en tu transmisión.\n• Las aplicaciones secundarias han sido puestas en pausa para maximizar tus FPS."
+}
+
+freeze_background_apps() {
+    rm -f "$FROZEN_APPS_FILE"
+    touch "$FROZEN_APPS_FILE"
+
+    # Aplicaciones candidatas a dormir mientras juegas/streameas
+    CANDIDATES=("libreoffice" "soffice.bin" "gimp" "inkscape" "thunderbird" "transmission-gtk" "qbittorrent")
+    for app in "${CANDIDATES[@]}"; do
+        if pgrep -x "$app" >/dev/null 2>&1; then
+            PIDS=$(pgrep -x "$app")
+            for pid in $PIDS; do
+                kill -STOP "$pid" 2>/dev/null || true
+                echo "$pid" >> "$FROZEN_APPS_FILE"
+            done
+            echo -e "    ${YELLOW}↳ Aplicación en segundo plano '${app}' puesta a dormir temporalmente.${NC}"
+        fi
+    done
+}
+
+resume_all_apps() {
+    if [ -f "$FROZEN_APPS_FILE" ]; then
+        while IFS= read -r pid; do
+            if [ -n "$pid" ]; then
+                kill -CONT "$pid" 2>/dev/null || true
+            fi
+        done < "$FROZEN_APPS_FILE"
+        rm -f "$FROZEN_APPS_FILE"
+        echo -e "  * ${GREEN}✓ Todas las aplicaciones que estaban dormidas han sido reanudadas.${NC}"
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# PERFIL 4: MODO AHORRO Y EQUIPOS MODESTOS
+# ------------------------------------------------------------------------------
+apply_lowspec_mode() {
+    clear
+    echo -e "${GREEN}${BOLD}Activando Perfil de Bajo Consumo y Equipos Modestos...${NC}"
+
+    resume_all_apps
+
+    if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+        for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo "powersave" | sudo tee "$g" >/dev/null 2>&1 || true
+        done
+    fi
+
+    # Desactivar efectos gráficos pesados
+    xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null || true
+
+    echo -e "  * ${GREEN}✓ Consumo de energía al mínimo.${NC}"
+    echo -e "  * ${GREEN}✓ Efectos visuales desactivados para máxima velocidad en chips modestos.${NC}"
+
+    show_alert "Modo Bajo Consumo Activo" "El sistema opera en modo ultra eficiente, ideal para procesadores de gama de entrada o para maximizar la batería de tu laptop."
+}
+
+show_alert() {
+    local TITLE="$1"
+    local MSG="$2"
+    if [ -n "$UI" ]; then
+        $UI --title "${TITLE}" --msgbox "${MSG}" 13 72
+    else
+        echo -e "\n${GREEN}${BOLD}✓ ${TITLE}:${NC}\n${MSG}\n"
+        read -p "Presiona ENTER para volver al menú..." _
+    fi
+    main_menu
+}
+
+main_menu

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-live-init - Inicialización del Entorno Live de Dzulux Linux
+# Diseñado y Creado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+# Asegurar grupo autologin
+groupadd -r autologin 2>/dev/null || true
+
+# Asegurar usuario liveuser y grupos
+if ! id -u liveuser >/dev/null 2>&1; then
+    useradd -m -u 1000 -g users -G wheel,audio,video,input,storage,power,network,autologin -s /bin/bash liveuser
+else
+    usermod -aG wheel,audio,video,input,storage,power,network,autologin liveuser 2>/dev/null || true
+fi
+
+# Desbloquear contraseñas para permitir entrar con Enter o con dzulux
+passwd -d liveuser 2>/dev/null || true
+passwd -d root 2>/dev/null || true
+echo "liveuser:dzulux" | chpasswd 2>/dev/null || true
+echo "root:dzulux" | chpasswd 2>/dev/null || true
+passwd -d liveuser 2>/dev/null || true
+passwd -d root 2>/dev/null || true
+
+# Asegurar propiedad completa de /home/liveuser
+mkdir -p /home/liveuser/Desktop
+cp -rf /etc/skel/. /home/liveuser/ 2>/dev/null || true
+chown -R 1000:1000 /home/liveuser 2>/dev/null || true
+chmod 755 /home/liveuser 2>/dev/null || true
+
+# Replicar temas y panel XFCE a nivel de sistema en tiempo de ejecución
+if [ -d /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml ]; then
+    mkdir -p /etc/xdg/xfce4/xfconf/xfce-perchannel-xml /etc/xdg/xfce4/panel
+    cp -rf /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/* /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/ 2>/dev/null || true
+    if [ -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc ]; then
+        cp -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc /etc/xdg/xfce4/panel/ 2>/dev/null || true
+    fi
+fi
+
+# Sudo 100% sin contraseña para liveuser y root
+mkdir -p /etc/sudoers.d
+echo "liveuser ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/liveuser
+echo "root ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/root
+chmod 440 /etc/sudoers.d/* 2>/dev/null || true
+
+# Si se detectó hardware de laptop (batería), habilitar TLP
+if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then
+    systemctl start tlp.service 2>/dev/null || true
+fi
+
+# Iniciar gestor de redes
+systemctl start NetworkManager.service 2>/dev/null || true
+
+# Iniciar Bluetooth si se detecta adaptador inalámbrico
+if command -v rfkill >/dev/null 2>&1 && rfkill list bluetooth 2>/dev/null | grep -q "bluetooth"; then
+    systemctl start bluetooth.service 2>/dev/null || true
+fi
+
+# Si se seleccionó Modo CLI en el arranque de GRUB, desactivar LightDM y aislar multi-user.target
+if grep -q "system_mode=cli" /proc/cmdline; then
+    systemctl stop lightdm.service display-manager.service 2>/dev/null || true
+    systemctl mask lightdm.service display-manager.service 2>/dev/null || true
+    systemctl isolate multi-user.target 2>/dev/null || true
+fi

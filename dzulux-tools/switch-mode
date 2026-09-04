@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# switch-mode - Alternador de Modo Dual (GUI / Terminal) para Dzulux Linux
+# Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+show_help() {
+    echo -e "${CYAN}${BOLD}Dzulux Linux - Gestor de Modo Dual (Diseñado por Alfredo Dzul)${NC}"
+    echo "Uso: switch-mode [COMANDO]"
+    echo ""
+    echo "Comandos disponibles:"
+    echo "  gui          Inicia el Entorno Gráfico (XFCE) en esta sesión."
+    echo "  cli          Regresa al Modo Terminal / Consola pura."
+    echo "  status       Muestra el modo actual y el modo de arranque predeterminado."
+    echo "  lowspec on   Desactiva efectos visuales para máxima velocidad en PCs/laptops modestas."
+    echo "  lowspec off  Restaura efectos visuales completos."
+    echo "  default gui  Configura el Modo Gráfico como el inicio por defecto al encender."
+    echo "  default cli  Configura el Modo Terminal como el inicio por defecto al encender."
+    echo ""
+}
+
+ACTION="${1:-}"
+SUB_ACTION="${2:-}"
+
+case "$ACTION" in
+    gui)
+        echo -e "${GREEN}Iniciando Entorno Gráfico de Dzulux (LightDM / XFCE)...${NC}"
+        sudo systemctl unmask lightdm display-manager 2>/dev/null || true
+        sudo systemctl start lightdm
+        ;;
+    cli)
+        echo -e "${YELLOW}Deteniendo Entorno Gráfico y cambiando a Modo Consola / Terminal...${NC}"
+        sudo systemctl stop lightdm
+        sudo systemctl isolate multi-user.target
+        ;;
+    status)
+        CURRENT_TARGET="$(systemctl get-default)"
+        echo -e "${CYAN}Estado del Modo Dual de Dzulux:${NC}"
+        echo -e "  * Modo de arranque predeterminado: ${BOLD}${CURRENT_TARGET}${NC}"
+        if pgrep -x lightdm >/dev/null 2>&1 || pgrep -x Xorg >/dev/null 2>&1; then
+            echo -e "  * Sesión actual: ${GREEN}${BOLD}MODO GRÁFICO (GUI ACTIVO)${NC}"
+        else
+            echo -e "  * Sesión actual: ${CYAN}${BOLD}MODO TERMINAL / CONSOLA PURA (CLI ACTIVO)${NC}"
+        fi
+        ;;
+    default)
+        if [ "$SUB_ACTION" == "gui" ]; then
+            echo -e "${GREEN}Configurando arranque predeterminado: MODO GRÁFICO.${NC}"
+            sudo systemctl set-default graphical.target
+        elif [ "$SUB_ACTION" == "cli" ]; then
+            echo -e "${GREEN}Configurando arranque predeterminado: MODO TERMINAL (CLI).${NC}"
+            sudo systemctl set-default multi-user.target
+        else
+            echo -e "${RED}Opción no válida. Usa 'switch-mode default gui' o 'switch-mode default cli'.${NC}"
+            exit 1
+        fi
+        ;;
+    lowspec)
+        STATUS="${2:-on}"
+        if [ "$STATUS" == "on" ]; then
+            echo -e "${GREEN}Activando Modo Ultra Fluido para equipos y laptops modestos...${NC}"
+            xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null || true
+            echo -e "  * Efectos y sombras de ventanas desactivados para cero lag."
+            echo -e "  * Máxima velocidad de respuesta en CPU Celeron/Pentium/Atom."
+        else
+            echo -e "${CYAN}Restaurando efectos visuales completos...${NC}"
+            xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+        fi
+        ;;
+    *)
+        show_help
+        ;;
+esac

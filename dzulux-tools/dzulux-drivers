@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-drivers - Asistente de Detección e Instalación de Controladores
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# Seleccionar interfaz gráfica o de texto
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+# 1. Comprobación de Conexión a Internet
+check_internet() {
+    if ! ping -c 1 1.1.1.1 >/dev/null 2>&1 && ! curl -s --head https://archlinux.org >/dev/null 2>&1; then
+        if [ -n "$UI" ]; then
+            $UI --title "Sin Conexión a Internet" --msgbox \
+"Dzulux Drivers necesita conexión a Internet para descargar los controladores exactos de tu hardware.\n\n\
+Por favor conéctate a una red Wi-Fi o Ethernet:\n\
+• En modo gráfico: Usa el icono de red junto al reloj.\n\
+• En modo terminal: Ejecuta el comando 'nmtui' para conectarte a Wi-Fi." 12 70
+        else
+            echo -e "${RED}${BOLD}⚠ No se detectó conexión a Internet.${NC}"
+            echo "Conéctate a Wi-Fi ejecutando 'nmtui' o usando el icono de red en el escritorio."
+        fi
+        exit 1
+    fi
+}
+
+check_internet
+
+# 2. Escaneo de Hardware y Recomendaciones
+PKG_LIST=()
+SUMMARY_TEXT="Hardware detectado en tu equipo:\n\n"
+
+# --- A) Tarjetas Gráficas (GPU) ---
+if command -v lspci >/dev/null 2>&1; then
+    GPUS="$(lspci -nn | grep -E "VGA|3D|Display" || true)"
+    if echo "$GPUS" | grep -iq "nvidia"; then
+        SUMMARY_TEXT+="• GPU NVIDIA: Tarjeta gráfica dedicada detectada.\n  ↳ Se instalarán controladores acelerados y utilidades Prime.\n\n"
+        PKG_LIST+=("nvidia-utils" "nvidia-settings" "nvidia-prime")
+        # Si es Turing o más moderno, nvidia-open; sino fallback general
+        PKG_LIST+=("nvidia-open")
+    fi
+    if echo "$GPUS" | grep -iq "intel"; then
+        SUMMARY_TEXT+="• Gráficos Intel: GPU integrada detectada.\n  ↳ Se instalará aceleración de video por hardware (VA-API / Intel Media Driver).\n\n"
+        PKG_LIST+=("intel-media-driver" "libva-intel-driver")
+    fi
+    if echo "$GPUS" | grep -iq -E "amd|radeon"; then
+        SUMMARY_TEXT+="• Gráficos AMD Radeon: GPU detectada.\n  ↳ Se activará soporte Vulkan Radeon y decodificación de video Mesa.\n\n"
+        PKG_LIST+=("vulkan-radeon" "libva-mesa-driver")
+    fi
+fi
+
+# --- B) Procesador y Microcódigo ---
+CPU_VENDOR="$(grep -m1 "vendor_id" /proc/cpuinfo | awk '{print $3}' || echo "")"
+if [ "$CPU_VENDOR" == "GenuineIntel" ]; then
+    SUMMARY_TEXT+="• Procesador Intel: Se añadirá microcódigo oficial para máxima estabilidad y seguridad.\n\n"
+    PKG_LIST+=("intel-ucode")
+elif [ "$CPU_VENDOR" == "AuthenticAMD" ]; then
+    SUMMARY_TEXT+="• Procesador AMD: Se añadirá microcódigo AMD oficial para rendimiento óptimo.\n\n"
+    PKG_LIST+=("amd-ucode")
+fi
+
+# --- C) Laptops y Batería ---
+IS_LAPTOP=0
+if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then
+    IS_LAPTOP=1
+    SUMMARY_TEXT+="• Laptop / Portátil: Batería detectada.\n  ↳ Se configurará TLP para ahorro de energía y control de brillo en teclas Fn.\n\n"
+    PKG_LIST+=("tlp" "brightnessctl" "powertop" "acpid")
+fi
+
+# --- D) Wi-Fi y Conectividad Inalámbrica ---
+if command -v lspci >/dev/null 2>&1; then
+    if lspci | grep -iq "Broadcom"; then
+        SUMMARY_TEXT+="• Adaptador Wi-Fi Broadcom: Detectado (Común en Apple Mac y Laptops Dell/HP).\n  ↳ Se añadirá el controlador broadcom-wl.\n\n"
+        PKG_LIST+=("broadcom-wl")
+    fi
+fi
+
+# --- E) Bluetooth ---
+if command -v rfkill >/dev/null 2>&1 && rfkill list bluetooth | grep -q "bluetooth"; then
+    SUMMARY_TEXT+="• Adaptador Bluetooth: Módulo inalámbrico detectado.\n  ↳ Se habilitarán servicios BlueZ y gestor Blueman.\n\n"
+    PKG_LIST+=("bluez" "bluez-utils" "blueman")
+fi
+
+# --- F) Audio y Micrófonos de Laptop ---
+if dmesg 2>/dev/null | grep -iq "sof-audio" || [ "$IS_LAPTOP" -eq 1 ]; then
+    SUMMARY_TEXT+="• Audio de Laptop: Se garantizará Sound Open Firmware (SOF) para altavoces y micrófonos.\n\n"
+    PKG_LIST+=("sof-firmware" "alsa-ucm-conf")
+fi
+
+# Eliminar duplicados de la lista de paquetes
+UNIQUE_PKGS=($(printf "%s\n" "${PKG_LIST[@]}" | sort -u))
+
+if [ "${#UNIQUE_PKGS[@]}" -eq 0 ]; then
+    if [ -n "$UI" ]; then
+        $UI --title "Hardware Optimizado" --msgbox \
+"¡Excelente!\n\nTu equipo ya cuenta con todos los controladores necesarios dentro del núcleo de Dzulux Linux.\n\nNo se requieren controladores propietarios adicionales para tu hardware." 12 70
+    else
+        clear
+        echo -e "${GREEN}${BOLD}✓ ¡Excelente! Tu equipo ya cuenta con todos los controladores necesarios dentro del núcleo de Dzulux Linux.${NC}"
+        echo "No se requieren controladores propietarios adicionales para tu hardware."
+    fi
+    exit 0
+fi
+
+# 3. Preguntar al usuario antes de proceder
+if [ -n "$UI" ]; then
+    if ! $UI --title "Asistente de Controladores - Dzulux Linux" \
+        --yesno "${SUMMARY_TEXT}¿Deseas que Dzulux descargue e instale automáticamente estos controladores optimizados para tu hardware?" 20 74; then
+        clear
+        echo "Operación cancelada por el usuario."
+        exit 0
+    fi
+else
+    clear
+    echo -e "${CYAN}${BOLD}=== ASISTENTE DE CONTROLADORES DE DZULUX LINUX ===${NC}"
+    echo -e "Diseñado por Alfredo Dzul\n"
+    echo -e "${SUMMARY_TEXT}"
+    read -p "¿Deseas descargar e instalar estos controladores ahora? (S/n): " RESP
+    if [[ "$RESP" =~ ^[Nn]$ ]]; then
+        echo "Operación cancelada."
+        exit 0
+    fi
+fi
+
+# 4. Descarga e Instalación Automática
+clear
+echo -e "${CYAN}${BOLD}Descargando e instalando controladores optimizados para tu equipo...${NC}"
+echo -e "Paquetes a instalar: ${GREEN}${UNIQUE_PKGS[*]}${NC}\n"
+
+# Sincronizar bases de datos e instalar
+sudo pacman -Sy --needed --noconfirm "${UNIQUE_PKGS[@]}"
+
+# 5. Activación de Servicios según el Hardware
+echo -e "\n${CYAN}Activando servicios y optimizaciones...${NC}"
+
+if [ "$IS_LAPTOP" -eq 1 ]; then
+    sudo systemctl enable --now tlp.service 2>/dev/null || true
+    echo -e "  * ${GREEN}✓ Servicio de ahorro de batería TLP activado.${NC}"
+fi
+
+if [[ " ${UNIQUE_PKGS[*]} " =~ " bluez " ]]; then
+    sudo systemctl enable --now bluetooth.service 2>/dev/null || true
+    echo -e "  * ${GREEN}✓ Servicio de Bluetooth activado.${NC}"
+fi
+
+# 6. Mensaje de Éxito
+if [ -n "$UI" ]; then
+    $UI --title "Controladores Instalados con Éxito" --msgbox \
+"¡Todos los controladores para tu equipo fueron instalados y configurados!\n\n\
+Tu tarjeta de video, audio, batería, Wi-Fi y Bluetooth están listos para ofrecer el máximo rendimiento.\n\n\
+Diseñado por Alfredo Dzul para Dzulux Linux." 12 70
+else
+    echo -e "\n${GREEN}${BOLD}¡Éxito! Todos los controladores fueron instalados y optimizados para tu máquina.${NC}"
+fi

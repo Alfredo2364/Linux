@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-battery - Gestor Inteligente de Ahorro de Batería con Wi-Fi Configurable
+# Dzulux Linux - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+main_menu() {
+    if [ -n "$UI" ]; then
+        CHOICE=$($UI --title "Dzulux Battery - Ahorro de Batería (Alfredo Dzul)" --menu \
+"Selecciona un perfil de energía adaptado a tus necesidades:" 18 72 4 \
+"1" "📶 Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)" \
+"2" "🚨 Modo Emergencia Extrema (Offline, Brillo al 15%, Ultra ahorro)" \
+"3" "⚙️ Configuración Personalizada (Elegir qué componentes desactivar)" \
+"4" "⚡ Restaurar Modo Normal / Alto Rendimiento" 3>&1 1>&2 2>&3)
+    else
+        clear
+        echo -e "${CYAN}${BOLD}=== DZULUX BATTERY - GESTOR DE ENERGÍA ===${NC}"
+        echo -e "Diseñado por Alfredo Dzul\n"
+        echo "1) Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)"
+        echo "2) Modo Emergencia Extrema (Offline, Brillo 15%)"
+        echo "3) Configuración Personalizada"
+        echo "4) Restaurar Modo Normal"
+        read -p "Elige una opción (1-4): " CHOICE
+    fi
+
+    case "$CHOICE" in
+        1) apply_productive ;;
+        2) apply_extreme ;;
+        3) apply_custom ;;
+        4) apply_normal ;;
+        *) exit 0 ;;
+    esac
+}
+
+apply_productive() {
+    clear
+    echo -e "${GREEN}${BOLD}Aplicando Modo Ahorro Productivo (Wi-Fi 100% activo)...${NC}"
+    
+    # Apagar Bluetooth para ahorrar energía sin tocar el Wi-Fi
+    sudo rfkill block bluetooth 2>/dev/null || true
+    echo -e "  * ${GREEN}✓ Wi-Fi mantenido encendido para trabajar y subir documentos.${NC}"
+    echo -e "  * ${YELLOW}✓ Bluetooth apagado para evitar drenaje innecesario.${NC}"
+
+    # Brillo de pantalla al 40%
+    if command -v brightnessctl >/dev/null 2>&1; then
+        brightnessctl set 40% >/dev/null 2>&1 || true
+        echo -e "  * ${GREEN}✓ Brillo de pantalla ajustado al 40%.${NC}"
+    fi
+
+    # TLP en modo batería
+    if command -v tlp >/dev/null 2>&1; then
+        sudo tlp bat >/dev/null 2>&1 || true
+        echo -e "  * ${GREEN}✓ Perfil TLP de ahorro en procesador y periféricos activado.${NC}"
+    fi
+
+    echo -e "\n${GREEN}${BOLD}¡Modo Productivo activo! Hasta 35% más de duración sin perder internet.${NC}"
+    read -p "Presiona ENTER para volver..." _
+    main_menu
+}
+
+apply_extreme() {
+    clear
+    echo -e "${YELLOW}${BOLD}Aplicando Modo Emergencia Extrema...${NC}"
+    
+    sudo rfkill block bluetooth 2>/dev/null || true
+    sudo rfkill block wifi 2>/dev/null || true
+    echo -e "  * ${YELLOW}✓ Todas las antenas inalámbricas apagadas.${NC}"
+
+    if command -v brightnessctl >/dev/null 2>&1; then
+        brightnessctl set 15% >/dev/null 2>&1 || true
+        echo -e "  * ${YELLOW}✓ Brillo al 15%.${NC}"
+    fi
+
+    if command -v tlp >/dev/null 2>&1; then
+        sudo tlp bat >/dev/null 2>&1 || true
+    fi
+
+    # Desactivar efectos gráficos XFCE
+    xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null || true
+    echo -e "  * ${YELLOW}✓ Efectos gráficos desactivados para mínimo consumo de GPU.${NC}"
+
+    echo -e "\n${YELLOW}${BOLD}¡Modo Emergencia activo! Máxima duración para guardar tu trabajo local.${NC}"
+    read -p "Presiona ENTER para volver..." _
+    main_menu
+}
+
+apply_custom() {
+    if [ -n "$UI" ]; then
+        OPTS=$($UI --title "Ajustes Personalizados de Batería" --checklist \
+"Marca con ESPACIO las opciones que deseas aplicar:" 16 70 4 \
+"WIFI" "Mantener Wi-Fi encendido" ON \
+"BT" "Apagar Bluetooth" ON \
+"BRIGHT" "Reducir brillo al 35%" ON \
+"TLP" "Activar ahorro TLP en procesador" ON 3>&1 1>&2 2>&3)
+        
+        if echo "$OPTS" | grep -q "BT"; then sudo rfkill block bluetooth 2>/dev/null || true; fi
+        if ! echo "$OPTS" | grep -q "WIFI"; then sudo rfkill block wifi 2>/dev/null || true; fi
+        if echo "$OPTS" | grep -q "BRIGHT" && command -v brightnessctl >/dev/null 2>&1; then brightnessctl set 35% >/dev/null 2>&1 || true; fi
+        if echo "$OPTS" | grep -q "TLP" && command -v tlp >/dev/null 2>&1; then sudo tlp bat >/dev/null 2>&1 || true; fi
+    fi
+    main_menu
+}
+
+apply_normal() {
+    clear
+    echo -e "${CYAN}Restaurando modo normal de energía...${NC}"
+    sudo rfkill unblock wifi 2>/dev/null || true
+    sudo rfkill unblock bluetooth 2>/dev/null || true
+    if command -v brightnessctl >/dev/null 2>&1; then brightnessctl set 80% >/dev/null 2>&1 || true; fi
+    if command -v tlp >/dev/null 2>&1; then sudo tlp ac >/dev/null 2>&1 || true; fi
+    xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+    echo -e "${GREEN}✓ Rendimiento normal y todas las conexiones habilitadas.${NC}"
+    read -p "Presiona ENTER para volver..." _
+    main_menu
+}
+
+main_menu

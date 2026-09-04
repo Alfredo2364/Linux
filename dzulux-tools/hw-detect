@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# hw-detect - Detección y Diagnóstico de Hardware de Dzulux Linux
+# Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+# Colores para la terminal
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+clear
+echo -e "${CYAN}${BOLD}"
+echo "  ================================================================"
+echo "     DZULUX LINUX - DIAGNÓSTICO DE HARDWARE (BETA 1.1)"
+echo "     Diseñado por Alfredo Dzul"
+echo "  ================================================================"
+echo -e "${NC}"
+
+# 1. Información del Equipo / Fabricante
+echo -e "${BLUE}${BOLD}[1] TIPO DE EQUIPO Y ARQUITECTURA:${NC}"
+SYS_VENDOR="$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null || echo "Desconocido")"
+PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "Genérico")"
+BOARD_NAME="$(cat /sys/class/dmi/id/board_name 2>/dev/null || echo "N/A")"
+
+echo -e "  * Fabricante: ${BOLD}${SYS_VENDOR}${NC}"
+echo -e "  * Modelo:     ${BOLD}${PRODUCT_NAME} (${BOARD_NAME})${NC}"
+
+IS_MAC=0
+if echo "${SYS_VENDOR} ${PRODUCT_NAME}" | grep -iq "Apple"; then
+    IS_MAC=1
+    echo -e "  * ${GREEN}✓ Equipo Apple Mac detectado (Configuración Mac activa: Teclas Fn, WiFi Broadcom)${NC}"
+fi
+
+IS_LAPTOP=0
+if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then
+    IS_LAPTOP=1
+    echo -e "  * ${GREEN}✓ Tipo de equipo: Portátil / Laptop con Batería${NC}"
+else
+    echo -e "  * ${CYAN}ℹ Tipo de equipo: Computadora de Escritorio / PC o VM${NC}"
+fi
+
+echo ""
+
+# 2. Detección de Tarjetas Gráficas (GPU)
+echo -e "${BLUE}${BOLD}[2] CONTROLADORES Y TARJETAS GRÁFICAS (GPU):${NC}"
+if command -v lspci >/dev/null 2>&1; then
+    GPUS="$(lspci -nn | grep -E "VGA|3D|Display" || true)"
+    if [ -n "$GPUS" ]; then
+        echo -e "${GPUS}" | while IFS= read -r line; do
+            echo -e "  * Dispositivo: ${BOLD}${line}${NC}"
+            if echo "$line" | grep -iq "nvidia"; then
+                echo -e "    ${YELLOW}↳ GPU NVIDIA detectada.${NC}"
+                if lsmod | grep -iq "nvidia"; then
+                    echo -e "      ${GREEN}✓ Controlador propietario NVIDIA cargado correctamente.${NC}"
+                elif lsmod | grep -iq "nouveau"; then
+                    echo -e "      ${CYAN}✓ Controlador Nouveau (Open-source) en ejecución.${NC}"
+                fi
+            elif echo "$line" | grep -iq "intel"; then
+                echo -e "    ${GREEN}↳ Gráficos Intel detectados (Mesa / Intel Media Driver activo).${NC}"
+            elif echo "$line" | grep -iq -E "amd|radeon"; then
+                echo -e "    ${GREEN}↳ Gráficos AMD Radeon detectados (AMDGPU / Vulkan Radeon activo).${NC}"
+            fi
+        done
+    else
+        echo -e "  ${YELLOW}No se detectaron adaptadores PCI VGA estándar.${NC}"
+    fi
+fi
+
+echo ""
+
+# 3. Detección de Audio y Micrófono
+echo -e "${BLUE}${BOLD}[3] SISTEMA DE SONIDO Y AUDIO:${NC}"
+if [ -f /proc/asound/cards ]; then
+    echo -e "  * Tarjetas de audio detectadas por el Kernel:"
+    sed 's/^/    /' /proc/asound/cards
+    if dmesg 2>/dev/null | grep -iq "sof-audio"; then
+        echo -e "  * ${GREEN}✓ Intel/AMD SOF-Firmware (Sound Open Firmware) activo para laptop.${NC}"
+    fi
+else
+    echo -e "  ${YELLOW}No se encontró subsistema ALSA activo.${NC}"
+fi
+
+if pgrep -x pipewire >/dev/null 2>&1; then
+    echo -e "  * ${GREEN}✓ Servidor de Audio PipeWire: EN EJECUCIÓN${NC}"
+else
+    echo -e "  * ${YELLOW}⚠ Servidor PipeWire no activo en este modo.${NC}"
+fi
+
+echo ""
+
+# 4. Estado de Batería y Pantalla (Laptops)
+if [ "$IS_LAPTOP" -eq 1 ]; then
+    echo -e "${BLUE}${BOLD}[4] BATERÍA Y PANTALLA DE LAPTOP:${NC}"
+    for bat in /sys/class/power_supply/BAT*; do
+        if [ -d "$bat" ]; then
+            BAT_NAME="$(basename "$bat")"
+            CAPACITY="$(cat "$bat/capacity" 2>/dev/null || echo "N/A")"
+            STATUS="$(cat "$bat/status" 2>/dev/null || echo "N/A")"
+            echo -e "  * Batería ${BAT_NAME}: ${BOLD}${CAPACITY}%${NC} [Estado: ${STATUS}]"
+        fi
+    done
+
+    if [ -d /sys/class/backlight ] && [ -n "$(ls -A /sys/class/backlight 2>/dev/null)" ]; then
+        echo -e "  * ${GREEN}✓ Controlador de retroiluminación de pantalla (Brillo) disponible.${NC}"
+        if command -v brightnessctl >/dev/null 2>&1; then
+            CURR_BRIGHT="$(brightnessctl get 2>/dev/null || echo "N/A")"
+            MAX_BRIGHT="$(brightnessctl max 2>/dev/null || echo "N/A")"
+            echo -e "    Nivel actual: ${CURR_BRIGHT} / ${MAX_BRIGHT}"
+        fi
+    fi
+
+    if systemctl is-active --quiet tlp 2>/dev/null; then
+        echo -e "  * ${GREEN}✓ Demonio TLP (Ahorro inteligente de batería): ACTIVO${NC}"
+    else
+        echo -e "  * ${CYAN}ℹ Demonio TLP listo para ser habilitado en la instalación.${NC}"
+    fi
+    echo ""
+fi
+
+# 5. Redes e Inalámbrico
+echo -e "${BLUE}${BOLD}[5] CONECTIVIDAD DE RED:${NC}"
+if command -v nmcli >/dev/null 2>&1; then
+    WIFI_DEV="$(nmcli device 2>/dev/null | grep -E "wifi" || true)"
+    if [ -n "$WIFI_DEV" ]; then
+        echo -e "  * ${GREEN}✓ Tarjeta Wi-Fi detectada:${NC}"
+        echo "$WIFI_DEV" | sed 's/^/    /'
+    else
+        echo -e "  * ${YELLOW}No se detectaron adaptadores Wi-Fi activos en este momento.${NC}"
+    fi
+fi
+
+echo -e "${CYAN}----------------------------------------------------------------${NC}"
+echo -e "Diagnóstico finalizado. Para instalar Dzulux ejecuta: ${GREEN}${BOLD}dzulux-installer${NC}"
+echo -e "${CYAN}================================================================${NC}"

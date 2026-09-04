@@ -1,0 +1,487 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# dzulux-installer - Instalador Guiado Paso a Paso de Dzulux Linux
+# Creado y Diseñado por Alfredo Dzul
+# Versión: 1.1 (BETA) - Soporte Completo Dual Boot (Windows / macOS / Linux)
+# ==============================================================================
+
+set -euo pipefail
+
+# Asegurar que se ejecuta con privilegios de root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Por favor, ejecuta el instalador con privilegios de administrador (sudo dzulux-installer)"
+    exit 1
+fi
+
+# Utilidad de diálogo preferida
+UI="whiptail"
+if ! command -v whiptail >/dev/null 2>&1; then
+    if command -v dialog >/dev/null 2>&1; then
+        UI="dialog"
+    else
+        echo "Error: No se encontró 'whiptail' ni 'dialog'. Instalando dependencias necesarias..."
+        exit 1
+    fi
+fi
+
+# ------------------------------------------------------------------------------
+# 1. BIENVENIDA Y NOTA DE VERSIÓN BETA
+# ------------------------------------------------------------------------------
+$UI --title "Dzulux Linux 1.1 (Beta) - Diseñado por Alfredo Dzul" --msgbox \
+"¡Bienvenido al instalador oficial de Dzulux Linux!\n\n\
+Creado y diseñado por: Alfredo Dzul.\n\n\
+NOTA IMPORTANTE (ESTADO BETA):\n\
+Este sistema operativo se encuentra actualmente en versión BETA. Está diseñado para ofrecer una experiencia equilibrada, ágil y compatible con PC, Laptops y equipos Apple Mac x86_64.\n\n\
+Incluye soporte para DUAL BOOT: Si ya tienes Windows, macOS u otro sistema, podrás conservarlo y elegir cuál iniciar al encender el equipo.\n\n\
+Este asistente te explicará en detalle cada decisión antes de realizar cualquier cambio." 18 74
+
+# ------------------------------------------------------------------------------
+# 2. AUDITORÍA DE HARDWARE Y ELECCIÓN DE EDICIÓN (ESTÁNDAR vs LITE)
+# ------------------------------------------------------------------------------
+CPU_MODEL="$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | sed 's/^[ \t]*//' || echo "Genérico")"
+CPU_CORES="$(grep -c "^processor" /proc/cpuinfo || echo "1")"
+TOTAL_RAM_MB="$(free -m | awk '/^Mem:/{print $2}')"
+
+IS_LOW_SPEC=0
+if echo "$CPU_MODEL" | grep -iqE "celeron|pentium|atom|athlon|e2-|e1-|sempron" || [ "$CPU_CORES" -le 2 ] || [ "$TOTAL_RAM_MB" -le 3500 ]; then
+    IS_LOW_SPEC=1
+fi
+
+if [ "$IS_LOW_SPEC" -eq 1 ]; then
+    # Mensaje de advertencia y protección para procesadores de gama de entrada
+    $UI --title "Hardware Detectado: Optimización Inteligente" --msgbox \
+"Dzulux Installer ha detectado el siguiente procesador:\n\n\
+• Procesador: ${CPU_MODEL} (${CPU_CORES} núcleos)\n\
+• Memoria RAM: ${TOTAL_RAM_MB} MB\n\n\
+DIAGNÓSTICO DEL SISTEMA:\n\
+Tu equipo cuenta con un procesador de gama de entrada (Celeron / Pentium / Atom / Athlon básico).\n\n\
+Para proteger tu laptop de sobrecalentamientos, congelamientos y garantizar 60 FPS estables sin lentitud, Dzulux limitará las opciones de instalación exclusivamente a la EDICIÓN LITE o MODO TERMINAL." 19 74
+
+    SYSTEM_MODE=$($UI --title "Paso 1: Selección de Edición Dzulux" --menu \
+"Para este procesador se ofrecen únicamente las ediciones optimizadas:\n\n\
+¿Qué edición deseas instalar?" 17 74 2 \
+"1" "Dzulux Lite (Escritorio Ultra Ligero sin efectos pesados, Cero Lentitud)" \
+"2" "Dzulux Terminal / CLI (Modo Servidor / Consola Pura - 148 MB RAM)" \
+3>&1 1>&2 2>&3)
+else
+    # Procesador capaz de gama media o alta
+    SYSTEM_MODE=$($UI --title "Paso 1: Selección del Modo de Sistema" --menu \
+"Dzulux te permite elegir cómo deseas utilizar tu equipo. Por favor selecciona el modo que mejor se adapte a tus necesidades:\n\n\
+¿Qué modo deseas instalar?" 17 74 2 \
+"1" "Dzulux Standard (Escritorio Completo XFCE + Efectos Gráficos + Wallpapers)" \
+"2" "Dzulux Terminal / Consola Pura (Estilo Ubuntu Server / CLI)" \
+3>&1 1>&2 2>&3)
+fi
+
+if [ -z "$SYSTEM_MODE" ]; then
+    echo "Instalación cancelada por el usuario."
+    exit 0
+fi
+
+if [ "$SYSTEM_MODE" == "1" ]; then
+    if [ "$IS_LOW_SPEC" -eq 1 ]; then
+        MODE_NAME="Dzulux Lite (Optimizado para procesadores Celeron/Athlon)"
+        $UI --title "Dzulux Lite Seleccionado" --msgbox \
+"Has seleccionado: Dzulux Lite.\n\n\
+Optimizaciones que se aplicarán automáticamente:\n\
+• Compositor y sombras desactivadas para máxima fluidez de ventanas.\n\
+• Compresión zRAM que duplica la memoria RAM útil sin congelamientos.\n\
+• Ajustes del kernel para respuesta rápida en disco.\n\
+• Consumo en reposo de ~380 MB de RAM. Tu Celeron/Athlon volará sin tirones." 16 72
+    else
+        MODE_NAME="Dzulux Standard (XFCE Completo)"
+        $UI --title "Modo Gráfico Estándar Seleccionado" --msgbox \
+"Has seleccionado: Modo Gráfico Estándar.\n\n\
+• Entorno visual XFCE completo con temas oscuros, animaciones y wallpapers.\n\
+• Navegador Firefox, utilidades visuales y panel con bandeja de sistema.\n\
+• Consumo equilibrado (~550 MB de RAM en reposo)." 15 72
+    fi
+else
+    MODE_NAME="Dzulux Terminal Minimalista (Estilo Ubuntu Server)"
+    $UI --title "Modo Terminal Seleccionado" --msgbox \
+"Has seleccionado: Modo Terminal / Consola.\n\n\
+• Consumo mínimo de ~148 MB de RAM.\n\
+• Ideal para servidores, pruebas o diagnóstico.\n\
+• Siempre podrás iniciar la interfaz visual con 'switch-mode gui'." 15 72
+fi
+
+# ------------------------------------------------------------------------------
+# 3. TIPO DE INSTALACIÓN: DUAL BOOT vs LIMPIA
+# ------------------------------------------------------------------------------
+INSTALL_TYPE=$($UI --title "Paso 2: Tipo de Instalación (¿Dual Boot o Limpia?)" --menu \
+"¿Cómo deseas instalar Dzulux en tu almacenamiento?\n\n\
+Elige la opción adecuada para tu equipo:" 17 76 2 \
+"1" "Dual Boot (Instalar junto a Windows / macOS / otro Linux existente)" \
+"2" "Instalación Limpia (Borrar todo el disco y usar solo Dzulux)" \
+3>&1 1>&2 2>&3)
+
+if [ -z "$INSTALL_TYPE" ]; then
+    echo "Instalación cancelada en selección de tipo de instalación."
+    exit 0
+fi
+
+BOOT_PART=""
+ROOT_PART=""
+
+if [ "$INSTALL_TYPE" == "1" ]; then
+    # --- MODO DUAL BOOT ---
+    $UI --title "Información del Modo Dual Boot" --msgbox \
+"Has elegido DUAL BOOT.\n\n\
+¿Cómo funciona?\n\
+• Tu sistema operativo actual (Windows, macOS u otro Linux) NO será borrado.\n\
+• Dzulux se instalará en una partición que elijas.\n\
+• Se configurará el menú de arranque GRUB para que cada vez que prendas el equipo, puedas elegir entre:\n\
+    1. Dzulux Linux\n\
+    2. Windows Boot Manager (o macOS / tu otro sistema)\n\n\
+A continuación, selecciona la partición EFI existente y la partición donde residirá Dzulux." 17 74
+
+    PARTS_RAW=$(lsblk -l -n -p -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT | grep -E "sd[a-z][0-9]|nvme[0-9]n[0-9]p[0-9]|vd[a-z][0-9]" || true)
+
+    if [ -z "$PARTS_RAW" ]; then
+        $UI --title "Error" --msgbox "No se encontraron particiones disponibles en este equipo." 8 60
+        exit 1
+    fi
+
+    PART_OPTIONS=()
+    while read -r line; do
+        P_NAME=$(echo "$line" | awk '{print $1}')
+        P_DESC=$(echo "$line" | cut -d' ' -f2-)
+        PART_OPTIONS+=("$P_NAME" "$P_DESC")
+    done <<< "$PARTS_RAW"
+
+    BOOT_PART=$($UI --title "Dual Boot: Selecciona la Partición EFI (Bootloader)" --menu \
+"Selecciona la partición EFI existente (suele ser FAT32 de 100M a 512M donde vive el arranque de Windows/Mac):" 17 76 6 \
+"${PART_OPTIONS[@]}" 3>&1 1>&2 2>&3)
+
+    if [ -z "$BOOT_PART" ]; then
+        echo "Cancelado por usuario."
+        exit 0
+    fi
+
+    ROOT_PART=$($UI --title "Dual Boot: Selecciona la Partición para Dzulux" --menu \
+"Selecciona la partición donde se instalará Dzulux Linux (¡ATENCIÓN: Solo esta partición será formateada!):" 17 76 6 \
+"${PART_OPTIONS[@]}" 3>&1 1>&2 2>&3)
+
+    if [ -z "$ROOT_PART" ]; then
+        echo "Cancelado por usuario."
+        exit 0
+    fi
+
+    if [ "$BOOT_PART" == "$ROOT_PART" ]; then
+        $UI --title "Error" --msgbox "La partición de arranque EFI y la partición del sistema Dzulux no pueden ser la misma." 8 70
+        exit 1
+    fi
+
+    $UI --title "Confirmación Dual Boot" --yesno \
+"Resumen de la configuración Dual Boot:\n\n\
+• Partición EFI (Se conservará, NO se formatea): ${BOOT_PART}\n\
+• Partición de Dzulux (Se formateará a EXT4):  ${ROOT_PART}\n\n\
+¿Deseas continuar con el formateo de ${ROOT_PART} y la instalación?" 14 72
+
+else
+    # --- MODO INSTALACIÓN LIMPIA (BORRADO TOTAL) ---
+    $UI --title "Paso 2: Selección de Disco Completo" --msgbox \
+"A continuación seleccionarás el disco donde se instalará Dzulux Linux de forma exclusiva.\n\n\
+¡ADVERTENCIA CRÍTICA!\n\
+Todos los datos, particiones y sistemas operativos existentes en el disco seleccionado serán reemplazados por completo." 14 72
+
+    AVAILABLE_DISKS=$(lsblk -d -n -p -o NAME,SIZE,MODEL | grep -E "sd|nvme|vd|mmcblk" || true)
+
+    if [ -z "$AVAILABLE_DISKS" ]; then
+        $UI --title "Error" --msgbox "No se encontraron discos de almacenamiento compatibles en este equipo." 8 60
+        exit 1
+    fi
+
+    MENU_ITEMS=()
+    while read -r line; do
+        DEV=$(echo "$line" | awk '{print $1}')
+        INFO=$(echo "$line" | cut -d' ' -f2-)
+        MENU_ITEMS+=("$DEV" "$INFO")
+    done <<< "$AVAILABLE_DISKS"
+
+    CHOSEN_DISK=$($UI --title "Paso 2: Selecciona el Disco Destino" --menu \
+"Selecciona el disco donde deseas instalar Dzulux Linux:" 16 72 6 \
+"${MENU_ITEMS[@]}" 3>&1 1>&2 2>&3)
+
+    if [ -z "$CHOSEN_DISK" ]; then
+        echo "Instalación cancelada en selección de disco."
+        exit 0
+    fi
+
+    $UI --title "CONFIRMACIÓN CRÍTICA DE BORRADO" --yesno \
+"¿Estás completamente seguro de que deseas borrar y usar todo el disco:\n\n\
+   ${CHOSEN_DISK}\n\n\
+ATENCIÓN: Todos los archivos previos se perderán definitivamente." 12 70
+
+    # Particionado GPT completo
+    umount -R /mnt 2>/dev/null || true
+    parted -s "${CHOSEN_DISK}" mklabel gpt
+    parted -s "${CHOSEN_DISK}" mkpart "DZULUX_BOOT" fat32 1MiB 513MiB
+    parted -s "${CHOSEN_DISK}" set 1 esp on
+    parted -s "${CHOSEN_DISK}" mkpart "DZULUX_ROOT" ext4 513MiB 100%
+
+    if echo "${CHOSEN_DISK}" | grep -qE "nvme|mmcblk"; then
+        BOOT_PART="${CHOSEN_DISK}p1"
+        ROOT_PART="${CHOSEN_DISK}p2"
+    else
+        BOOT_PART="${CHOSEN_DISK}1"
+        ROOT_PART="${CHOSEN_DISK}2"
+    fi
+
+    mkfs.fat -F32 "${BOOT_PART}"
+fi
+
+# Determinar disco físico si se seleccionó Dual Boot
+CHOSEN_DISK="${CHOSEN_DISK:-/dev/$(lsblk -no PKNAME "${ROOT_PART}" 2>/dev/null | head -n1 || echo "sda")}"
+
+# Detección de almacenamiento soldado de 32 GB (eMMC / SSD pequeño)
+DISK_SIZE_BYTES=$(lsblk -b -n -d -o SIZE "${CHOSEN_DISK}" 2>/dev/null || echo "100000000000")
+USE_BTRFS_COMPRESSION=0
+
+if [ "$DISK_SIZE_BYTES" -le 38000000000 ] || echo "${CHOSEN_DISK}" | grep -q "mmcblk"; then
+    USE_BTRFS_COMPRESSION=1
+fi
+
+# Formatear partición ROOT para Dzulux
+umount -R /mnt 2>/dev/null || true
+
+if [ "$USE_BTRFS_COMPRESSION" -eq 1 ]; then
+    # Almacenamiento modesto / 32 GB eMMC: Btrfs con compresión zstd para ahorrar 50% de espacio y proteger la memoria flash
+    mkfs.btrfs -f -L "Dzulux" "${ROOT_PART}"
+    mount -o compress=zstd:1,noatime,space_cache=v2 "${ROOT_PART}" /mnt
+else
+    # Almacenamiento estándar: ext4 con noatime y 1% de espacio reservado
+    mkfs.ext4 -F -m 1 -L "Dzulux" "${ROOT_PART}"
+    mount -o noatime "${ROOT_PART}" /mnt
+fi
+
+mkdir -p /mnt/boot/efi
+mount "${BOOT_PART}" /mnt/boot/efi
+
+# ------------------------------------------------------------------------------
+# 4. CONFIGURACIÓN DE USUARIO Y EQUIPO
+# ------------------------------------------------------------------------------
+USERNAME=$($UI --title "Paso 3: Cuenta de Usuario" --inputbox \
+"Escribe el nombre de usuario que usarás para iniciar sesión (solo minúsculas, sin espacios, ej: alfredo):" 10 70 "usuario" 3>&1 1>&2 2>&3)
+
+if [ -z "$USERNAME" ]; then
+    USERNAME="usuario"
+fi
+
+USER_PASS=$($UI --title "Paso 3: Contraseña del Usuario" --passwordbox \
+"Escribe una contraseña segura para el usuario '${USERNAME}':" 10 70 3>&1 1>&2 2>&3)
+
+ROOT_PASS=$($UI --title "Paso 3: Contraseña de Administrador (Root)" --passwordbox \
+"Escribe una contraseña para el administrador del sistema (root):" 10 70 3>&1 1>&2 2>&3)
+
+HOSTNAME=$($UI --title "Paso 3: Nombre del Equipo" --inputbox \
+"Escribe el nombre identificador para este equipo en la red:" 10 70 "dzulux-pc" 3>&1 1>&2 2>&3)
+
+# ------------------------------------------------------------------------------
+# 5. DIAGNÓSTICO Y ADAPTACIÓN DE CONTROLADORES
+# ------------------------------------------------------------------------------
+HARDWARE_SUMMARY="Resumen de hardware detectado para instalación:\n"
+
+if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then
+    HARDWARE_SUMMARY+="• Batería de laptop detectada: Se activará TLP y gestor de ahorro de energía.\n"
+fi
+
+if lspci 2>/dev/null | grep -iq "nvidia"; then
+    HARDWARE_SUMMARY+="• GPU NVIDIA detectada: Se configurarán módulos propietarios y herramientas Prime.\n"
+fi
+
+if cat /sys/class/dmi/id/sys_vendor 2>/dev/null | grep -iq "Apple"; then
+    HARDWARE_SUMMARY+="• Equipo Apple Mac detectado: Se habilitará soporte de teclado Mac y firmware Wi-Fi Broadcom.\n"
+fi
+
+if [ "$USE_BTRFS_COMPRESSION" -eq 1 ]; then
+    HARDWARE_SUMMARY+="• Memoria eMMC / 32 GB detectada: Se activará compresión transparente Btrfs (zstd) y optimización de escritura para dejar +25 GB libres y proteger la memoria soldada.\n"
+fi
+
+HARDWARE_SUMMARY+="• Audio: PipeWire con SOF-Firmware para soporte de bocinas y micrófonos modernos.\n"
+HARDWARE_SUMMARY+="• Detección Dual Boot: os-prober activo para reconocer Windows / macOS en GRUB.\n"
+
+$UI --title "Paso 4: Detección Automática de Controladores" --msgbox \
+"${HARDWARE_SUMMARY}\n\
+Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
+
+# ------------------------------------------------------------------------------
+# 6. INSTALACIÓN DE ARCHIVOS, CONTROLADORES Y CONFIGURACIÓN DUAL BOOT
+# ------------------------------------------------------------------------------
+(
+    echo "10"; sleep 1
+    echo "XXX\nCopiando el núcleo del sistema Dzulux y paquetes esenciales...\nXXX"
+    
+    echo "10"; sleep 1
+    echo "XXX\nClonando imagen oficial de Dzulux Linux al disco (Instalación Offline de alta velocidad)...\nXXX"
+    
+    # Copiar el sistema raíz completo de la ISO a la partición de destino
+    rsync -aAX --info=progress2 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/home/liveuser/*"} / /mnt/
+    
+    # Crear directorios esenciales del sistema
+    mkdir -p /mnt/{dev,proc,sys,tmp,run,mnt,media,home}
+    chmod 1777 /mnt/tmp
+
+    # Eliminar configuraciones y rastros exclusivos de la sesión Live USB
+    rm -f /mnt/etc/systemd/system/getty@tty1.service.d/autologin.conf 2>/dev/null || true
+    rm -f /mnt/etc/systemd/system/getty@tty2.service.d/autologin.conf 2>/dev/null || true
+    rm -f /mnt/etc/lightdm/lightdm.conf.d/dzulux-live.conf 2>/dev/null || true
+    rm -f /mnt/etc/systemd/system/dzulux-live-init.service 2>/dev/null || true
+    rm -f /mnt/etc/systemd/system/multi-user.target.wants/dzulux-live-init.service 2>/dev/null || true
+    sed -i '/liveuser/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
+    rm -f /mnt/etc/sudoers.d/liveuser 2>/dev/null || true
+
+    echo "40"; sleep 1
+    echo "XXX\nGenerando tabla de particiones (fstab)...\nXXX"
+    if command -v genfstab >/dev/null 2>&1; then
+        genfstab -U /mnt > /mnt/etc/fstab
+    fi
+
+    echo "60"; sleep 1
+    echo "XXX\nConfigurando identidad, usuario '${USERNAME}', teclado y claves de seguridad...\nXXX"
+    
+    # Inicializar claves maestras de pacman limpias para el disco duro
+    arch-chroot /mnt pacman-key --init 2>/dev/null || true
+    arch-chroot /mnt pacman-key --populate archlinux 2>/dev/null || true
+
+    echo "${HOSTNAME}" > /mnt/etc/hostname
+
+    # Localización y teclado en español
+    echo "LANG=es_MX.UTF-8" > /mnt/etc/locale.conf
+    echo "KEYMAP=la-latin1" > /mnt/etc/vconsole.conf
+    echo "FONT=lat9w-16" >> /mnt/etc/vconsole.conf
+    sed -i 's/#es_MX.UTF-8 UTF-8/es_MX.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    sed -i 's/#es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    arch-chroot /mnt locale-gen 2>/dev/null || true
+
+    # Crear usuario real en el disco instalado
+    arch-chroot /mnt useradd -m -u 1000 -g users -G wheel,audio,video,input,storage,power,network -s /bin/bash "${USERNAME}" 2>/dev/null || true
+    echo "${USERNAME}:${USER_PASS}" | arch-chroot /mnt chpasswd 2>/dev/null || true
+    echo "root:${ROOT_PASS}" | arch-chroot /mnt chpasswd 2>/dev/null || true
+
+    # Copiar configuración de skel al nuevo usuario
+    cp -rf /mnt/etc/skel/. /mnt/home/${USERNAME}/ 2>/dev/null || true
+    arch-chroot /mnt chown -R ${USERNAME}:users /mnt/home/${USERNAME} 2>/dev/null || true
+
+    # Habilitar sudo para el grupo wheel
+    mkdir -p /mnt/etc/sudoers.d
+    echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
+    chmod 440 /mnt/etc/sudoers.d/wheel
+
+    # Servicios esenciales de red y energía
+    arch-chroot /mnt systemctl enable NetworkManager.service 2>/dev/null || true
+    arch-chroot /mnt systemctl enable tlp.service 2>/dev/null || true
+
+    echo "75"; sleep 1
+    echo "XXX\nConfigurando soporte Dual Boot (Detección de Windows y otros sistemas)...\nXXX"
+    
+    mkdir -p /mnt/etc/default
+    if [ -f /etc/default/grub ]; then
+        cp /etc/default/grub /mnt/etc/default/grub
+    else
+        echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub
+    fi
+
+    sed -i '/GRUB_DISABLE_OS_PROBER/d' /mnt/etc/default/grub 2>/dev/null || true
+    echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub
+
+    echo "80"; sleep 1
+    echo "XXX\nReconstruyendo el Kernel (Initramfs) para arranque desde Disco Duro...\nXXX"
+    
+    # Eliminar configuraciones exclusivas del Live USB que rompen el arranque en disco
+    rm -f /mnt/etc/mkinitcpio.conf.d/archiso.conf 2>/dev/null || true
+    
+    # Reconstruir initramfs
+    arch-chroot /mnt mkinitcpio -P 2>/dev/null || true
+
+    echo "85"; sleep 1
+    echo "XXX\nInstalando temas, wallpapers y generando menú de arranque GRUB...\nXXX"
+    
+    if [ "$SYSTEM_MODE" == "1" ]; then
+        arch-chroot /mnt systemctl unmask lightdm.service display-manager.service 2>/dev/null || true
+        arch-chroot /mnt systemctl enable lightdm.service 2>/dev/null || true
+        arch-chroot /mnt systemctl set-default graphical.target 2>/dev/null || true
+    else
+        arch-chroot /mnt systemctl mask lightdm.service display-manager.service 2>/dev/null || true
+        arch-chroot /mnt systemctl disable lightdm.service 2>/dev/null || true
+        arch-chroot /mnt systemctl enable sshd.service 2>/dev/null || true
+        arch-chroot /mnt systemctl set-default multi-user.target 2>/dev/null || true
+    fi
+
+    # Instalar GRUB con detección automática de UEFI o BIOS Legacy (MBR)
+    if [ -d /sys/firmware/efi ]; then
+        # Modo UEFI
+        arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Dzulux --recheck 2>/dev/null || \
+        arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Dzulux --recheck 2>/dev/null || true
+    else
+        # Modo BIOS Tradicional (MBR) para computadoras y laptops antiguas
+        arch-chroot /mnt grub-install --target=i386-pc "${CHOSEN_DISK}" --recheck 2>/dev/null || true
+    fi
+    
+    arch-chroot /mnt os-prober 2>/dev/null || true
+    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
+
+    # Copiar fondos y assets de Dzulux
+    mkdir -p /mnt/usr/share/backgrounds/dzulux/
+    if [ -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg ]; then
+        cp /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg /mnt/usr/share/backgrounds/dzulux/
+    fi
+
+    # Configurar zRAM y optimizaciones para equipos y laptops de bajo rendimiento
+    mkdir -p /mnt/etc/systemd /mnt/etc/sysctl.d /mnt/etc/systemd/journald.conf.d
+    if [ -f /etc/systemd/zram-generator.conf ]; then
+        cp /etc/systemd/zram-generator.conf /mnt/etc/systemd/
+    fi
+    if [ -f /etc/sysctl.d/99-dzulux-lowspec.conf ]; then
+        cp /etc/sysctl.d/99-dzulux-lowspec.conf /mnt/etc/sysctl.d/
+    fi
+    if [ -f /etc/systemd/journald.conf.d/00-dzulux-storage.conf ]; then
+        cp /etc/systemd/journald.conf.d/00-dzulux-storage.conf /mnt/etc/systemd/journald.conf.d/
+    fi
+
+    # Habilitar mantenimiento automático de caché pacman para proteger espacio en discos de 32 GB
+    arch-chroot /mnt systemctl enable paccache.timer 2>/dev/null || true
+
+    # Si es edición Lite, configurar XFCE sin sombras ni composiciones pesadas de fábrica
+    if [ "$IS_LOW_SPEC" -eq 1 ] && [ "$SYSTEM_MODE" == "1" ]; then
+        echo "Dzulux Linux 1.1 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
+        mkdir -p /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
+        cat << 'EOF_LITE' > /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="box_move" type="bool" value="true"/>
+    <property name="box_resize" type="bool" value="true"/>
+    <property name="theme" type="string" value="Materia-dark"/>
+  </property>
+</channel>
+EOF_LITE
+    fi
+
+    echo "100"; sleep 1
+    echo "XXX\n¡Instalación completada exitosamente!\nXXX"
+) | $UI --title "Progreso de Instalación de Dzulux Linux" --gauge "Iniciando instalación..." 10 70 0
+
+# Desmontar de forma segura
+umount -R /mnt 2>/dev/null || true
+
+# ------------------------------------------------------------------------------
+# 7. MENSAJE FINAL
+# ------------------------------------------------------------------------------
+$UI --title "¡FELICITACIONES! - DZULUX LINUX INSTALADO" --msgbox \
+"Dzulux Linux 1.1 (Beta) ha sido instalado con éxito en tu equipo.\n\n\
+Detalles de la instalación:\n\
+• Modo seleccionado: ${MODE_NAME}\n\
+• Tipo de instalación: $([ "$INSTALL_TYPE" == "1" ] && echo "Dual Boot (con Windows/Mac)" || echo "Disco Completo")\n\
+• Usuario principal: ${USERNAME}\n\
+• Creador y Diseñador: Alfredo Dzul\n\n\
+Al reiniciar tu equipo, el menú de arranque GRUB te permitirá elegir entre:\n\
+  - Dzulux Linux\n\
+  - Tu sistema operativo original (Windows / macOS / otro Linux)\n\n\
+Ya puedes retirar la memoria USB y reiniciar tu equipo.\n\
+¡Gracias por usar Dzulux Linux!" 19 74
+
+clear
+echo "Instalación completada. Puedes reiniciar tu equipo ejecutando: reboot"

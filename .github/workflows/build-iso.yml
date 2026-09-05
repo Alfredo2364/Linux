@@ -65,8 +65,38 @@ jobs:
       - name: Clonar Repositorio
         uses: actions/checkout@v4
 
-      - name: Preparar Entorno de Compilación (Ubuntu Base + XFCE)
+      - name: Instalar Dependencias de Compilación
         run: |
-          echo "==== INICIANDO COMPILACIÓN DE DZULUX DESKTOP ===="
-          echo "Instalando entorno gráfico, drivers NVIDIA, y apps..."
-          # Próximamente: Comandos reales de debootstrap / live-build
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo
+
+      - name: Inyectar Herramientas Dzulux al Desktop
+        run: |
+          mkdir -p dzulux-desktop-build/config/includes.chroot/usr/local/bin
+          cp dzulux-tools/* dzulux-desktop-build/config/includes.chroot/usr/local/bin/
+          chmod +x dzulux-desktop-build/config/includes.chroot/usr/local/bin/*
+
+      - name: Compilar Dzulux Desktop ISO (live-build)
+        run: |
+          cd dzulux-desktop-build
+          chmod +x auto/*
+          sudo lb clean
+          if ! sudo lb config 2>&1 | tee config.log; then
+            echo "--- CONFIG FAILED. LOG OUTPUT: ---"
+            cat config.log
+            exit 1
+          fi
+          if ! sudo lb build 2>&1 | tee build.log; then
+            echo "--- BUILD FAILED. LOG OUTPUT: ---"
+            cat build.log
+            exit 1
+          fi
+
+      - name: Guardar ISO Generada y Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: dzulux-desktop-artifacts
+          path: |
+            dzulux-desktop-build/*.iso
+            dzulux-desktop-build/build.log
+          retention-days: 7

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+lb config noauto \
+    --mode ubuntu \
+    --distribution noble \
+    --architectures amd64 \
+    --archive-areas "main restricted universe multiverse" \
+    --iso-application "Dzulux Desktop (GUI)" \
+    --iso-publisher "Alfredo Dzul" \
+    --iso-volume "DZULUX_DESKTOP" \
+    --binary-images iso \
+    --bootloader "grub-efi" \
+    --linux-packages "linux-image linux-headers" \
+    --bootappend-live "boot=casper quiet splash nomodeset" \
+    ""

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Dzulux Desktop Branding & Settings Hook
+# Se ejecuta dentro del chroot de Ubuntu durante la compilación
+
+# 1. Modificar os-release para quitar marca Ubuntu
+cat <<EOF > /usr/lib/os-release
+PRETTY_NAME="Dzulux Linux Desktop"
+NAME="Dzulux Desktop"
+VERSION_ID="2.0"
+VERSION="2.0 (Noble Base)"
+VERSION_CODENAME=noble
+ID=dzulux
+ID_LIKE=ubuntu
+HOME_URL="https://github.com/Alfredo2364/Linux"
+SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+PRIVACY_POLICY_URL="https://github.com/Alfredo2364/Linux"
+UBUNTU_CODENAME=noble
+EOF
+
+cp /usr/lib/os-release /etc/os-release
+
+# 2. Configurar ZRAM
+cat <<EOF > /etc/default/zramswap
+ALGO=lz4
+PERCENT=50
+EOF
+
+# 3. Eliminar motd de Ubuntu
+rm -rf /etc/update-motd.d/*
+
+# 4. Inyectar Dzulux Welcome en terminal (bashrc global)
+if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
+    echo "dzulux-welcome" >> /etc/bash.bashrc
+fi
+
+# 5. Forzar autologin de live user (casper) en LightDM
+mkdir -p /etc/lightdm/lightdm.conf.d/
+cat <<EOF > /etc/lightdm/lightdm.conf.d/autologin-dzulux.conf
+[Seat:*]
+autologin-user=ubuntu
+autologin-user-timeout=0
+EOF
+
+echo "Dzulux Desktop Branding Hook Completado"

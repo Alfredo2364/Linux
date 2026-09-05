@@ -1,0 +1,55 @@
+live-boot
+live-config
+systemd-sysv
+network-manager
+nano
+vim
+curl
+wget
+git
+htop
+neofetch
+dialog
+zram-tools
+ufw
+smartmontools
+rsync
+parted
+btrfs-progs
+ntfs-3g
+dosfstools
+grub-efi-amd64
+grub-pc-bin
+
+# Interfaz Gráfica (XFCE ligero)
+xorg
+xfce4
+xfce4-goodies
+lightdm
+lightdm-gtk-greeter
+
+# Controladores de Video Universales (Intel, AMD, Nouveau)
+mesa-utils
+xserver-xorg-video-all
+xserver-xorg-video-amdgpu
+xserver-xorg-video-nouveau
+xserver-xorg-video-intel
+libgl1-mesa-dri
+vulkan-tools
+
+# Audio
+pulseaudio
+alsa-utils
+pavucontrol
+
+# Apps Base
+firefox
+gnome-terminal
+thunar
+mousepad
+gvfs-backends
+
+# Python (para algunas herramientas Dzulux)
+python3
+python3-pip
+qrencode

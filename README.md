@@ -18,15 +18,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v1.1-beta/Dzulux-Linux-1.1-Beta-Paquete-Completo.zip">
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/latest/dzulux-desktop-hybrid.iso">
     <img src="https://img.shields.io/badge/📥%20DESCARGAR%20DZULUX%20LINUX%20(1%20CLIC)-PAQUETE%20COMPLETO%20[ISO%20+%20GUÍA%20PDF]-00f2fe?style=for-the-badge&logo=linux&logoColor=black" alt="Descargar Dzulux Linux"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-desktop-2.0-beta-x86_64.iso">💿 Descargar ISO (Dzulux Desktop)</a> &nbsp;•&nbsp; 
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/dzulux-server-2.0-beta-x86_64.iso">🖥️ Descargar ISO (Dzulux Server)</a> &nbsp;•&nbsp; 
-  <a href="https://github.com/Alfredo2364/Linux/releases/download/v2.0-beta/Guia_y_Agradecimientos_Dzulux.pdf">📄 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/latest/dzulux-desktop-hybrid.iso">🖥️ Descargar ISO (Dzulux Desktop)</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/releases/download/latest/dzulux-server-hybrid.iso">💻 Descargar ISO (Dzulux Server)</a> &nbsp;•&nbsp; 
+  <a href="https://github.com/Alfredo2364/Linux/raw/main/output/Guia_y_Agradecimientos_Dzulux.pdf">📖 Descargar Guía y Agradecimientos (PDF)</a> &nbsp;•&nbsp;
   <a href="https://alfredo2364.github.io/Linux/">🌐 Ver Sitio Web Oficial</a>
 </p>
 

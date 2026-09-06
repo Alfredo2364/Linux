@@ -106,3 +106,32 @@ jobs:
             dzulux-desktop-build/*.iso
             dzulux-desktop-build/build.log
           retention-days: 7
+
+  publish-release:
+    name: Publicar ISOs en GitHub Releases
+    needs: [build-server-iso, build-desktop-iso]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Descargar artefactos (Server)
+        uses: actions/download-artifact@v4
+        with:
+          name: dzulux-server-artifacts
+          path: server-iso
+      - name: Descargar artefactos (Desktop)
+        uses: actions/download-artifact@v4
+        with:
+          name: dzulux-desktop-artifacts
+          path: desktop-iso
+      - name: Crear/Actualizar Release "latest"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Dzulux Linux (Auto-Build)"
+          body: "Última compilación automática de Dzulux Linux Server y Desktop."
+          files: |
+            server-iso/*.iso
+            desktop-iso/*.iso
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

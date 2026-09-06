@@ -20,6 +20,9 @@ btrfs-progs
 ntfs-3g
 dosfstools
 syslinux-utils
+syslinux-common
+syslinux-themes-debian
+isolinux
 efibootmgr
 grub-efi-amd64
 grub-pc-bin

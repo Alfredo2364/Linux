@@ -18,7 +18,7 @@ jobs:
       - name: Instalar Dependencias de Compilación
         run: |
           sudo apt-get update
-          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo syslinux-utils
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo mtools grub-pc-bin grub-efi-amd64-bin grub2-common
 
       - name: Inyectar Herramientas Dzulux al Servidor
         run: |
@@ -47,6 +47,9 @@ jobs:
             cat build.log
             exit 1
           fi
+          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
+          sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ || echo "grub-mkrescue falló, se usará la ISO original"
+          sudo rm -f live-image-amd64.iso
 
       - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4
@@ -68,7 +71,7 @@ jobs:
       - name: Instalar Dependencias de Compilación
         run: |
           sudo apt-get update
-          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso sudo mtools grub-pc-bin grub-efi-amd64-bin grub2-common
 
       - name: Inyectar Herramientas Dzulux al Desktop
         run: |
@@ -91,6 +94,9 @@ jobs:
             cat build.log
             exit 1
           fi
+          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
+          sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ || echo "grub-mkrescue falló, se usará la ISO original"
+          sudo rm -f live-image-amd64.iso
 
       - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4

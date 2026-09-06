@@ -1,2 +1,40 @@
 #!/usr/bin/env bash
-echo 'Cleaner'
+
+# Dzulux Cleaner Script
+# Herramienta de mantenimiento profundo para liberar espacio y optimizar el sistema
+
+echo "========================================"
+echo "         Dzulux System Cleaner          "
+echo "========================================"
+echo "Iniciando limpieza profunda del sistema..."
+echo "Nota: Se te pedirá la contraseña de administrador."
+echo ""
+
+# 1. Limpiar caché de paquetes APT
+echo "[1/5] Vaciando caché de instalaciones y actualizaciones (apt clean)..."
+sudo apt-get clean
+sudo apt-get autoclean
+
+# 2. Eliminar dependencias huérfanas
+echo "[2/5] Eliminando librerías huérfanas y paquetes sin uso (autoremove)..."
+sudo apt-get autoremove --purge -y
+
+# 3. Limpiar registros antiguos del sistema (Systemd Journal)
+echo "[3/5] Borrando logs antiguos del sistema (dejando solo los últimos 3 días)..."
+sudo journalctl --vacuum-time=3d
+
+# 4. Limpiar miniaturas y caché del usuario
+echo "[4/5] Borrando caché de miniaturas de imágenes y archivos temporales locales..."
+rm -rf ~/.cache/thumbnails/*
+
+# 5. Vaciar la Papelera
+echo "[5/5] Vaciando la papelera de reciclaje..."
+rm -rf ~/.local/share/Trash/files/*
+rm -rf ~/.local/share/Trash/info/*
+
+echo ""
+echo "========================================"
+echo "    ¡Limpieza Completada con Éxito!     "
+echo "========================================"
+echo "Tu sistema Dzulux ahora está optimizado y con más espacio libre."
+echo ""

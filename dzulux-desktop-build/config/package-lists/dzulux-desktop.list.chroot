@@ -19,9 +19,8 @@ btrfs-progs
 ntfs-3g
 dosfstools
 syslinux-utils
-syslinux-common
-isolinux
-grub-efi-amd64
+efibootmgr
+grub-efi-amd64-bin
 grub-pc-bin
 
 # Interfaz Gráfica (XFCE ligero)

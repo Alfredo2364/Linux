@@ -1,2 +1,37 @@
 #!/usr/bin/env bash
-echo 'Gaming Setup'
+
+echo "========================================"
+echo "    Iniciando Dzulux Gaming Setup       "
+echo "========================================"
+echo "Este script preparará tu PC para correr juegos de Linux y Windows."
+echo "Nota: Se requieren permisos de administrador."
+echo ""
+
+# 1. Habilitar arquitectura de 32 bits (Esencial para Wine y Steam)
+echo "[1/5] Habilitando soporte para 32 bits (i386)..."
+sudo dpkg --add-architecture i386
+sudo apt-get update
+
+# 2. Instalar dependencias clave y Wine
+echo "[2/5] Instalando Wine y controladores gráficos 32/64 bits..."
+sudo apt-get install -y wine64 wine32 libvulkan1 libvulkan1:i386 mesa-vulkan-drivers mesa-vulkan-drivers:i386
+
+# 3. Instalar Steam
+echo "[3/5] Instalando Steam..."
+sudo apt-get install -y steam
+
+# 4. Instalar Lutris (Para juegos de Epic, GOG, y Windows)
+echo "[4/5] Instalando Lutris..."
+sudo apt-get install -y lutris
+
+# 5. Instalar MangoHud (Contador de FPS)
+echo "[5/5] Instalando MangoHud (Monitor de rendimiento en pantalla)..."
+sudo apt-get install -y mangohud
+
+echo ""
+echo "========================================"
+echo "    ¡Configuración Gaming Completada!   "
+echo "========================================"
+echo "- Ya puedes buscar 'Steam' o 'Lutris' en tu menú de aplicaciones."
+echo "- Para ver tus FPS mientras juegas, inicia tus juegos de Steam con: mangohud %command%"
+echo ""

@@ -10,10 +10,8 @@ lb config noauto \
     --iso-application "Dzulux Desktop (GUI)" \
     --iso-publisher "Alfredo Dzul" \
     --iso-volume "DZULUX_DESKTOP" \
-    --binary-images iso-hybrid \
-    --bootloader "syslinux,grub-efi" \
-    --syslinux-theme "" \
-    --syslinux-menu false \
+    --binary-images iso \
+    --bootloader "grub-pc,grub-efi" \
     --linux-packages "linux-image linux-headers" \
     --bootappend-live "boot=casper quiet splash nomodeset" \
     ""

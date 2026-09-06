@@ -12,7 +12,8 @@ lb config noauto \
     --iso-volume "DZULUX_DESKTOP" \
     --binary-images iso-hybrid \
     --bootloader "syslinux,grub-efi" \
-    --syslinux-theme "debian" \
+    --syslinux-theme "" \
+    --syslinux-menu false \
     --linux-packages "linux-image linux-headers" \
     --bootappend-live "boot=casper quiet splash nomodeset" \
     ""

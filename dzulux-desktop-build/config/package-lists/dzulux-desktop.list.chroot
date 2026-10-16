@@ -22,13 +22,17 @@ syslinux-utils
 efibootmgr
 grub-efi-amd64-bin
 grub-pc-bin
+os-prober
+chntpw
 
-# Interfaz Gráfica (XFCE ligero)
+# Interfaz Gráfica (XFCE ligero y temas)
 xorg
 xfce4
 xfce4-goodies
 lightdm
 lightdm-gtk-greeter
+materia-gtk-theme
+papirus-icon-theme
 
 # Controladores de Video Universales (Intel, AMD, Nouveau)
 mesa-utils

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# dzulux-live-init - Inicialización del Entorno Live de Dzulux Linux
+# dzulux-live-init - Inicialización del Entorno Live de Dzulux Linux 2.0
 # Diseñado y Creado por Alfredo Dzul
 # ==============================================================================
 
@@ -9,26 +9,31 @@ set -euo pipefail
 # Asegurar grupo autologin
 groupadd -r autologin 2>/dev/null || true
 
-# Asegurar usuario liveuser y grupos
-if ! id -u liveuser >/dev/null 2>&1; then
-    useradd -m -u 1000 -g users -G wheel,audio,video,input,storage,power,network,autologin -s /bin/bash liveuser
-else
-    usermod -aG wheel,audio,video,input,storage,power,network,autologin liveuser 2>/dev/null || true
+# Detectar o crear usuario live (ubuntu o liveuser)
+LIVE_USER="ubuntu"
+if id -u liveuser >/dev/null 2>&1; then
+    LIVE_USER="liveuser"
+elif ! id -u ubuntu >/dev/null 2>&1; then
+    LIVE_USER="liveuser"
+    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin "${LIVE_USER}" 2>/dev/null || \
+    useradd -m -u 1000 -s /bin/bash "${LIVE_USER}" 2>/dev/null || true
 fi
 
+usermod -aG sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin "${LIVE_USER}" 2>/dev/null || true
+
 # Desbloquear contraseñas para permitir entrar con Enter o con dzulux
-passwd -d liveuser 2>/dev/null || true
+passwd -d "${LIVE_USER}" 2>/dev/null || true
 passwd -d root 2>/dev/null || true
-echo "liveuser:dzulux" | chpasswd 2>/dev/null || true
+echo "${LIVE_USER}:dzulux" | chpasswd 2>/dev/null || true
 echo "root:dzulux" | chpasswd 2>/dev/null || true
-passwd -d liveuser 2>/dev/null || true
+passwd -d "${LIVE_USER}" 2>/dev/null || true
 passwd -d root 2>/dev/null || true
 
-# Asegurar propiedad completa de /home/liveuser
-mkdir -p /home/liveuser/Desktop
-cp -rf /etc/skel/. /home/liveuser/ 2>/dev/null || true
-chown -R 1000:1000 /home/liveuser 2>/dev/null || true
-chmod 755 /home/liveuser 2>/dev/null || true
+# Asegurar propiedad completa de /home/$LIVE_USER
+mkdir -p "/home/${LIVE_USER}/Desktop"
+cp -rf /etc/skel/. "/home/${LIVE_USER}/" 2>/dev/null || true
+chown -R "${LIVE_USER}:${LIVE_USER}" "/home/${LIVE_USER}" 2>/dev/null || true
+chmod 755 "/home/${LIVE_USER}" 2>/dev/null || true
 
 # Replicar temas y panel XFCE a nivel de sistema en tiempo de ejecución
 if [ -d /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml ]; then
@@ -39,9 +44,9 @@ if [ -d /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml ]; then
     fi
 fi
 
-# Sudo 100% sin contraseña para liveuser y root
+# Sudo 100% sin contraseña para el usuario live y root
 mkdir -p /etc/sudoers.d
-echo "liveuser ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/liveuser
+echo "${LIVE_USER} ALL=(ALL:ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${LIVE_USER}"
 echo "root ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/root
 chmod 440 /etc/sudoers.d/* 2>/dev/null || true
 

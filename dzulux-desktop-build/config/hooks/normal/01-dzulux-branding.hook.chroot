@@ -1,18 +1,20 @@
 #!/bin/bash
 
-# Dzulux Desktop Branding & Settings Hook
+# Dzulux Desktop 2.0 Branding, Settings & Menu Launchers Hook
 # Se ejecuta dentro del chroot de Ubuntu durante la compilación
 
-# 1. Modificar os-release para quitar marca Ubuntu
+set -e
+
+# 1. Modificar os-release para identidad Dzulux 2.0
 cat <<EOF > /usr/lib/os-release
-PRETTY_NAME="Dzulux Linux Desktop"
+PRETTY_NAME="Dzulux Linux 2.0 Desktop (Beta)"
 NAME="Dzulux Desktop"
 VERSION_ID="2.0"
-VERSION="2.0 (Noble Base)"
+VERSION="2.0 (Beta - Noble Base)"
 VERSION_CODENAME=noble
 ID=dzulux
 ID_LIKE=ubuntu
-HOME_URL="https://github.com/Alfredo2364/Linux"
+HOME_URL="https://alfredo2364.github.io/Linux/"
 SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 PRIVACY_POLICY_URL="https://github.com/Alfredo2364/Linux"
@@ -26,6 +28,7 @@ cat <<EOF > /etc/default/zramswap
 ALGO=lz4
 PERCENT=50
 EOF
+systemctl enable zramswap.service 2>/dev/null || true
 
 # 3. Eliminar motd de Ubuntu
 rm -rf /etc/update-motd.d/*
@@ -35,12 +38,62 @@ if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
     echo "dzulux-welcome" >> /etc/bash.bashrc
 fi
 
-# 5. Forzar autologin de live user (casper) en LightDM
+# 5. Forzar autologin de live user (ubuntu) en LightDM
 mkdir -p /etc/lightdm/lightdm.conf.d/
 cat <<EOF > /etc/lightdm/lightdm.conf.d/autologin-dzulux.conf
 [Seat:*]
 autologin-user=ubuntu
 autologin-user-timeout=0
+user-session=xfce
 EOF
 
-echo "Dzulux Desktop Branding Hook Completado"
+# 6. Generar lanzadores oficiales (.desktop) en el menú de aplicaciones XFCE
+mkdir -p /usr/share/applications /etc/skel/Desktop
+
+create_launcher() {
+    local FILE="$1"
+    local NAME="$2"
+    local COMMENT="$3"
+    local EXEC="$4"
+    local ICON="$5"
+    local CATS="$6"
+
+    cat <<EOF > "/usr/share/applications/${FILE}.desktop"
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=${NAME}
+Comment=${COMMENT}
+Exec=${EXEC}
+Icon=${ICON}
+Terminal=true
+Categories=${CATS}
+StartupNotify=true
+EOF
+    chmod 644 "/usr/share/applications/${FILE}.desktop"
+}
+
+create_launcher "dzulux-installer"   "Instalar Dzulux Linux 2.0"     "Instalador guiado con soporte Dual Boot y Limpio"   "sudo /usr/local/bin/dzulux-installer"   "system-software-install"      "System;Settings;"
+create_launcher "dzulux-apps"        "Dzulux App Hub (Tienda)"       "Instala Oficina, Juegos, VS Code y Navegadores"     "/usr/local/bin/dzulux-apps"             "system-software-install"      "System;PackageManager;"
+create_launcher "dzulux-gaming"      "Dzulux Gaming Setup"           "Configura Steam, Lutris, Wine y MangoHud en 1 clic" "/usr/local/bin/dzulux-gaming"           "applications-games"           "Game;System;"
+create_launcher "dzulux-drivers"     "Dzulux Controladores (Drivers)" "Detección e instalación automática de drivers"     "/usr/local/bin/dzulux-drivers"          "preferences-desktop-display"  "System;Settings;HardwareSettings;"
+create_launcher "dzulux-performance" "Dzulux Performance Engine"     "Perfiles de CPU: Oficina, Game Booster y Streaming" "/usr/local/bin/dzulux-performance"      "utilities-system-monitor"     "System;Settings;"
+create_launcher "dzulux-cleaner"     "Dzulux System Cleaner"         "Limpieza profunda de caché APT, logs y papelera"    "/usr/local/bin/dzulux-cleaner"          "user-trash-full"              "System;Utility;"
+create_launcher "dzulux-backup"      "Dzulux Backup (Respaldos)"     "Copias de seguridad .tar.gz y sincronización USB"   "/usr/local/bin/dzulux-backup"           "drive-harddisk"               "System;Utility;Archiving;"
+create_launcher "dzulux-share"       "Dzulux Share (Wi-Fi QR)"       "Comparte archivos a tu celular por Wi-Fi con QR"    "/usr/local/bin/dzulux-share"            "folder-publicshare"           "Network;FileTransfer;Utility;"
+create_launcher "dzulux-usb"         "Dzulux USB Manager"            "Montar, expulsar y formatear memorias USB"          "/usr/local/bin/dzulux-usb"              "drive-removable-media-usb"    "System;Utility;"
+create_launcher "dzulux-rescue"      "Dzulux Rescue (Salvamento)"    "Rescate de archivos Windows, SAM Reset y S.M.A.R.T." "sudo /usr/local/bin/dzulux-rescue"     "dialog-warning"               "System;Utility;"
+create_launcher "dzulux-snapshots"   "Dzulux Snapshots"              "Puntos de restauración instantáneos del sistema"    "/usr/local/bin/dzulux-snapshots"        "document-revert"              "System;Utility;"
+create_launcher "dzulux-battery"     "Dzulux Battery (Batería)"      "Ahorro inteligente de batería con Wi-Fi activo"     "/usr/local/bin/dzulux-battery"          "battery"                      "System;Settings;"
+create_launcher "dzulux-stealth"     "Dzulux Stealth (Privacidad)"   "MAC aleatoria, DNS seguro y Firewall en Wi-Fi"      "/usr/local/bin/dzulux-stealth"          "security-high"                "Network;Security;System;"
+create_launcher "dzulux-looks"       "Dzulux Looks (Apariencia)"     "Alterna entre Cyberpunk, Windows 10 y Minimal Flat" "/usr/local/bin/dzulux-looks"            "preferences-desktop-theme"    "Settings;DesktopSettings;"
+create_launcher "dzulux-update"      "Dzulux Update (Actualizador)"  "Actualiza la Suite Dzulux y paquetes del sistema"   "sudo /usr/local/bin/dzulux-update"      "system-software-update"       "System;Settings;PackageManager;"
+create_launcher "hw-detect"          "Dzulux Auditoría de Hardware"  "Diagnóstico completo de CPU, GPU, Audio y Red"      "/usr/local/bin/hw-detect"               "computer"                     "System;Monitor;"
+
+# Colocar accesos directos clave en el Escritorio por defecto
+for desk_item in dzulux-installer dzulux-apps dzulux-gaming dzulux-drivers dzulux-update; do
+    cp "/usr/share/applications/${desk_item}.desktop" "/etc/skel/Desktop/${desk_item}.desktop"
+    chmod +x "/etc/skel/Desktop/${desk_item}.desktop"
+done
+
+echo "Dzulux Desktop 2.0 Branding & Menu Hook Completado"

@@ -1,2 +1,169 @@
 #!/usr/bin/env bash
-echo 'USB Auto-Mount'
+# ==============================================================================
+# dzulux-usb - Gestor Seguro de Memorias USB y Discos Externos
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+if command -v dialog >/dev/null 2>&1; then
+    UI="dialog"
+elif command -v whiptail >/dev/null 2>&1; then
+    UI="whiptail"
+else
+    UI=""
+fi
+
+MOUNT_BASE="/mnt/usb_dzulux"
+sudo mkdir -p "$MOUNT_BASE"
+
+main_menu() {
+    while true; do
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux USB Manager 2.0 (Alfredo Dzul)" --menu \
+"Administra memorias USB y unidades externas fácilmente:" 17 72 5 \
+"1" "🔌 Montar Memoria USB / Disco Externo en ${MOUNT_BASE}" \
+"2" "⏏️ Desmontar de Forma Segura (Expulsar sin dañar datos)" \
+"3" "🧹 Formatear Memoria USB (FAT32 / NTFS / EXT4)" \
+"4" "📋 Ver Dispositivos Conectados" \
+"5" "🚪 Salir" 3>&1 1>&2 2>&3 || echo "5")
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX USB MANAGER 2.0 ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo "1) Montar Memoria USB / Disco Externo"
+            echo "2) Desmontar de Forma Segura (Expulsar)"
+            echo "3) Formatear Memoria USB"
+            echo "4) Ver Dispositivos Conectados"
+            echo "5) Salir"
+            read -p "Elige una opción [1-5]: " CHOICE
+        fi
+
+        case "$CHOICE" in
+            1) mount_usb ;;
+            2) unmount_usb ;;
+            3) format_usb ;;
+            4) list_usb ;;
+            *) exit 0 ;;
+        esac
+    done
+}
+
+select_partition() {
+    local PROMPT="$1"
+    local PARTS_RAW
+    PARTS_RAW=$(lsblk -lno NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT | grep -E "^sd[a-z][0-9]|^nvme[0-9]n[0-9]p[0-9]" || true)
+    if [ -z "$PARTS_RAW" ]; then
+        msg_box "Sin Unidades" "No se detectaron particiones disponibles."
+        echo ""
+        return
+    fi
+
+    local ITEMS=()
+    while read -r line; do
+        local P_NAME
+        local P_INFO
+        P_NAME=$(echo "$line" | awk '{print $1}')
+        P_INFO=$(echo "$line" | cut -d' ' -f2-)
+        ITEMS+=("/dev/${P_NAME}" "${P_INFO}")
+    done <<< "$PARTS_RAW"
+
+    if [ -n "$UI" ]; then
+        $UI --title "Seleccionar Partición" --menu "$PROMPT" 17 72 6 "${ITEMS[@]}" 3>&1 1>&2 2>&3 || echo ""
+    else
+        echo "$PROMPT" >&2
+        for ((i=0; i<${#ITEMS[@]}; i+=2)); do
+            echo "$((i/2 + 1))) ${ITEMS[i]} (${ITEMS[i+1]})" >&2
+        done
+        read -p "Número: " NUM
+        local IDX=$(( (NUM - 1) * 2 ))
+        echo "${ITEMS[IDX]:-}"
+    fi
+}
+
+mount_usb() {
+    local PART
+    PART=$(select_partition "Selecciona la partición USB que deseas montar:")
+    [ -z "$PART" ] && return
+
+    sudo mkdir -p "$MOUNT_BASE"
+    sudo umount "$MOUNT_BASE" 2>/dev/null || true
+
+    if sudo mount -o uid=1000,gid=1000 "$PART" "$MOUNT_BASE" 2>/dev/null || sudo mount "$PART" "$MOUNT_BASE" 2>/dev/null; then
+        if [ -n "${DISPLAY:-}" ] && command -v thunar >/dev/null 2>&1; then
+            thunar "$MOUNT_BASE" &
+        fi
+        msg_box "Memoria USB Montada" "¡Dispositivo ${PART} montado con éxito en:\n${MOUNT_BASE}!"
+    else
+        msg_box "Error de Montaje" "No se pudo montar ${PART}. Verifica el formato del dispositivo."
+    fi
+}
+
+unmount_usb() {
+    sudo sync
+    if sudo umount "$MOUNT_BASE" 2>/dev/null; then
+        msg_box "Expulsión Segura" "¡La memoria USB ha sido desmontada de forma segura!\nYa puedes retirarla del puerto."
+    else
+        msg_box "Aviso" "No había ninguna unidad activa en ${MOUNT_BASE} o está siendo ocupada por otro programa."
+    fi
+}
+
+format_usb() {
+    local PART
+    PART=$(select_partition "Selecciona la partición USB que deseas FORMATEAR (Se borrarán sus datos):")
+    [ -z "$PART" ] && return
+
+    local FSTYPE="vfat"
+    if [ -n "$UI" ]; then
+        FSTYPE=$($UI --title "Formato de Sistema de Archivos" --menu \
+"Elige el formato para ${PART}:" 14 68 3 \
+"vfat" "FAT32 (Compatible con Windows, Mac, Linux y TV)" \
+"ntfs" "NTFS (Ideal para archivos mayores a 4 GB en Windows/Linux)" \
+"ext4" "EXT4 (Nativo de Linux)" 3>&1 1>&2 2>&3 || echo "")
+    else
+        read -p "Formato (vfat / ntfs / ext4) [vfat]: " FSTYPE
+        FSTYPE="${FSTYPE:-vfat}"
+    fi
+    [ -z "$FSTYPE" ] && return
+
+    if [ -n "$UI" ]; then
+        if ! $UI --title "Confirmar Formateo" --yesno "¿Estás seguro de formatear ${PART} a ${FSTYPE}?\nTodos los datos en esa partición se borrarán." 10 65; then
+            return
+        fi
+    fi
+
+    sudo umount "$PART" 2>/dev/null || true
+    case "$FSTYPE" in
+        vfat) sudo mkfs.fat -F32 -n "DZULUX_USB" "$PART" ;;
+        ntfs) sudo mkfs.ntfs -f -L "DZULUX_USB" "$PART" ;;
+        ext4) sudo mkfs.ext4 -F -L "DZULUX_USB" "$PART" ;;
+    esac
+
+    msg_box "Formateo Completado" "¡La unidad ${PART} ha sido formateada exitosamente en formato ${FSTYPE}!"
+}
+
+list_usb() {
+    local INFO
+    INFO=$(lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT)
+    msg_box "Dispositivos de Almacenamiento" "${INFO}"
+}
+
+msg_box() {
+    local TITLE="$1"
+    local MSG="$2"
+    if [ -n "$UI" ]; then
+        $UI --title "${TITLE}" --msgbox "${MSG}" 16 74
+    else
+        echo -e "\n${GREEN}${BOLD}=== ${TITLE} ===${NC}\n${MSG}\n"
+        read -p "Presiona ENTER para continuar..." _
+    fi
+}
+
+main_menu

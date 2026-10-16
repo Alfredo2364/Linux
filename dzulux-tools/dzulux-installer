@@ -2,7 +2,7 @@
 # ==============================================================================
 # dzulux-installer - Instalador Guiado Paso a Paso de Dzulux Linux
 # Creado y Diseñado por Alfredo Dzul
-# Versión: 1.1 (BETA) - Soporte Completo Dual Boot (Windows / macOS / Linux)
+# Versión: 2.0 (BETA) - Base Ubuntu/Debian con Soporte Completo Dual Boot
 # ==============================================================================
 
 set -euo pipefail
@@ -27,8 +27,8 @@ fi
 # ------------------------------------------------------------------------------
 # 1. BIENVENIDA Y NOTA DE VERSIÓN BETA
 # ------------------------------------------------------------------------------
-$UI --title "Dzulux Linux 1.1 (Beta) - Diseñado por Alfredo Dzul" --msgbox \
-"¡Bienvenido al instalador oficial de Dzulux Linux!\n\n\
+$UI --title "Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul" --msgbox \
+"¡Bienvenido al instalador oficial de Dzulux Linux 2.0!\n\n\
 Creado y diseñado por: Alfredo Dzul.\n\n\
 NOTA IMPORTANTE (ESTADO BETA):\n\
 Este sistema operativo se encuentra actualmente en versión BETA. Está diseñado para ofrecer una experiencia equilibrada, ágil y compatible con PC, Laptops y equipos Apple Mac x86_64.\n\n\
@@ -316,7 +316,7 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     echo "XXX\nClonando imagen oficial de Dzulux Linux al disco (Instalación Offline de alta velocidad)...\nXXX"
     
     # Copiar el sistema raíz completo de la ISO a la partición de destino
-    rsync -aAX --info=progress2 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found","/home/liveuser/*"} / /mnt/
+    rsync -aAX --info=progress2 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/cdrom/*","/rofs/*","/lost+found","/home/liveuser/*","/home/ubuntu/*"} / /mnt/
     
     # Crear directorios esenciales del sistema
     mkdir -p /mnt/{dev,proc,sys,tmp,run,mnt,media,home}
@@ -324,54 +324,78 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
 
     # Eliminar configuraciones y rastros exclusivos de la sesión Live USB
     rm -f /mnt/etc/systemd/system/getty@tty1.service.d/autologin.conf 2>/dev/null || true
+    rm -f /mnt/etc/systemd/system/getty@tty1.service.d/override.conf 2>/dev/null || true
     rm -f /mnt/etc/systemd/system/getty@tty2.service.d/autologin.conf 2>/dev/null || true
     rm -f /mnt/etc/lightdm/lightdm.conf.d/dzulux-live.conf 2>/dev/null || true
+    rm -f /mnt/etc/lightdm/lightdm.conf.d/autologin-dzulux.conf 2>/dev/null || true
     rm -f /mnt/etc/systemd/system/dzulux-live-init.service 2>/dev/null || true
     rm -f /mnt/etc/systemd/system/multi-user.target.wants/dzulux-live-init.service 2>/dev/null || true
     sed -i '/liveuser/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
-    rm -f /mnt/etc/sudoers.d/liveuser 2>/dev/null || true
+    sed -i '/^ubuntu:/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
+    rm -f /mnt/etc/sudoers.d/liveuser /mnt/etc/sudoers.d/ubuntu /mnt/etc/sudoers.d/90-live-build 2>/dev/null || true
 
     echo "40"; sleep 1
-    echo "XXX\nGenerando tabla de particiones (fstab)...\nXXX"
-    if command -v genfstab >/dev/null 2>&1; then
-        genfstab -U /mnt > /mnt/etc/fstab
+    echo "XXX\nGenerando tabla de particiones (fstab) por UUID...\nXXX"
+    ROOT_UUID=$(blkid -s UUID -o value "${ROOT_PART}" || echo "")
+    BOOT_UUID=$(blkid -s UUID -o value "${BOOT_PART}" || echo "")
+    cat <<EOF_FSTAB > /mnt/etc/fstab
+# /etc/fstab: static file system information for Dzulux Linux 2.0
+EOF_FSTAB
+    if [ -n "$ROOT_UUID" ]; then
+        if [ "$USE_BTRFS_COMPRESSION" -eq 1 ]; then
+            echo "UUID=${ROOT_UUID}  /          btrfs  defaults,compress=zstd:1,noatime,space_cache=v2  0  1" >> /mnt/etc/fstab
+        else
+            echo "UUID=${ROOT_UUID}  /          ext4   defaults,noatime,errors=remount-ro               0  1" >> /mnt/etc/fstab
+        fi
+    fi
+    if [ -n "$BOOT_UUID" ]; then
+        echo "UUID=${BOOT_UUID}  /boot/efi  vfat   umask=0077                                       0  1" >> /mnt/etc/fstab
+    fi
+
+    # Montar sistemas de archivos virtuales para chroot en Ubuntu/Debian
+    for dir in dev dev/pts proc sys run; do
+        mkdir -p "/mnt/$dir"
+        mount --bind "/$dir" "/mnt/$dir" 2>/dev/null || true
+    done
+    if [ -d /sys/firmware/efi/efivars ]; then
+        mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars 2>/dev/null || true
     fi
 
     echo "60"; sleep 1
-    echo "XXX\nConfigurando identidad, usuario '${USERNAME}', teclado y claves de seguridad...\nXXX"
-    
-    # Inicializar claves maestras de pacman limpias para el disco duro
-    arch-chroot /mnt pacman-key --init 2>/dev/null || true
-    arch-chroot /mnt pacman-key --populate archlinux 2>/dev/null || true
+    echo "XXX\nConfigurando identidad, usuario '${USERNAME}', teclado y permisos...\nXXX"
 
     echo "${HOSTNAME}" > /mnt/etc/hostname
+    cat <<EOF_HOSTS > /mnt/etc/hosts
+127.0.0.1   localhost
+127.0.1.1   ${HOSTNAME}
+EOF_HOSTS
 
-    # Localización y teclado en español
-    echo "LANG=es_MX.UTF-8" > /mnt/etc/locale.conf
-    echo "KEYMAP=la-latin1" > /mnt/etc/vconsole.conf
-    echo "FONT=lat9w-16" >> /mnt/etc/vconsole.conf
-    sed -i 's/#es_MX.UTF-8 UTF-8/es_MX.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
-    sed -i 's/#es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
-    sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
-    arch-chroot /mnt locale-gen 2>/dev/null || true
+    # Localización y teclado en español (Ubuntu/Debian)
+    echo "LANG=es_MX.UTF-8" > /mnt/etc/default/locale
+    sed -i 's/# es_MX.UTF-8 UTF-8/es_MX.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    sed -i 's/# es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
+    chroot /mnt locale-gen es_MX.UTF-8 en_US.UTF-8 2>/dev/null || true
 
-    # Crear usuario real en el disco instalado
-    arch-chroot /mnt useradd -m -u 1000 -g users -G wheel,audio,video,input,storage,power,network -s /bin/bash "${USERNAME}" 2>/dev/null || true
-    echo "${USERNAME}:${USER_PASS}" | arch-chroot /mnt chpasswd 2>/dev/null || true
-    echo "root:${ROOT_PASS}" | arch-chroot /mnt chpasswd 2>/dev/null || true
+    # Crear usuario real en el disco instalado (grupos Ubuntu: sudo, adm, audio, video, plugdev, netdev)
+    chroot /mnt useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev "${USERNAME}" 2>/dev/null || \
+    chroot /mnt useradd -m -u 1000 -s /bin/bash -G sudo "${USERNAME}" 2>/dev/null || true
+    echo "${USERNAME}:${USER_PASS}" | chroot /mnt chpasswd 2>/dev/null || true
+    echo "root:${ROOT_PASS}" | chroot /mnt chpasswd 2>/dev/null || true
 
     # Copiar configuración de skel al nuevo usuario
-    cp -rf /mnt/etc/skel/. /mnt/home/${USERNAME}/ 2>/dev/null || true
-    arch-chroot /mnt chown -R ${USERNAME}:users /mnt/home/${USERNAME} 2>/dev/null || true
+    cp -rf /mnt/etc/skel/. "/mnt/home/${USERNAME}/" 2>/dev/null || true
+    chroot /mnt chown -R "${USERNAME}:${USERNAME}" "/home/${USERNAME}" 2>/dev/null || true
 
-    # Habilitar sudo para el grupo wheel
+    # Asegurar sudo para el grupo sudo
     mkdir -p /mnt/etc/sudoers.d
-    echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
-    chmod 440 /mnt/etc/sudoers.d/wheel
+    echo "%sudo ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/dzulux-sudo
+    chmod 440 /mnt/etc/sudoers.d/dzulux-sudo
 
     # Servicios esenciales de red y energía
-    arch-chroot /mnt systemctl enable NetworkManager.service 2>/dev/null || true
-    arch-chroot /mnt systemctl enable tlp.service 2>/dev/null || true
+    chroot /mnt systemctl enable NetworkManager.service 2>/dev/null || true
+    chroot /mnt systemctl enable zramswap.service 2>/dev/null || true
+    chroot /mnt systemctl enable tlp.service 2>/dev/null || true
 
     echo "75"; sleep 1
     echo "XXX\nConfigurando soporte Dual Boot (Detección de Windows y otros sistemas)...\nXXX"
@@ -379,48 +403,42 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     mkdir -p /mnt/etc/default
     if [ -f /etc/default/grub ]; then
         cp /etc/default/grub /mnt/etc/default/grub
-    else
-        echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub
     fi
-
     sed -i '/GRUB_DISABLE_OS_PROBER/d' /mnt/etc/default/grub 2>/dev/null || true
     echo "GRUB_DISABLE_OS_PROBER=false" >> /mnt/etc/default/grub
 
     echo "80"; sleep 1
-    echo "XXX\nReconstruyendo el Kernel (Initramfs) para arranque desde Disco Duro...\nXXX"
+    echo "XXX\nReconstruyendo el Kernel (initramfs) para arranque desde Disco Duro...\nXXX"
     
-    # Eliminar configuraciones exclusivas del Live USB que rompen el arranque en disco
-    rm -f /mnt/etc/mkinitcpio.conf.d/archiso.conf 2>/dev/null || true
-    
-    # Reconstruir initramfs
-    arch-chroot /mnt mkinitcpio -P 2>/dev/null || true
+    # Reconstruir initramfs en Ubuntu/Debian
+    chroot /mnt update-initramfs -c -k all 2>/dev/null || chroot /mnt update-initramfs -u 2>/dev/null || true
 
     echo "85"; sleep 1
     echo "XXX\nInstalando temas, wallpapers y generando menú de arranque GRUB...\nXXX"
     
     if [ "$SYSTEM_MODE" == "1" ]; then
-        arch-chroot /mnt systemctl unmask lightdm.service display-manager.service 2>/dev/null || true
-        arch-chroot /mnt systemctl enable lightdm.service 2>/dev/null || true
-        arch-chroot /mnt systemctl set-default graphical.target 2>/dev/null || true
+        chroot /mnt systemctl unmask lightdm.service display-manager.service 2>/dev/null || true
+        chroot /mnt systemctl enable lightdm.service 2>/dev/null || true
+        chroot /mnt systemctl set-default graphical.target 2>/dev/null || true
     else
-        arch-chroot /mnt systemctl mask lightdm.service display-manager.service 2>/dev/null || true
-        arch-chroot /mnt systemctl disable lightdm.service 2>/dev/null || true
-        arch-chroot /mnt systemctl enable sshd.service 2>/dev/null || true
-        arch-chroot /mnt systemctl set-default multi-user.target 2>/dev/null || true
+        chroot /mnt systemctl mask lightdm.service display-manager.service 2>/dev/null || true
+        chroot /mnt systemctl disable lightdm.service 2>/dev/null || true
+        chroot /mnt systemctl enable ssh.service 2>/dev/null || chroot /mnt systemctl enable sshd.service 2>/dev/null || true
+        chroot /mnt systemctl set-default multi-user.target 2>/dev/null || true
     fi
 
     # Instalar GRUB con detección automática de UEFI o BIOS Legacy (MBR)
     if [ -d /sys/firmware/efi ]; then
         # Modo UEFI
-        arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Dzulux --recheck 2>/dev/null || \
-        arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Dzulux --recheck 2>/dev/null || true
+        chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Dzulux --recheck 2>/dev/null || \
+        chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Dzulux --removable --recheck 2>/dev/null || true
     else
         # Modo BIOS Tradicional (MBR) para computadoras y laptops antiguas
-        arch-chroot /mnt grub-install --target=i386-pc "${CHOSEN_DISK}" --recheck 2>/dev/null || true
+        chroot /mnt grub-install --target=i386-pc "${CHOSEN_DISK}" --recheck 2>/dev/null || true
     fi
     
-    arch-chroot /mnt os-prober 2>/dev/null || true
-    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
+    chroot /mnt os-prober 2>/dev/null || true
+    chroot /mnt update-grub 2>/dev/null || chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
 
     # Copiar fondos y assets de Dzulux
     mkdir -p /mnt/usr/share/backgrounds/dzulux/
@@ -428,24 +446,9 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
         cp /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg /mnt/usr/share/backgrounds/dzulux/
     fi
 
-    # Configurar zRAM y optimizaciones para equipos y laptops de bajo rendimiento
-    mkdir -p /mnt/etc/systemd /mnt/etc/sysctl.d /mnt/etc/systemd/journald.conf.d
-    if [ -f /etc/systemd/zram-generator.conf ]; then
-        cp /etc/systemd/zram-generator.conf /mnt/etc/systemd/
-    fi
-    if [ -f /etc/sysctl.d/99-dzulux-lowspec.conf ]; then
-        cp /etc/sysctl.d/99-dzulux-lowspec.conf /mnt/etc/sysctl.d/
-    fi
-    if [ -f /etc/systemd/journald.conf.d/00-dzulux-storage.conf ]; then
-        cp /etc/systemd/journald.conf.d/00-dzulux-storage.conf /mnt/etc/systemd/journald.conf.d/
-    fi
-
-    # Habilitar mantenimiento automático de caché pacman para proteger espacio en discos de 32 GB
-    arch-chroot /mnt systemctl enable paccache.timer 2>/dev/null || true
-
     # Si es edición Lite, configurar XFCE sin sombras ni composiciones pesadas de fábrica
     if [ "$IS_LOW_SPEC" -eq 1 ] && [ "$SYSTEM_MODE" == "1" ]; then
-        echo "Dzulux Linux 1.1 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
+        echo "Dzulux Linux 2.0 (Beta) - Edición Lite" > /mnt/etc/dzulux-edition
         mkdir -p /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
         cat << 'EOF_LITE' > /mnt/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -462,7 +465,7 @@ EOF_LITE
 
     echo "100"; sleep 1
     echo "XXX\n¡Instalación completada exitosamente!\nXXX"
-) | $UI --title "Progreso de Instalación de Dzulux Linux" --gauge "Iniciando instalación..." 10 70 0
+) | $UI --title "Progreso de Instalación de Dzulux Linux 2.0" --gauge "Iniciando instalación..." 10 70 0
 
 # Desmontar de forma segura
 umount -R /mnt 2>/dev/null || true
@@ -470,18 +473,18 @@ umount -R /mnt 2>/dev/null || true
 # ------------------------------------------------------------------------------
 # 7. MENSAJE FINAL
 # ------------------------------------------------------------------------------
-$UI --title "¡FELICITACIONES! - DZULUX LINUX INSTALADO" --msgbox \
-"Dzulux Linux 1.1 (Beta) ha sido instalado con éxito en tu equipo.\n\n\
+$UI --title "¡FELICITACIONES! - DZULUX LINUX 2.0 INSTALADO" --msgbox \
+"Dzulux Linux 2.0 (Beta) ha sido instalado con éxito en tu equipo.\n\n\
 Detalles de la instalación:\n\
 • Modo seleccionado: ${MODE_NAME}\n\
 • Tipo de instalación: $([ "$INSTALL_TYPE" == "1" ] && echo "Dual Boot (con Windows/Mac)" || echo "Disco Completo")\n\
 • Usuario principal: ${USERNAME}\n\
 • Creador y Diseñador: Alfredo Dzul\n\n\
 Al reiniciar tu equipo, el menú de arranque GRUB te permitirá elegir entre:\n\
-  - Dzulux Linux\n\
+  - Dzulux Linux 2.0\n\
   - Tu sistema operativo original (Windows / macOS / otro Linux)\n\n\
 Ya puedes retirar la memoria USB y reiniciar tu equipo.\n\
 ¡Gracias por usar Dzulux Linux!" 19 74
 
 clear
-echo "Instalación completada. Puedes reiniciar tu equipo ejecutando: reboot"
+echo "Instalación completada. Puedes reiniciar tu equipo ejecutando: sudo reboot"

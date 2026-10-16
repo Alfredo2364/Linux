@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # dzulux-apps - Centro de Instalación Curada de Aplicaciones (App Hub)
-# Dzulux Linux - Diseñado por Alfredo Dzul
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
 # ==============================================================================
 
 set -euo pipefail
@@ -21,26 +21,30 @@ else
     UI=""
 fi
 
-# Inicializar Flathub si flatpak está disponible
+# Inicializar Flathub si flatpak está disponible (o instalarlo si falta)
 init_flatpak() {
+    if ! command -v flatpak >/dev/null 2>&1; then
+        sudo apt-get update -y >/dev/null 2>&1 || true
+        sudo apt-get install -y flatpak 2>/dev/null || true
+    fi
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
     fi
 }
 
 main_menu() {
     if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux App Hub - Tienda de Software (Alfredo Dzul)" --menu \
-"Selecciona una categoría de aplicaciones para instalar con 1 clic:" 18 70 6 \
+        CHOICE=$($UI --title "Dzulux App Hub 2.0 - Tienda de Software (Alfredo Dzul)" --menu \
+"Selecciona una categoría de aplicaciones para instalar con 1 clic:" 18 72 6 \
 "1" "💼 Oficina y Estudio (LibreOffice, Obsidian, Lector PDF)" \
 "2" "🎮 Juegos y Multimedia (Steam, Heroic, Discord, Spotify, VLC)" \
 "3" "🛠️ Desarrollo y Código (VS Code, Git, Docker, Node, Python)" \
 "4" "🌐 Navegadores Web (Brave, Google Chrome, Chromium)" \
 "5" "🎨 Diseño y Gráficos (GIMP, Inkscape, Krita, Blender)" \
-"6" "Salir" 3>&1 1>&2 2>&3)
+"6" "Salir" 3>&1 1>&2 2>&3 || echo "6")
     else
         clear
-        echo -e "${CYAN}${BOLD}=== DZULUX APP HUB - TIENDA DE APLICACIONES ===${NC}"
+        echo -e "${CYAN}${BOLD}=== DZULUX APP HUB 2.0 - TIENDA DE APLICACIONES ===${NC}"
         echo -e "Diseñado por Alfredo Dzul\n"
         echo "1) Oficina y Estudio"
         echo "2) Juegos y Multimedia"
@@ -62,46 +66,60 @@ main_menu() {
 }
 
 install_office() {
+    clear
+    echo -e "${CYAN}${BOLD}Instalando Suite de Oficina y Estudio...${NC}"
+    sudo apt-get update -y || true
+    sudo apt-get install -y libreoffice evince || true
     init_flatpak
-    sudo pacman -Sy --needed --noconfirm libreoffice-fresh evince 2>/dev/null || true
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak install -y flathub md.obsidian.Obsidian 2>/dev/null || true
+        sudo flatpak install -y flathub md.obsidian.Obsidian 2>/dev/null || true
     fi
-    show_success "Suite de Oficina (LibreOffice, Visor PDF y Obsidian)"
+    show_success "Suite de Oficina (LibreOffice, Visor PDF Evince y Obsidian)"
 }
 
 install_games() {
+    clear
+    echo -e "${CYAN}${BOLD}Instalando Juegos y Multimedia...${NC}"
+    sudo dpkg --add-architecture i386 2>/dev/null || true
+    sudo apt-get update -y || true
+    sudo apt-get install -y steam-installer vlc || sudo apt-get install -y vlc || true
     init_flatpak
-    sudo pacman -Sy --needed --noconfirm steam vlc 2>/dev/null || true
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak install -y flathub com.discordapp.Discord com.heroicgameslauncher.hgl com.spotify.Client 2>/dev/null || true
+        sudo flatpak install -y flathub com.discordapp.Discord com.heroicgameslauncher.hgl com.spotify.Client 2>/dev/null || true
     fi
     show_success "Juegos y Multimedia (Steam, Discord, Heroic Games, Spotify, VLC)"
 }
 
 install_dev() {
-    init_flatpak
-    sudo pacman -Sy --needed --noconfirm code docker docker-compose nodejs npm python python-pip git 2>/dev/null || true
+    clear
+    echo -e "${CYAN}${BOLD}Instalando Entorno de Desarrollo...${NC}"
+    sudo apt-get update -y || true
+    sudo apt-get install -y git docker.io docker-compose nodejs npm python3 python3-pippython3-venv build-essential 2>/dev/null || \
+    sudo apt-get install -y git docker.io nodejs npm python3 python3-pip build-essential || true
     sudo systemctl enable --now docker.service 2>/dev/null || true
-    sudo usermod -aG docker "$USER" 2>/dev/null || true
-    show_success "Entorno de Desarrollo (VS Code, Docker, Node.js, Python, Git)"
+    sudo usermod -aG docker "${SUDO_USER:-$USER}" 2>/dev/null || true
+    init_flatpak
+    if command -v flatpak >/dev/null 2>&1; then
+        sudo flatpak install -y flathub com.visualstudio.code 2>/dev/null || true
+    fi
+    show_success "Entorno de Desarrollo (VS Code, Docker, Node.js, Python 3, Git)"
 }
 
 install_browsers() {
+    clear
+    echo -e "${CYAN}${BOLD}Instalando Navegadores Web...${NC}"
     init_flatpak
-    sudo pacman -Sy --needed --noconfirm chromium 2>/dev/null || true
     if command -v flatpak >/dev/null 2>&1; then
-        flatpak install -y flathub com.brave.Browser com.google.Chrome 2>/dev/null || true
+        sudo flatpak install -y flathub org.chromium.Chromium com.brave.Browser com.google.Chrome 2>/dev/null || true
     fi
     show_success "Navegadores Web (Chromium, Brave Browser, Google Chrome)"
 }
 
 install_design() {
-    init_flatpak
-    sudo pacman -Sy --needed --noconfirm gimp inkscape 2>/dev/null || true
-    if command -v flatpak >/dev/null 2>&1; then
-        flatpak install -y flathub org.kde.krita org.blender.Blender 2>/dev/null || true
-    fi
+    clear
+    echo -e "${CYAN}${BOLD}Instalando Suite de Diseño y Gráficos...${NC}"
+    sudo apt-get update -y || true
+    sudo apt-get install -y gimp inkscape krita blender || true
     show_success "Suite de Diseño (GIMP, Inkscape, Krita, Blender)"
 }
 
@@ -109,10 +127,11 @@ show_success() {
     local APP_NAME="$1"
     if [ -n "$UI" ]; then
         $UI --title "Instalación Completada" --msgbox \
-"¡${APP_NAME} ha sido instalado con éxito en tu sistema Dzulux!\n\n\
+"¡${APP_NAME} ha sido instalado con éxito en tu sistema Dzulux 2.0!\n\n\
 Ya puedes encontrar las aplicaciones en el menú de inicio de XFCE." 12 70
     else
         echo -e "\n${GREEN}${BOLD}✓ ¡${APP_NAME} instalado exitosamente!${NC}\n"
+        read -p "Presiona ENTER para continuar..." _
     fi
     main_menu
 }

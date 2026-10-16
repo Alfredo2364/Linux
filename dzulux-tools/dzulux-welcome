@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# dzulux-welcome - Pantalla de Bienvenida de Dzulux Linux (Beta)
+# dzulux-welcome - Pantalla de Bienvenida de Dzulux Linux 2.0 (Beta)
 # Diseñado y Creado por Alfredo Dzul
 # ==============================================================================
 
@@ -13,40 +13,52 @@ NC='\033[0m'
 clear
 if command -v fastfetch >/dev/null 2>&1; then
     fastfetch --logo none
-else
+elif command -v neofetch >/dev/null 2>&1; then
+    neofetch --off
+elif [ -f /etc/motd ]; then
     cat /etc/motd
 fi
 
 echo -e "${CYAN}${BOLD}"
 echo "================================================================="
-echo "      ¡Bienvenido al Entorno Live de Dzulux Linux 1.1 (Beta)!    "
+echo "      ¡Bienvenido al Entorno Live de Dzulux Linux 2.0 (Beta)!    "
 echo "                   Diseñado por Alfredo Dzul                    "
 echo "================================================================="
 echo -e "${NC}"
 if [ -n "${DISPLAY:-}" ]; then
-    echo -e "Herramientas gráficas de la Suite Dzulux:"
-    echo -e "  • ${GREEN}${BOLD}dzulux-installer${NC}  -> Instalar Dzulux en tu disco (Dual Boot o Limpio)"
+    echo -e "Herramientas gráficas y de sistema de la Suite Dzulux 2.0:"
+    echo -e "  • ${GREEN}${BOLD}dzulux-installer${NC}  -> Instalar Dzulux 2.0 en tu disco (Dual Boot o Limpio)"
     echo -e "  • ${GREEN}${BOLD}dzulux-drivers${NC}    -> Descarga inteligente de controladores (GPU, Wi-Fi, Audio)"
-    echo -e "  • ${GREEN}${BOLD}dzulux-apps${NC}       -> Instalar Steam, Discord, VS Code, Office en 1 clic"
-    echo -e "  • ${GREEN}${BOLD}dzulux-snapshots${NC}  -> Puntos de restauración instantáneos con Btrfs"
+    echo -e "  • ${GREEN}${BOLD}dzulux-apps${NC}       -> Tienda App Hub (Oficina, VS Code, Navegadores en 1 clic)"
+    echo -e "  • ${GREEN}${BOLD}dzulux-gaming${NC}     -> Configurar Steam, Lutris, Wine y MangoHud automáticamente"
+    echo -e "  • ${GREEN}${BOLD}dzulux-performance${NC}-> Perfiles de CPU: Oficina, Game Booster y Streaming"
+    echo -e "  • ${GREEN}${BOLD}dzulux-cleaner${NC}    -> Limpieza profunda de caché, logs y basura del sistema"
+    echo -e "  • ${GREEN}${BOLD}dzulux-backup${NC}     -> Copias de seguridad (.tar.gz / rsync) en 1 clic"
+    echo -e "  • ${GREEN}${BOLD}dzulux-share${NC}      -> Compartir archivos por Wi-Fi con código QR hacia tu celular"
+    echo -e "  • ${GREEN}${BOLD}dzulux-usb${NC}        -> Montar, expulsar y formatear memorias USB de forma segura"
+    echo -e "  • ${GREEN}${BOLD}dzulux-snapshots${NC}  -> Puntos de restauración instantáneos con Btrfs / rsync"
     echo -e "  • ${GREEN}${BOLD}dzulux-rescue${NC}     -> Quitar contraseñas de Windows y recuperar archivos"
     echo -e "  • ${GREEN}${BOLD}dzulux-battery${NC}    -> Ahorro inteligente de batería con Wi-Fi configurable"
     echo -e "  • ${GREEN}${BOLD}dzulux-stealth${NC}    -> Escudo de privacidad para Wi-Fi públicos (MAC aleatoria)"
-    echo -e "  • ${GREEN}${BOLD}dzulux-looks${NC}      -> Alternar entre tema Cyberpunk y estilo Windows"
-    echo -e "  • ${GREEN}${BOLD}dzulux-performance${NC}-> Perfiles de CPU: Oficina, Game Booster y Streaming Sin Límites"
+    echo -e "  • ${GREEN}${BOLD}dzulux-looks${NC}      -> Alternar entre tema Cyberpunk, Estilo Windows 10 y Minimal"
     echo -e "  • ${GREEN}${BOLD}dzulux-update${NC}     -> Actualizador OTA del sistema y herramientas desde GitHub"
 else
-    echo -e "Herramientas de Servidor y Terminal de la Suite Dzulux:"
-    echo -e "  • ${GREEN}${BOLD}dzulux-installer${NC}  -> Iniciar instalación del sistema"
-    echo -e "  • ${GREEN}${BOLD}dzulux-update${NC}     -> Actualizador OTA de herramientas en terminal"
-    echo -e "  • ${GREEN}${BOLD}hw-detect${NC}         -> Diagnóstico y auditoría de hardware"
-    echo -e "  • ${GREEN}${BOLD}switch-mode gui${NC}   -> Cambiar e Iniciar Modo Gráfico (Escritorio)"
-    echo -e "  • ${GREEN}${BOLD}nmtui${NC}             -> Conectar a Wi-Fi (Modo texto)"
+    echo -e "Herramientas de Servidor y Terminal de la Suite Dzulux 2.0:"
+    echo -e "  • ${GREEN}${BOLD}dzulux-installer${NC}  -> Iniciar instalación del sistema en disco"
+    echo -e "  • ${GREEN}${BOLD}dzulux-update${NC}     -> Actualizador OTA de herramientas y paquetes APT"
+    echo -e "  • ${GREEN}${BOLD}dzulux-cleaner${NC}    -> Limpieza profunda de caché APT y logs del servidor"
+    echo -e "  • ${GREEN}${BOLD}dzulux-backup${NC}     -> Copias de seguridad (.tar.gz / rsync)"
+    echo -e "  • ${GREEN}${BOLD}dzulux-share${NC}      -> Servidor web rápido en red local con código QR"
+    echo -e "  • ${GREEN}${BOLD}dzulux-usb${NC}        -> Gestor de memorias USB y discos externos en consola"
+    echo -e "  • ${GREEN}${BOLD}dzulux-rescue${NC}     -> Rescate de particiones Windows y diagnóstico S.M.A.R.T."
+    echo -e "  • ${GREEN}${BOLD}hw-detect${NC}         -> Diagnóstico y auditoría detallada de hardware"
+    echo -e "  • ${GREEN}${BOLD}switch-mode gui${NC}   -> Cambiar e Iniciar Modo Gráfico (Escritorio XFCE)"
+    echo -e "  • ${GREEN}${BOLD}nmtui${NC}             -> Conectar a redes Wi-Fi o Ethernet (Modo texto)"
     echo ""
-    echo -e "Servicios de Servidor (Estilo Ubuntu Server):"
-    echo -e "  * SSH Server: 'sudo systemctl start sshd' (o 'enable sshd' permanente)"
+    echo -e "Servicios de Servidor (Base Ubuntu 24.04 LTS):"
+    echo -e "  * SSH Server: 'sudo systemctl start ssh' (o 'enable ssh' permanente)"
     echo -e "  * Firewall UFW: 'sudo ufw enable' y 'sudo ufw allow 22/tcp'"
 fi
 echo ""
-echo -e "${YELLOW}Nota: Sistema en fase BETA 1.1. Reporta detalles en: https://github.com/Alfredo2364/Linux${NC}"
+echo -e "${YELLOW}Nota: Sistema en fase BETA 2.0. Reporta detalles en: https://github.com/Alfredo2364/Linux${NC}"
 echo "================================================================="

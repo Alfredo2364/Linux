@@ -23,6 +23,8 @@ syslinux-utils
 efibootmgr
 grub-efi-amd64-bin
 grub-pc-bin
+os-prober
+chntpw
 python3
 python3-pip
 qrencode

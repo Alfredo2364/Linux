@@ -1,2 +1,56 @@
 #!/usr/bin/env bash
-echo 'Share'
+# ==============================================================================
+# dzulux-share - Servidor Rápido de Archivos en Red Local (con Código QR)
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
+# ==============================================================================
+
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+PORT="${2:-8080}"
+SHARE_DIR="${1:-$HOME}"
+
+if [ -n "${SUDO_USER:-}" ] && [ "$SHARE_DIR" = "/root" ]; then
+    SHARE_DIR="/home/${SUDO_USER}"
+fi
+
+# Obtener IP local principal
+LOCAL_IP=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}' | head -n1 || true)
+if [ -z "$LOCAL_IP" ]; then
+    LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "127.0.0.1")
+fi
+
+URL="http://${LOCAL_IP}:${PORT}"
+
+clear
+echo -e "${CYAN}${BOLD}==================================================================${NC}"
+echo -e "${CYAN}${BOLD}          DZULUX SHARE 2.0 - TRANSFERENCIA INALÁMBRICA            ${NC}"
+echo -e "${CYAN}${BOLD}                 Diseñado por Alfredo Dzul                        ${NC}"
+echo -e "${CYAN}${BOLD}==================================================================${NC}"
+echo ""
+echo -e "📂 Carpeta compartida: ${BOLD}${SHARE_DIR}${NC}"
+echo -e "🌐 Enlace en tu red Wi-Fi / LAN: ${GREEN}${BOLD}${URL}${NC}"
+echo ""
+
+# Abrir el puerto temporalmente en UFW si está activo
+if command -v ufw >/dev/null 2>&1 && sudo ufw status 2>/dev/null | grep -q "active"; then
+    sudo ufw allow "${PORT}/tcp" >/dev/null 2>&1 || true
+fi
+
+if command -v qrencode >/dev/null 2>&1; then
+    echo -e "${YELLOW}📱 Escanea este código QR con la cámara de tu celular para descargar archivos:${NC}\n"
+    qrencode -t ANSIUTF8 "$URL" || true
+    echo ""
+fi
+
+echo -e "${YELLOW}Presiona Ctrl + C en cualquier momento para detener la compartición.${NC}"
+echo -e "${CYAN}------------------------------------------------------------------${NC}"
+
+cd "$SHARE_DIR"
+python3 -m http.server "$PORT" --bind 0.0.0.0

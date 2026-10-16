@@ -22,10 +22,13 @@ jobs:
 
       - name: Inyectar Herramientas Dzulux al Servidor
         run: |
+          echo "Normalizando saltos de línea (LF) en scripts y hooks..."
+          find dzulux-tools dzulux-server-build -type f -exec sed -i 's/\r$//' {} +
           echo "Copiando herramientas maestras al entorno del servidor..."
           mkdir -p dzulux-server-build/config/includes.chroot/usr/local/bin
           cp -r dzulux-tools/* dzulux-server-build/config/includes.chroot/usr/local/bin/
           chmod +x dzulux-server-build/config/includes.chroot/usr/local/bin/*
+          chmod +x dzulux-server-build/config/hooks/normal/*.chroot || true
           
           echo "Eliminando herramientas gráficas (Gaming/Apps) de la versión Servidor..."
           rm -f dzulux-server-build/config/includes.chroot/usr/local/bin/dzulux-gaming
@@ -75,9 +78,12 @@ jobs:
 
       - name: Inyectar Herramientas Dzulux al Desktop
         run: |
+          echo "Normalizando saltos de línea (LF) en scripts y hooks..."
+          find dzulux-tools dzulux-desktop-build -type f -exec sed -i 's/\r$//' {} +
           mkdir -p dzulux-desktop-build/config/includes.chroot/usr/local/bin
           cp dzulux-tools/* dzulux-desktop-build/config/includes.chroot/usr/local/bin/
           chmod +x dzulux-desktop-build/config/includes.chroot/usr/local/bin/*
+          chmod +x dzulux-desktop-build/config/hooks/normal/*.chroot || true
 
       - name: Compilar Dzulux Desktop ISO (live-build)
         run: |

@@ -13,5 +13,5 @@ lb config noauto \
     --binary-images iso \
     --bootloader "grub-pc,grub-efi" \
     --linux-packages "linux-image linux-headers" \
-    --bootappend-live "boot=casper quiet splash nomodeset" \
+    --bootappend-live "boot=live components quiet splash nomodeset" \
     ""

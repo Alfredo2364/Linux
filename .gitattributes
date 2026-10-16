@@ -1,2 +1,6 @@
-# Auto detect text files and perform LF normalization
 * text=auto
+*.sh text eol=lf
+*.chroot text eol=lf
+dzulux-tools/* text eol=lf
+dzulux-server-build/auto/* text eol=lf
+dzulux-desktop-build/auto/* text eol=lf

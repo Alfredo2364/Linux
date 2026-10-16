@@ -39,8 +39,27 @@ ufw allow ssh || true
 
 # Configurar Auto-Login en CLI
 mkdir -p /etc/systemd/system/getty@tty1.service.d/
-cat <<EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
+cat <<'EOF' > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin root --noclear %I \\\
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
 EOF
+
+# Registrar servicio de inicialización Live de Dzulux
+cat <<'EOF' > /etc/systemd/system/dzulux-live-init.service
+[Unit]
+Description=Dzulux Linux 2.0 Live Environment Initialization
+Before=display-manager.service getty@tty1.service
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/dzulux-live-init
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+mkdir -p /etc/systemd/system/multi-user.target.wants
+ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service
+

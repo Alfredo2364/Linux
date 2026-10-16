@@ -38,7 +38,17 @@ if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
     echo "dzulux-welcome" >> /etc/bash.bashrc
 fi
 
-# 5. Forzar autologin de live user (ubuntu) en LightDM
+# 5. Asegurar creación del usuario live 'ubuntu' y autologin en LightDM
+if ! id -u ubuntu >/dev/null 2>&1; then
+    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev ubuntu 2>/dev/null || \
+    useradd -m -u 1000 -s /bin/bash ubuntu 2>/dev/null || true
+fi
+echo "ubuntu:dzulux" | chpasswd 2>/dev/null || true
+passwd -d ubuntu 2>/dev/null || true
+mkdir -p /etc/sudoers.d
+echo "ubuntu ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu
+chmod 440 /etc/sudoers.d/ubuntu
+
 mkdir -p /etc/lightdm/lightdm.conf.d/
 cat <<EOF > /etc/lightdm/lightdm.conf.d/autologin-dzulux.conf
 [Seat:*]
@@ -95,5 +105,23 @@ for desk_item in dzulux-installer dzulux-apps dzulux-gaming dzulux-drivers dzulu
     cp "/usr/share/applications/${desk_item}.desktop" "/etc/skel/Desktop/${desk_item}.desktop"
     chmod +x "/etc/skel/Desktop/${desk_item}.desktop"
 done
+
+# 7. Registrar servicio de inicialización Live de Dzulux
+cat <<'EOF' > /etc/systemd/system/dzulux-live-init.service
+[Unit]
+Description=Dzulux Linux 2.0 Live Environment Initialization
+Before=display-manager.service lightdm.service getty@tty1.service
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/dzulux-live-init
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+mkdir -p /etc/systemd/system/multi-user.target.wants
+ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service
 
 echo "Dzulux Desktop 2.0 Branding & Menu Hook Completado"

@@ -213,22 +213,35 @@ Todos los datos, particiones y sistemas operativos existentes en el disco selecc
    ${CHOSEN_DISK}\n\n\
 ATENCIÓN: Todos los archivos previos se perderán definitivamente." 12 70
 
-    # Particionado GPT completo
+    # Particionado inteligente según el modo de arranque de la máquina (UEFI vs BIOS Legacy/VMware)
     umount -R /mnt 2>/dev/null || true
-    parted -s "${CHOSEN_DISK}" mklabel gpt
-    parted -s "${CHOSEN_DISK}" mkpart "DZULUX_BOOT" fat32 1MiB 513MiB
-    parted -s "${CHOSEN_DISK}" set 1 esp on
-    parted -s "${CHOSEN_DISK}" mkpart "DZULUX_ROOT" ext4 513MiB 100%
+    if [ -d /sys/firmware/efi ]; then
+        parted -s "${CHOSEN_DISK}" mklabel gpt
+        parted -s "${CHOSEN_DISK}" mkpart "DZULUX_BOOT" fat32 1MiB 513MiB
+        parted -s "${CHOSEN_DISK}" set 1 esp on
+        parted -s "${CHOSEN_DISK}" mkpart "DZULUX_ROOT" ext4 513MiB 100%
 
-    if echo "${CHOSEN_DISK}" | grep -qE "nvme|mmcblk"; then
-        BOOT_PART="${CHOSEN_DISK}p1"
-        ROOT_PART="${CHOSEN_DISK}p2"
+        if echo "${CHOSEN_DISK}" | grep -qE "nvme|mmcblk"; then
+            BOOT_PART="${CHOSEN_DISK}p1"
+            ROOT_PART="${CHOSEN_DISK}p2"
+        else
+            BOOT_PART="${CHOSEN_DISK}1"
+            ROOT_PART="${CHOSEN_DISK}2"
+        fi
+        mkfs.fat -F32 "${BOOT_PART}"
     else
-        BOOT_PART="${CHOSEN_DISK}1"
-        ROOT_PART="${CHOSEN_DISK}2"
-    fi
+        # Modo BIOS Legacy (común en VMware por defecto y laptops antiguas)
+        parted -s "${CHOSEN_DISK}" mklabel msdos
+        parted -s "${CHOSEN_DISK}" mkpart primary ext4 1MiB 100%
+        parted -s "${CHOSEN_DISK}" set 1 boot on
 
-    mkfs.fat -F32 "${BOOT_PART}"
+        if echo "${CHOSEN_DISK}" | grep -qE "nvme|mmcblk"; then
+            ROOT_PART="${CHOSEN_DISK}p1"
+        else
+            ROOT_PART="${CHOSEN_DISK}1"
+        fi
+        BOOT_PART=""
+    fi
 fi
 
 # Determinar disco físico si se seleccionó Dual Boot
@@ -255,8 +268,10 @@ else
     mount -o noatime "${ROOT_PART}" /mnt
 fi
 
-mkdir -p /mnt/boot/efi
-mount "${BOOT_PART}" /mnt/boot/efi
+if [ -n "${BOOT_PART}" ]; then
+    mkdir -p /mnt/boot/efi
+    mount "${BOOT_PART}" /mnt/boot/efi
+fi
 
 # ------------------------------------------------------------------------------
 # 4. CONFIGURACIÓN DE USUARIO Y EQUIPO
@@ -336,8 +351,11 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
 
     echo "40"; sleep 1
     echo "XXX\nGenerando tabla de particiones (fstab) por UUID...\nXXX"
-    ROOT_UUID=$(blkid -s UUID -o value "${ROOT_PART}" || echo "")
-    BOOT_UUID=$(blkid -s UUID -o value "${BOOT_PART}" || echo "")
+    ROOT_UUID=$(blkid -s UUID -o value "${ROOT_PART}" 2>/dev/null || echo "")
+    BOOT_UUID=""
+    if [ -n "${BOOT_PART}" ]; then
+        BOOT_UUID=$(blkid -s UUID -o value "${BOOT_PART}" 2>/dev/null || echo "")
+    fi
     cat <<EOF_FSTAB > /mnt/etc/fstab
 # /etc/fstab: static file system information for Dzulux Linux 2.0
 EOF_FSTAB

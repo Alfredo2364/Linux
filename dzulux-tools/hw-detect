@@ -66,6 +66,8 @@ if command -v lspci >/dev/null 2>&1; then
                 echo -e "    ${GREEN}↳ Gráficos Intel detectados (Mesa / Intel Media Driver activo).${NC}"
             elif echo "$line" | grep -iq -E "amd|radeon"; then
                 echo -e "    ${GREEN}↳ Gráficos AMD Radeon detectados (AMDGPU / Vulkan Radeon activo).${NC}"
+            elif echo "$line" | grep -iq -E "vmware|vbox|virtio|qxl"; then
+                echo -e "    ${GREEN}↳ Adaptador Gráfico Virtual detectado (VMware SVGA / VirtualBox / KVM con open-vm-tools activo).${NC}"
             fi
         done
     else

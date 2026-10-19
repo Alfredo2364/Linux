@@ -60,10 +60,10 @@ jobs:
 set default=0
 set timeout=5
 menuentry "Dzulux Linux 2.0 Server (Live CLI)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset system_mode=cli
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli
     initrd /${INITRD:-live/initrd.img}
 }
-menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Fallback)" {
+menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {
     linux /${VMLINUZ:-live/vmlinuz} boot=live components nomodeset system_mode=cli
     initrd /${INITRD:-live/initrd.img}
 }
@@ -131,12 +131,16 @@ EOF_GRUB
             cat <<EOF_GRUB | sudo tee binary/boot/grub/grub.cfg >/dev/null
 set default=0
 set timeout=5
-menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI)" {
+menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / PC)" {
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash
+    initrd /${INITRD:-live/initrd.img}
+}
+menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {
     linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset
     initrd /${INITRD:-live/initrd.img}
 }
 menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset system_mode=cli
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli
     initrd /${INITRD:-live/initrd.img}
 }
 EOF_GRUB

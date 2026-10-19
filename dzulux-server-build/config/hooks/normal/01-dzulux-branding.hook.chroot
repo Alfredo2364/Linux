@@ -5,35 +5,58 @@ echo "Configurando Branding de Dzulux Server..."
 echo "dzulux" > /etc/hostname || true
 echo "127.0.0.1 localhost dzulux" > /etc/hosts || true
 
-# Reescribir os-release
-cat <<EOF > /etc/os-release
-PRETTY_NAME="Dzulux Linux 2.0 (Beta)"
+# 1. Identidad completa Dzulux en os-release y lsb-release (para neofetch, fastfetch, Grub, etc.)
+rm -f /etc/os-release /usr/lib/os-release
+cat <<EOF > /usr/lib/os-release
+PRETTY_NAME="Dzulux Linux 2.0 Server (Beta)"
 NAME="Dzulux Linux"
 VERSION_ID="2.0"
 VERSION="2.0 (Beta)"
+VERSION_CODENAME=noble
 ID=dzulux
-ID_LIKE=ubuntu
+ID_LIKE=debian
 HOME_URL="https://alfredo2364.github.io/Linux/"
+SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+EOF
+ln -sf /usr/lib/os-release /etc/os-release || true
+
+cat <<EOF > /etc/lsb-release
+DISTRIB_ID=Dzulux
+DISTRIB_RELEASE=2.0
+DISTRIB_CODENAME=noble
+DISTRIB_DESCRIPTION="Dzulux Linux 2.0 Server (Beta)"
 EOF
 
-# Eliminar MOTD de Ubuntu Server y vincular nuestro dzulux-welcome
-rm -rf /etc/update-motd.d/*
+# 2. Eliminar MOTD de Ubuntu Server y vincular nuestro dzulux-welcome
+rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
 cat <<EOF > /etc/update-motd.d/00-dzulux-welcome
 #!/bin/sh
 /usr/local/bin/dzulux-welcome
 EOF
 chmod +x /etc/update-motd.d/00-dzulux-welcome
 
-# Cambiar texto de login tty
-echo "Dzulux Linux 2.0 Server \n \l
+# 3. Cambiar texto de login tty y SSH (issue / issue.net) y GRUB distributor
+echo "Dzulux Linux 2.0 Server (Beta) \n \l
 " > /etc/issue
+echo "Dzulux Linux 2.0 Server (Beta)" > /etc/issue.net
 
-# Configurar ZRAM por defecto para equipos viejos
+mkdir -p /etc/default
+cat <<EOF > /etc/default/grub
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="Dzulux Linux 2.0"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=false
+EOF
+
+# 4. Configurar ZRAM por defecto para equipos viejos
 echo "ALGO=zstd" > /etc/default/zramswap
 echo "PERCENT=50" >> /etc/default/zramswap
 systemctl enable zramswap.service 2>/dev/null || true
 
-# Activar firewall UFW pero permitiendo SSH
+# 5. Activar firewall UFW pero permitiendo SSH
 ufw allow ssh 2>/dev/null || true
 
 # Configurar Auto-Login en CLI

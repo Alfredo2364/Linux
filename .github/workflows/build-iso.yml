@@ -60,11 +60,11 @@ jobs:
               echo 'set default=0'
               echo 'set timeout=5'
               echo 'menuentry "Dzulux Linux 2.0 Server (Live CLI)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli"
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
               echo "    initrd /${INITRD:-live/initrd.img}"
               echo '}'
               echo 'menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components nomodeset system_mode=cli"
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux nomodeset system_mode=cli"
               echo "    initrd /${INITRD:-live/initrd.img}"
               echo '}'
             } | sudo tee binary/boot/grub/grub.cfg >/dev/null
@@ -133,15 +133,15 @@ jobs:
               echo 'set default=0'
               echo 'set timeout=5'
               echo 'menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / VirtualBox / PC)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash"
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash"
               echo "    initrd /${INITRD:-live/initrd.img}"
               echo '}'
               echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset"
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash nomodeset"
               echo "    initrd /${INITRD:-live/initrd.img}"
               echo '}'
               echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli"
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
               echo "    initrd /${INITRD:-live/initrd.img}"
               echo '}'
             } | sudo tee binary/boot/grub/grub.cfg >/dev/null

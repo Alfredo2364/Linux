@@ -3,23 +3,46 @@
 # Dzulux Desktop 2.0 Branding, Settings & Menu Launchers Hook
 # Se ejecuta dentro del chroot de Ubuntu durante la compilación
 
-# 1. Modificar os-release para identidad Dzulux 2.0
+# 1. Modificar os-release y lsb-release para identidad 100% Dzulux 2.0 (sin rastro de Ubuntu en neofetch/sistema)
+echo "dzulux" > /etc/hostname || true
+echo "127.0.0.1 localhost dzulux" > /etc/hosts || true
+
 rm -f /etc/os-release /usr/lib/os-release
 cat <<EOF > /usr/lib/os-release
 PRETTY_NAME="Dzulux Linux 2.0 Desktop (Beta)"
 NAME="Dzulux Desktop"
 VERSION_ID="2.0"
-VERSION="2.0 (Beta - Noble Base)"
+VERSION="2.0 (Beta)"
 VERSION_CODENAME=noble
 ID=dzulux
-ID_LIKE=ubuntu
+ID_LIKE=debian
 HOME_URL="https://alfredo2364.github.io/Linux/"
 SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 PRIVACY_POLICY_URL="https://github.com/Alfredo2364/Linux"
-UBUNTU_CODENAME=noble
 EOF
 ln -sf /usr/lib/os-release /etc/os-release || true
+
+cat <<EOF > /etc/lsb-release
+DISTRIB_ID=Dzulux
+DISTRIB_RELEASE=2.0
+DISTRIB_CODENAME=noble
+DISTRIB_DESCRIPTION="Dzulux Linux 2.0 Desktop (Beta)"
+EOF
+
+echo "Dzulux Linux 2.0 Desktop (Beta) \n \l
+" > /etc/issue
+echo "Dzulux Linux 2.0 Desktop (Beta)" > /etc/issue.net
+
+mkdir -p /etc/default
+cat <<EOF > /etc/default/grub
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="Dzulux Linux 2.0"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=false
+EOF
 
 # 2. Configurar ZRAM
 cat <<EOF > /etc/default/zramswap
@@ -28,31 +51,31 @@ PERCENT=50
 EOF
 systemctl enable zramswap.service 2>/dev/null || true
 
-# 3. Eliminar motd de Ubuntu
-rm -rf /etc/update-motd.d/*
+# 3. Eliminar motd y avisos legales de Ubuntu
+rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
 
 # 4. Inyectar Dzulux Welcome en terminal (bashrc global)
 if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
     echo "dzulux-welcome" >> /etc/bash.bashrc
 fi
 
-# 5. Asegurar creación del usuario live 'ubuntu' y autologin en LightDM
+# 5. Asegurar creación del usuario live 'dzulux' y autologin en LightDM
 groupadd -r vboxsf 2>/dev/null || true
-if ! id -u ubuntu >/dev/null 2>&1; then
-    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,vboxsf ubuntu 2>/dev/null || \
-    useradd -m -u 1000 -s /bin/bash ubuntu 2>/dev/null || true
+if ! id -u dzulux >/dev/null 2>&1; then
+    useradd -m -u 1000 -c "Dzulux Live User" -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,vboxsf dzulux 2>/dev/null || \
+    useradd -m -u 1000 -s /bin/bash dzulux 2>/dev/null || true
 fi
-usermod -aG vboxsf ubuntu 2>/dev/null || true
-echo "ubuntu:dzulux" | chpasswd 2>/dev/null || true
-passwd -d ubuntu 2>/dev/null || true
+usermod -aG vboxsf dzulux 2>/dev/null || true
+echo "dzulux:dzulux" | chpasswd 2>/dev/null || true
+passwd -d dzulux 2>/dev/null || true
 mkdir -p /etc/sudoers.d
-echo "ubuntu ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu
-chmod 440 /etc/sudoers.d/ubuntu
+echo "dzulux ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/dzulux
+chmod 440 /etc/sudoers.d/dzulux
 
 mkdir -p /etc/lightdm/lightdm.conf.d/
 cat <<EOF > /etc/lightdm/lightdm.conf.d/autologin-dzulux.conf
 [Seat:*]
-autologin-user=ubuntu
+autologin-user=dzulux
 autologin-user-timeout=0
 user-session=xfce
 EOF

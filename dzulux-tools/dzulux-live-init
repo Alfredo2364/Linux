@@ -9,17 +9,18 @@ set -euo pipefail
 # Asegurar grupo autologin
 groupadd -r autologin 2>/dev/null || true
 
-# Detectar o crear usuario live (ubuntu o liveuser)
-LIVE_USER="ubuntu"
-if id -u liveuser >/dev/null 2>&1; then
-    LIVE_USER="liveuser"
-elif ! id -u ubuntu >/dev/null 2>&1; then
-    LIVE_USER="liveuser"
-    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin "${LIVE_USER}" 2>/dev/null || \
+# Asegurar hostname dzulux en la sesión Live
+echo "dzulux" > /etc/hostname 2>/dev/null || true
+hostname dzulux 2>/dev/null || true
+
+# Detectar o crear usuario live 'dzulux'
+LIVE_USER="dzulux"
+if ! id -u dzulux >/dev/null 2>&1; then
+    useradd -m -u 1000 -c "Dzulux Live User" -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin "${LIVE_USER}" 2>/dev/null || \
     useradd -m -u 1000 -s /bin/bash "${LIVE_USER}" 2>/dev/null || true
 fi
 
-usermod -aG sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin "${LIVE_USER}" 2>/dev/null || true
+usermod -aG sudo,adm,cdrom,dip,plugdev,audio,video,netdev,autologin,vboxsf "${LIVE_USER}" 2>/dev/null || true
 
 # Desbloquear contraseñas para permitir entrar con Enter o con dzulux
 passwd -d "${LIVE_USER}" 2>/dev/null || true

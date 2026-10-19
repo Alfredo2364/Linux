@@ -331,7 +331,7 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     echo "XXX\nClonando imagen oficial de Dzulux Linux al disco (Instalación Offline de alta velocidad)...\nXXX"
     
     # Copiar el sistema raíz completo de la ISO a la partición de destino
-    rsync -aAX --info=progress2 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/cdrom/*","/rofs/*","/lost+found","/home/liveuser/*","/home/ubuntu/*"} / /mnt/
+    rsync -aAX --info=progress2 --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/cdrom/*","/rofs/*","/lost+found","/home/liveuser/*","/home/ubuntu/*","/home/dzulux/*"} / /mnt/
     
     # Crear directorios esenciales del sistema
     mkdir -p /mnt/{dev,proc,sys,tmp,run,mnt,media,home}
@@ -347,7 +347,8 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     rm -f /mnt/etc/systemd/system/multi-user.target.wants/dzulux-live-init.service 2>/dev/null || true
     sed -i '/liveuser/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
     sed -i '/^ubuntu:/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
-    rm -f /mnt/etc/sudoers.d/liveuser /mnt/etc/sudoers.d/ubuntu /mnt/etc/sudoers.d/90-live-build 2>/dev/null || true
+    sed -i '/^dzulux:/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
+    rm -f /mnt/etc/sudoers.d/liveuser /mnt/etc/sudoers.d/ubuntu /mnt/etc/sudoers.d/dzulux /mnt/etc/sudoers.d/90-live-build 2>/dev/null || true
 
     echo "40"; sleep 1
     echo "XXX\nGenerando tabla de particiones (fstab) por UUID...\nXXX"

@@ -31,7 +31,6 @@ rfkill
 open-vm-tools
 virtualbox-guest-utils
 qemu-guest-agent
-linux-cloud-tools-common
 python3
 python3-pip
 qrencode

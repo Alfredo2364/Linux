@@ -1,11 +1,9 @@
 #!/bin/sh
 
-set -e
-
 echo "Configurando Branding de Dzulux Server..."
 
-echo "dzulux" > /etc/hostname
-echo "127.0.0.1 localhost dzulux" > /etc/hosts
+echo "dzulux" > /etc/hostname || true
+echo "127.0.0.1 localhost dzulux" > /etc/hosts || true
 
 # Reescribir os-release
 cat <<EOF > /etc/os-release
@@ -27,15 +25,16 @@ EOF
 chmod +x /etc/update-motd.d/00-dzulux-welcome
 
 # Cambiar texto de login tty
-echo "Dzulux Linux 2.0 Server \\\n \\\l
+echo "Dzulux Linux 2.0 Server \n \l
 " > /etc/issue
 
 # Configurar ZRAM por defecto para equipos viejos
-echo -e "ALGO=zstd\nPERCENT=50" > /etc/default/zramswap
-systemctl enable zramswap.service || true
+echo "ALGO=zstd" > /etc/default/zramswap
+echo "PERCENT=50" >> /etc/default/zramswap
+systemctl enable zramswap.service 2>/dev/null || true
 
 # Activar firewall UFW pero permitiendo SSH
-ufw allow ssh || true
+ufw allow ssh 2>/dev/null || true
 
 # Configurar Auto-Login en CLI
 mkdir -p /etc/systemd/system/getty@tty1.service.d/
@@ -61,5 +60,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 mkdir -p /etc/systemd/system/multi-user.target.wants
-ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service
+ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service || true
+
+exit 0
 

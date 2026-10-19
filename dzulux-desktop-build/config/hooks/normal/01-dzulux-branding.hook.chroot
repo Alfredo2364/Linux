@@ -3,9 +3,8 @@
 # Dzulux Desktop 2.0 Branding, Settings & Menu Launchers Hook
 # Se ejecuta dentro del chroot de Ubuntu durante la compilación
 
-set -e
-
 # 1. Modificar os-release para identidad Dzulux 2.0
+rm -f /etc/os-release /usr/lib/os-release
 cat <<EOF > /usr/lib/os-release
 PRETTY_NAME="Dzulux Linux 2.0 Desktop (Beta)"
 NAME="Dzulux Desktop"
@@ -20,8 +19,7 @@ BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 PRIVACY_POLICY_URL="https://github.com/Alfredo2364/Linux"
 UBUNTU_CODENAME=noble
 EOF
-
-cp /usr/lib/os-release /etc/os-release
+ln -sf /usr/lib/os-release /etc/os-release || true
 
 # 2. Configurar ZRAM
 cat <<EOF > /etc/default/zramswap
@@ -124,6 +122,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 mkdir -p /etc/systemd/system/multi-user.target.wants
-ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service
+ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service || true
 
 echo "Dzulux Desktop 2.0 Branding & Menu Hook Completado"
+exit 0

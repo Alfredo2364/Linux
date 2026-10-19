@@ -49,7 +49,6 @@ virtualbox-guest-utils
 virtualbox-guest-x11
 spice-vdagent
 qemu-guest-agent
-linux-cloud-tools-common
 libgl1-mesa-dri
 vulkan-tools
 

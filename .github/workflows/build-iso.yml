@@ -47,8 +47,8 @@ jobs:
             exit 1
           fi
           if ! sudo lb build 2>&1 | tee build.log; then
-            echo "--- BUILD FAILED. LOG OUTPUT: ---"
-            cat build.log
+            echo "--- BUILD FAILED. LAST 120 LINES OF LOG OUTPUT: ---"
+            tail -n 120 build.log
             exit 1
           fi
           echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
@@ -77,6 +77,7 @@ jobs:
           fi
 
       - name: Guardar ISO Generada y Logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dzulux-server-artifacts
@@ -119,8 +120,8 @@ jobs:
             exit 1
           fi
           if ! sudo lb build 2>&1 | tee build.log; then
-            echo "--- BUILD FAILED. LOG OUTPUT: ---"
-            cat build.log
+            echo "--- BUILD FAILED. LAST 120 LINES OF LOG OUTPUT: ---"
+            tail -n 120 build.log
             exit 1
           fi
           echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
@@ -153,6 +154,7 @@ jobs:
           fi
 
       - name: Guardar ISO Generada y Logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dzulux-desktop-artifacts

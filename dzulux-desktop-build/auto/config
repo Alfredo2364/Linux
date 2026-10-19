@@ -12,6 +12,7 @@ lb config noauto \
     --iso-volume "DZULUX_DESKTOP" \
     --binary-images iso \
     --bootloader "grub-pc,grub-efi" \
+    --initramfs live-boot \
     --linux-packages "linux-image linux-headers" \
     --bootappend-live "boot=live components username=dzulux hostname=dzulux quiet splash" \
     "${@}"

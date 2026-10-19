@@ -37,6 +37,7 @@ jobs:
 
       - name: Compilar Dzulux Server ISO (live-build)
         run: |
+          set -o pipefail
           cd dzulux-server-build
           chmod +x auto/*
           sudo lb clean
@@ -51,8 +52,29 @@ jobs:
             exit 1
           fi
           echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
-          sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ || echo "grub-mkrescue falló, se usará la ISO original"
-          sudo rm -f live-image-amd64.iso
+          sudo mkdir -p binary/boot/grub
+          if [ ! -f binary/boot/grub/grub.cfg ]; then
+            VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
+            INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
+            cat <<EOF_GRUB | sudo tee binary/boot/grub/grub.cfg >/dev/null
+set default=0
+set timeout=5
+menuentry "Dzulux Linux 2.0 Server (Live CLI)" {
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset system_mode=cli
+    initrd /${INITRD:-live/initrd.img}
+}
+menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Fallback)" {
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components nomodeset system_mode=cli
+    initrd /${INITRD:-live/initrd.img}
+}
+EOF_GRUB
+          fi
+          if sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ -- -volid "DZULUX_SERVER"; then
+            sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso
+          else
+            echo "grub-mkrescue falló, renombrando ISO original..."
+            for iso in *.iso; do [ -f "$iso" ] && sudo mv "$iso" dzulux-server-hybrid.iso && break; done
+          fi
 
       - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4
@@ -87,6 +109,7 @@ jobs:
 
       - name: Compilar Dzulux Desktop ISO (live-build)
         run: |
+          set -o pipefail
           cd dzulux-desktop-build
           chmod +x auto/*
           sudo lb clean
@@ -101,8 +124,29 @@ jobs:
             exit 1
           fi
           echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
-          sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ || echo "grub-mkrescue falló, se usará la ISO original"
-          sudo rm -f live-image-amd64.iso
+          sudo mkdir -p binary/boot/grub
+          if [ ! -f binary/boot/grub/grub.cfg ]; then
+            VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
+            INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
+            cat <<EOF_GRUB | sudo tee binary/boot/grub/grub.cfg >/dev/null
+set default=0
+set timeout=5
+menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI)" {
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset
+    initrd /${INITRD:-live/initrd.img}
+}
+menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {
+    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset system_mode=cli
+    initrd /${INITRD:-live/initrd.img}
+}
+EOF_GRUB
+          fi
+          if sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ -- -volid "DZULUX_DESKTOP"; then
+            sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso
+          else
+            echo "grub-mkrescue falló, renombrando ISO original..."
+            for iso in *.iso; do [ -f "$iso" ] && sudo mv "$iso" dzulux-desktop-hybrid.iso && break; done
+          fi
 
       - name: Guardar ISO Generada y Logs
         uses: actions/upload-artifact@v4

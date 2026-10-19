@@ -18,7 +18,7 @@ sudo apt-get install -y wine64 wine32 libvulkan1 libvulkan1:i386 mesa-vulkan-dri
 
 # 3. Instalar Steam
 echo "[3/5] Instalando Steam..."
-sudo apt-get install -y steam
+sudo apt-get install -y steam-installer || sudo apt-get install -y steam || true
 
 # 4. Instalar Lutris (Para juegos de Epic, GOG, y Windows)
 echo "[4/5] Instalando Lutris..."

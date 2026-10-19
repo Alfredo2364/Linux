@@ -48,14 +48,19 @@ pulseaudio
 alsa-utils
 pavucontrol
 
-# Apps Base
-firefox
-gnome-terminal
+# Apps Base y Utilidades Gráficas
+xfce4-terminal
 thunar
 mousepad
 gvfs-backends
+flatpak
+brightnessctl
+tlp
+rfkill
+pciutils
+usbutils
 
-# Python (para algunas herramientas Dzulux)
+# Python (para herramientas Dzulux)
 python3
 python3-pip
 qrencode

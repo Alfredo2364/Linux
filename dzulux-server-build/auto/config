@@ -14,4 +14,4 @@ lb config noauto \
     --bootloader "grub-pc,grub-efi" \
     --linux-packages "linux-image linux-headers" \
     --bootappend-live "boot=live components quiet splash nomodeset system_mode=cli" \
-    ""
+    "${@}"

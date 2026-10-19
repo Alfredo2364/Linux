@@ -25,6 +25,9 @@ grub-efi-amd64-bin
 grub-pc-bin
 os-prober
 chntpw
+pciutils
+usbutils
+rfkill
 python3
 python3-pip
 qrencode

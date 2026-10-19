@@ -62,6 +62,10 @@ if command -v lspci >/dev/null 2>&1; then
         SUMMARY_TEXT+="• Gráficos AMD Radeon: GPU detectada.\n  ↳ Se activará soporte Vulkan Radeon y decodificación de video Mesa.\n\n"
         PKG_LIST+=("mesa-vulkan-drivers" "mesa-va-drivers" "libdrm-amdgpu1")
     fi
+    if echo "$GPUS" | grep -iq -E "virtualbox|vbox|InnoTek|vmware"; then
+        SUMMARY_TEXT+="• Máquina Virtual Detectada (Oracle VirtualBox / VMware):\n  ↳ Se instalarán controladores de pantalla completa, portapapeles compartido e integración de ratón.\n\n"
+        PKG_LIST+=("virtualbox-guest-utils" "virtualbox-guest-x11" "open-vm-tools" "open-vm-tools-desktop")
+    fi
 fi
 
 # --- B) Procesador y Microcódigo ---

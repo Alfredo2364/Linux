@@ -29,6 +29,7 @@ pciutils
 usbutils
 rfkill
 open-vm-tools
+virtualbox-guest-utils
 qemu-guest-agent
 python3
 python3-pip

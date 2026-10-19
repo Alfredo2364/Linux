@@ -39,10 +39,12 @@ if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
 fi
 
 # 5. Asegurar creación del usuario live 'ubuntu' y autologin en LightDM
+groupadd -r vboxsf 2>/dev/null || true
 if ! id -u ubuntu >/dev/null 2>&1; then
-    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev ubuntu 2>/dev/null || \
+    useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,vboxsf ubuntu 2>/dev/null || \
     useradd -m -u 1000 -s /bin/bash ubuntu 2>/dev/null || true
 fi
+usermod -aG vboxsf ubuntu 2>/dev/null || true
 echo "ubuntu:dzulux" | chpasswd 2>/dev/null || true
 passwd -d ubuntu 2>/dev/null || true
 mkdir -p /etc/sudoers.d

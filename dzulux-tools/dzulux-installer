@@ -395,8 +395,9 @@ EOF_HOSTS
     sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /mnt/etc/locale.gen 2>/dev/null || true
     chroot /mnt locale-gen es_MX.UTF-8 en_US.UTF-8 2>/dev/null || true
 
-    # Crear usuario real en el disco instalado (grupos Ubuntu: sudo, adm, audio, video, plugdev, netdev)
-    chroot /mnt useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev "${USERNAME}" 2>/dev/null || \
+    # Crear usuario real en el disco instalado (grupos Ubuntu + vboxsf para VirtualBox)
+    chroot /mnt groupadd -r vboxsf 2>/dev/null || true
+    chroot /mnt useradd -m -u 1000 -s /bin/bash -G sudo,adm,cdrom,dip,plugdev,audio,video,netdev,vboxsf "${USERNAME}" 2>/dev/null || \
     chroot /mnt useradd -m -u 1000 -s /bin/bash -G sudo "${USERNAME}" 2>/dev/null || true
     echo "${USERNAME}:${USER_PASS}" | chroot /mnt chpasswd 2>/dev/null || true
     echo "root:${ROOT_PASS}" | chroot /mnt chpasswd 2>/dev/null || true

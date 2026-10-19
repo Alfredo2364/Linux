@@ -124,10 +124,14 @@ create_launcher "dzulux-update"      "Dzulux Update (Actualizador)"  "Actualiza 
 create_launcher "hw-detect"          "Dzulux Auditoría de Hardware"  "Diagnóstico completo de CPU, GPU, Audio y Red"      "/usr/local/bin/hw-detect"               "computer"                     "System;Monitor;"
 
 # Colocar accesos directos clave en el Escritorio por defecto
+mkdir -p /home/dzulux/Desktop
 for desk_item in dzulux-installer dzulux-apps dzulux-gaming dzulux-drivers dzulux-update; do
     cp "/usr/share/applications/${desk_item}.desktop" "/etc/skel/Desktop/${desk_item}.desktop"
     chmod +x "/etc/skel/Desktop/${desk_item}.desktop"
+    cp "/usr/share/applications/${desk_item}.desktop" "/home/dzulux/Desktop/${desk_item}.desktop"
+    chmod +x "/home/dzulux/Desktop/${desk_item}.desktop"
 done
+chown -R dzulux:dzulux /home/dzulux 2>/dev/null || true
 
 # 7. Registrar servicio de inicialización Live de Dzulux
 cat <<'EOF' > /etc/systemd/system/dzulux-live-init.service

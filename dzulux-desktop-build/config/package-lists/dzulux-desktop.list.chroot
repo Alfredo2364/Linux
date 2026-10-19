@@ -34,13 +34,14 @@ lightdm-gtk-greeter
 materia-gtk-theme
 papirus-icon-theme
 
-# Controladores de Video Universales (Intel, AMD, Nouveau, VMware, Oracle VirtualBox)
+# Controladores de Video Universales (Intel, AMD, Nouveau, VMware, VirtualBox, QEMU/KVM, Hyper-V)
 mesa-utils
 xserver-xorg-video-all
 xserver-xorg-video-amdgpu
 xserver-xorg-video-nouveau
 xserver-xorg-video-intel
 xserver-xorg-video-vmware
+xserver-xorg-video-qxl
 xserver-xorg-input-vmmouse
 open-vm-tools
 open-vm-tools-desktop
@@ -48,6 +49,7 @@ virtualbox-guest-utils
 virtualbox-guest-x11
 spice-vdagent
 qemu-guest-agent
+linux-cloud-tools-common
 libgl1-mesa-dri
 vulkan-tools
 

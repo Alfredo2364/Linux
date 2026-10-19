@@ -59,7 +59,7 @@ main_menu() {
 select_partition() {
     local PROMPT="$1"
     local PARTS_RAW
-    PARTS_RAW=$(lsblk -lno NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT | grep -E "^sd[a-z][0-9]|^nvme[0-9]n[0-9]p[0-9]" || true)
+    PARTS_RAW=$(lsblk -lno NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT | grep -E "^sd[a-z][0-9]|^vd[a-z][0-9]|^xvd[a-z][0-9]|^nvme[0-9]n[0-9]p[0-9]|^mmcblk[0-9]p[0-9]" || true)
     if [ -z "$PARTS_RAW" ]; then
         msg_box "Sin Unidades" "No se detectaron particiones disponibles."
         echo ""

@@ -56,18 +56,18 @@ jobs:
           if [ ! -f binary/boot/grub/grub.cfg ]; then
             VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
             INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
-            cat <<EOF_GRUB | sudo tee binary/boot/grub/grub.cfg >/dev/null
-set default=0
-set timeout=5
-menuentry "Dzulux Linux 2.0 Server (Live CLI)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli
-    initrd /${INITRD:-live/initrd.img}
-}
-menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components nomodeset system_mode=cli
-    initrd /${INITRD:-live/initrd.img}
-}
-EOF_GRUB
+            {
+              echo 'set default=0'
+              echo 'set timeout=5'
+              echo 'menuentry "Dzulux Linux 2.0 Server (Live CLI)" {'
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli"
+              echo "    initrd /${INITRD:-live/initrd.img}"
+              echo '}'
+              echo 'menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {'
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components nomodeset system_mode=cli"
+              echo "    initrd /${INITRD:-live/initrd.img}"
+              echo '}'
+            } | sudo tee binary/boot/grub/grub.cfg >/dev/null
           fi
           if sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ -- -volid "DZULUX_SERVER"; then
             sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso
@@ -128,22 +128,22 @@ EOF_GRUB
           if [ ! -f binary/boot/grub/grub.cfg ]; then
             VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
             INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
-            cat <<EOF_GRUB | sudo tee binary/boot/grub/grub.cfg >/dev/null
-set default=0
-set timeout=5
-menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / PC)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash
-    initrd /${INITRD:-live/initrd.img}
-}
-menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset
-    initrd /${INITRD:-live/initrd.img}
-}
-menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {
-    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli
-    initrd /${INITRD:-live/initrd.img}
-}
-EOF_GRUB
+            {
+              echo 'set default=0'
+              echo 'set timeout=5'
+              echo 'menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / VirtualBox / PC)" {'
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash"
+              echo "    initrd /${INITRD:-live/initrd.img}"
+              echo '}'
+              echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {'
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash nomodeset"
+              echo "    initrd /${INITRD:-live/initrd.img}"
+              echo '}'
+              echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {'
+              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components quiet splash system_mode=cli"
+              echo "    initrd /${INITRD:-live/initrd.img}"
+              echo '}'
+            } | sudo tee binary/boot/grub/grub.cfg >/dev/null
           fi
           if sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ -- -volid "DZULUX_DESKTOP"; then
             sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso

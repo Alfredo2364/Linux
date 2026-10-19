@@ -46,35 +46,31 @@ jobs:
             cat config.log
             exit 1
           fi
-          if ! sudo lb build 2>&1 | tee build.log; then
-            echo "--- BUILD FAILED. LAST 120 LINES OF LOG OUTPUT: ---"
+          sudo lb build 2>&1 | tee build.log || true
+          if [ ! -f binary/live/filesystem.squashfs ]; then
+            echo "--- BUILD FAILED (No se generó filesystem.squashfs). LAST 120 LINES OF LOG OUTPUT: ---"
             tail -n 120 build.log
             exit 1
           fi
-          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
+          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus y Máquinas Virtuales..."
           sudo mkdir -p binary/boot/grub
-          if [ ! -f binary/boot/grub/grub.cfg ]; then
-            VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
-            INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
-            {
-              echo 'set default=0'
-              echo 'set timeout=5'
-              echo 'menuentry "Dzulux Linux 2.0 Server (Live CLI)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
-              echo "    initrd /${INITRD:-live/initrd.img}"
-              echo '}'
-              echo 'menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux nomodeset system_mode=cli"
-              echo "    initrd /${INITRD:-live/initrd.img}"
-              echo '}'
-            } | sudo tee binary/boot/grub/grub.cfg >/dev/null
-          fi
-          if sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ -- -volid "DZULUX_SERVER"; then
-            sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso
-          else
-            echo "grub-mkrescue falló, renombrando ISO original..."
-            for iso in *.iso; do [ -f "$iso" ] && sudo mv "$iso" dzulux-server-hybrid.iso && break; done
-          fi
+          VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
+          INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
+          {
+            echo 'set default=0'
+            echo 'set timeout=5'
+            echo 'menuentry "Dzulux Linux 2.0 Server (Live CLI)" {'
+            echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
+            echo "    initrd /${INITRD:-live/initrd.img}"
+            echo '}'
+            echo 'menuentry "Dzulux Linux 2.0 Server (Modo Seguro / Gráficos Básicos)" {'
+            echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux nomodeset system_mode=cli"
+            echo "    initrd /${INITRD:-live/initrd.img}"
+            echo '}'
+          } | sudo tee binary/boot/grub/grub.cfg >/dev/null
+          sudo rm -f *.iso
+          sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ -- -volid "DZULUX_SERVER"
+          ls -lh dzulux-server-hybrid.iso
 
       - name: Guardar ISO Generada y Logs
         if: always()
@@ -119,39 +115,35 @@ jobs:
             cat config.log
             exit 1
           fi
-          if ! sudo lb build 2>&1 | tee build.log; then
-            echo "--- BUILD FAILED. LAST 120 LINES OF LOG OUTPUT: ---"
+          sudo lb build 2>&1 | tee build.log || true
+          if [ ! -f binary/live/filesystem.squashfs ]; then
+            echo "--- BUILD FAILED (No se generó filesystem.squashfs). LAST 120 LINES OF LOG OUTPUT: ---"
             tail -n 120 build.log
             exit 1
           fi
-          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus..."
+          echo "Generando ISO híbrida con grub-mkrescue para máxima compatibilidad con Rufus y Máquinas Virtuales..."
           sudo mkdir -p binary/boot/grub
-          if [ ! -f binary/boot/grub/grub.cfg ]; then
-            VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
-            INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
-            {
-              echo 'set default=0'
-              echo 'set timeout=5'
-              echo 'menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / VirtualBox / PC)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash"
-              echo "    initrd /${INITRD:-live/initrd.img}"
-              echo '}'
-              echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash nomodeset"
-              echo "    initrd /${INITRD:-live/initrd.img}"
-              echo '}'
-              echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {'
-              echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
-              echo "    initrd /${INITRD:-live/initrd.img}"
-              echo '}'
-            } | sudo tee binary/boot/grub/grub.cfg >/dev/null
-          fi
-          if sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ -- -volid "DZULUX_DESKTOP"; then
-            sudo rm -f live-image-amd64.iso live-image-amd64.hybrid.iso
-          else
-            echo "grub-mkrescue falló, renombrando ISO original..."
-            for iso in *.iso; do [ -f "$iso" ] && sudo mv "$iso" dzulux-desktop-hybrid.iso && break; done
-          fi
+          VMLINUZ=$(cd binary && ls live/vmlinuz* 2>/dev/null | head -n1)
+          INITRD=$(cd binary && ls live/initrd* 2>/dev/null | head -n1)
+          {
+            echo 'set default=0'
+            echo 'set timeout=5'
+            echo 'menuentry "Dzulux Linux 2.0 Desktop (Live XFCE GUI - Acelerado / VMware / VirtualBox / PC)" {'
+            echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash"
+            echo "    initrd /${INITRD:-live/initrd.img}"
+            echo '}'
+            echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Seguro Gráficos - nomodeset)" {'
+            echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash nomodeset"
+            echo "    initrd /${INITRD:-live/initrd.img}"
+            echo '}'
+            echo 'menuentry "Dzulux Linux 2.0 Desktop (Modo Terminal / CLI)" {'
+            echo "    linux /${VMLINUZ:-live/vmlinuz} boot=live components username=dzulux hostname=dzulux quiet splash system_mode=cli"
+            echo "    initrd /${INITRD:-live/initrd.img}"
+            echo '}'
+          } | sudo tee binary/boot/grub/grub.cfg >/dev/null
+          sudo rm -f *.iso
+          sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ -- -volid "DZULUX_DESKTOP"
+          ls -lh dzulux-desktop-hybrid.iso
 
       - name: Guardar ISO Generada y Logs
         if: always()

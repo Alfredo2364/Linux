@@ -75,6 +75,8 @@ jobs:
             echo "    initrd /${INITRD:-live/initrd.img}"
             echo '}'
           } | sudo tee binary/boot/grub/grub.cfg >/dev/null
+          sudo mkdir -p binary/.disk
+          echo "Dzulux Linux 2.0 Server (Beta) - amd64 LIVE" | sudo tee binary/.disk/info >/dev/null
           sudo rm -f *.iso
           sudo grub-mkrescue -o dzulux-server-hybrid.iso binary/ -- -volid "DZULUX_SERVER"
           ls -lh dzulux-server-hybrid.iso
@@ -85,7 +87,7 @@ jobs:
         with:
           name: dzulux-server-artifacts
           path: |
-            dzulux-server-build/*.iso
+            dzulux-server-build/dzulux-server-hybrid.iso
             dzulux-server-build/build.log
           retention-days: 7
 
@@ -155,6 +157,8 @@ jobs:
             echo "    initrd /${INITRD:-live/initrd.img}"
             echo '}'
           } | sudo tee binary/boot/grub/grub.cfg >/dev/null
+          sudo mkdir -p binary/.disk
+          echo "Dzulux Linux 2.0 Desktop (Beta) - amd64 LIVE" | sudo tee binary/.disk/info >/dev/null
           sudo rm -f *.iso
           sudo grub-mkrescue -o dzulux-desktop-hybrid.iso binary/ -- -volid "DZULUX_DESKTOP"
           ls -lh dzulux-desktop-hybrid.iso
@@ -165,7 +169,7 @@ jobs:
         with:
           name: dzulux-desktop-artifacts
           path: |
-            dzulux-desktop-build/*.iso
+            dzulux-desktop-build/dzulux-desktop-hybrid.iso
             dzulux-desktop-build/build.log
           retention-days: 7
 

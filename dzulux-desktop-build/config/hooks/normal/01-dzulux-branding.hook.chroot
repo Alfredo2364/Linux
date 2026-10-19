@@ -151,5 +151,10 @@ EOF
 mkdir -p /etc/systemd/system/multi-user.target.wants
 ln -sf /etc/systemd/system/dzulux-live-init.service /etc/systemd/system/multi-user.target.wants/dzulux-live-init.service || true
 
+# 8. Blindar initramfs para que por defecto arranque en modo Live (incluso si VirtualBox Unattended modifica grub.cfg)
+mkdir -p /etc/initramfs-tools/conf.d
+echo "export BOOT=live" > /etc/initramfs-tools/conf.d/dzulux-live.conf
+update-initramfs -u -k all 2>/dev/null || true
+
 echo "Dzulux Desktop 2.0 Branding & Menu Hook Completado"
 exit 0

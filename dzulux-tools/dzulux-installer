@@ -345,6 +345,7 @@ Presiona ACEPTAR para comenzar la preparación y copia de archivos." 16 74
     rm -f /mnt/etc/lightdm/lightdm.conf.d/autologin-dzulux.conf 2>/dev/null || true
     rm -f /mnt/etc/systemd/system/dzulux-live-init.service 2>/dev/null || true
     rm -f /mnt/etc/systemd/system/multi-user.target.wants/dzulux-live-init.service 2>/dev/null || true
+    rm -f /mnt/etc/initramfs-tools/conf.d/dzulux-live.conf 2>/dev/null || true
     sed -i '/liveuser/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
     sed -i '/^ubuntu:/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true
     sed -i '/^dzulux:/d' /mnt/etc/passwd /mnt/etc/shadow /mnt/etc/group /mnt/etc/gshadow 2>/dev/null || true

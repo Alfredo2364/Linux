@@ -53,20 +53,20 @@ chmod 440 /etc/sudoers.d/* 2>/dev/null || true
 
 # Si se detectó hardware de laptop (batería), habilitar TLP
 if [ -d /sys/class/power_supply ] && ls /sys/class/power_supply/BAT* 1>/dev/null 2>&1; then
-    systemctl start tlp.service 2>/dev/null || true
+    systemctl --no-block start tlp.service 2>/dev/null || true
 fi
 
 # Iniciar gestor de redes
-systemctl start NetworkManager.service 2>/dev/null || true
+systemctl --no-block start NetworkManager.service 2>/dev/null || true
 
 # Iniciar Bluetooth si se detecta adaptador inalámbrico
 if command -v rfkill >/dev/null 2>&1 && rfkill list bluetooth 2>/dev/null | grep -q "bluetooth"; then
-    systemctl start bluetooth.service 2>/dev/null || true
+    systemctl --no-block start bluetooth.service 2>/dev/null || true
 fi
 
 # Si se seleccionó Modo CLI en el arranque de GRUB, desactivar LightDM y aislar multi-user.target
 if grep -q "system_mode=cli" /proc/cmdline; then
-    systemctl stop lightdm.service display-manager.service 2>/dev/null || true
     systemctl mask lightdm.service display-manager.service 2>/dev/null || true
-    systemctl isolate multi-user.target 2>/dev/null || true
+    systemctl --no-block stop lightdm.service display-manager.service 2>/dev/null || true
+    systemctl set-default multi-user.target 2>/dev/null || true
 fi

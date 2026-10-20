@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # dzulux-battery - Gestor Inteligente de Ahorro de Batería con Wi-Fi Configurable
-# Dzulux Linux - Diseñado por Alfredo Dzul
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
 # ==============================================================================
 
 set -euo pipefail
@@ -22,32 +22,35 @@ else
 fi
 
 main_menu() {
-    if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux Battery - Ahorro de Batería (Alfredo Dzul)" --menu \
+    while true; do
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Battery - Ahorro de Batería (Alfredo Dzul)" --menu \
 "Selecciona un perfil de energía adaptado a tus necesidades:" 18 72 5 \
 "1" "📶 Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)" \
 "2" "🚨 Modo Emergencia Extrema (Offline, Brillo al 15%, Ultra ahorro)" \
 "3" "⚙️ Configuración Personalizada (Elegir qué componentes desactivar)" \
 "4" "⚡ Restaurar Modo Normal / Alto Rendimiento" \
 "5" "🚪 Salir" 3>&1 1>&2 2>&3 || echo "5")
-    else
-        clear
-        echo -e "${CYAN}${BOLD}=== DZULUX BATTERY - GESTOR DE ENERGÍA ===${NC}"
-        echo -e "Diseñado por Alfredo Dzul\n"
-        echo "1) Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)"
-        echo "2) Modo Emergencia Extrema (Offline, Brillo 15%)"
-        echo "3) Configuración Personalizada"
-        echo "4) Restaurar Modo Normal"
-        read -p "Elige una opción (1-4): " CHOICE
-    fi
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX BATTERY - GESTOR DE ENERGÍA ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo "1) Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)"
+            echo "2) Modo Emergencia Extrema (Offline, Brillo 15%)"
+            echo "3) Configuración Personalizada"
+            echo "4) Restaurar Modo Normal"
+            echo "5) Salir"
+            read -p "Elige una opción (1-5): " CHOICE
+        fi
 
-    case "$CHOICE" in
-        1) apply_productive ;;
-        2) apply_extreme ;;
-        3) apply_custom ;;
-        4) apply_normal ;;
-        *) exit 0 ;;
-    esac
+        case "$CHOICE" in
+            1) apply_productive ;;
+            2) apply_extreme ;;
+            3) apply_custom ;;
+            4) apply_normal ;;
+            5|*) exit 0 ;;
+        esac
+    done
 }
 
 apply_productive() {
@@ -61,7 +64,7 @@ apply_productive() {
 
     # Brillo de pantalla al 40%
     if command -v brightnessctl >/dev/null 2>&1; then
-        brightnessctl set 40% >/dev/null 2>&1 || true
+        sudo brightnessctl set 40% >/dev/null 2>&1 || true
         echo -e "  * ${GREEN}✓ Brillo de pantalla ajustado al 40%.${NC}"
     fi
 
@@ -73,7 +76,6 @@ apply_productive() {
 
     echo -e "\n${GREEN}${BOLD}¡Modo Productivo activo! Hasta 35% más de duración sin perder internet.${NC}"
     read -p "Presiona ENTER para volver..." _
-    main_menu
 }
 
 apply_extreme() {
@@ -85,7 +87,7 @@ apply_extreme() {
     echo -e "  * ${YELLOW}✓ Todas las antenas inalámbricas apagadas.${NC}"
 
     if command -v brightnessctl >/dev/null 2>&1; then
-        brightnessctl set 15% >/dev/null 2>&1 || true
+        sudo brightnessctl set 15% >/dev/null 2>&1 || true
         echo -e "  * ${YELLOW}✓ Brillo al 15%.${NC}"
     fi
 
@@ -99,24 +101,56 @@ apply_extreme() {
 
     echo -e "\n${YELLOW}${BOLD}¡Modo Emergencia activo! Máxima duración para guardar tu trabajo local.${NC}"
     read -p "Presiona ENTER para volver..." _
-    main_menu
 }
 
 apply_custom() {
     if [ -n "$UI" ]; then
         OPTS=$($UI --title "Ajustes Personalizados de Batería" --checklist \
-"Marca con ESPACIO las opciones que deseas aplicar:" 16 70 4 \
-"WIFI" "Mantener Wi-Fi encendido" ON \
+"Marca con ESPACIO las opciones que deseas aplicar (Presiona Cancelar para no alterar nada):" 16 74 4 \
+"WIFI" "Mantener Wi-Fi encendido (desmarcar para apagar)" ON \
 "BT" "Apagar Bluetooth" ON \
 "BRIGHT" "Reducir brillo al 35%" ON \
-"TLP" "Activar ahorro TLP en procesador" ON 3>&1 1>&2 2>&3)
+"TLP" "Activar ahorro TLP en procesador" ON 3>&1 1>&2 2>&3 || echo "CANCEL")
         
-        if echo "$OPTS" | grep -q "BT"; then sudo rfkill block bluetooth 2>/dev/null || true; fi
-        if ! echo "$OPTS" | grep -q "WIFI"; then sudo rfkill block wifi 2>/dev/null || true; fi
-        if echo "$OPTS" | grep -q "BRIGHT" && command -v brightnessctl >/dev/null 2>&1; then brightnessctl set 35% >/dev/null 2>&1 || true; fi
-        if echo "$OPTS" | grep -q "TLP" && command -v tlp >/dev/null 2>&1; then sudo tlp bat >/dev/null 2>&1 || true; fi
+        if [ "$OPTS" = "CANCEL" ] || [ -z "$OPTS" ]; then
+            return
+        fi
+
+        if echo "$OPTS" | grep -q "BT"; then 
+            sudo rfkill block bluetooth 2>/dev/null || true
+        else
+            sudo rfkill unblock bluetooth 2>/dev/null || true
+        fi
+
+        if echo "$OPTS" | grep -q "WIFI"; then 
+            sudo rfkill unblock wifi 2>/dev/null || true
+        else 
+            sudo rfkill block wifi 2>/dev/null || true
+        fi
+
+        if echo "$OPTS" | grep -q "BRIGHT" && command -v brightnessctl >/dev/null 2>&1; then 
+            sudo brightnessctl set 35% >/dev/null 2>&1 || true
+        fi
+
+        if echo "$OPTS" | grep -q "TLP" && command -v tlp >/dev/null 2>&1; then 
+            sudo tlp bat >/dev/null 2>&1 || true
+        fi
+        
+        $UI --title "Configuración Aplicada" --msgbox "Se aplicaron los ajustes seleccionados." 8 60 || true
+    else
+        clear
+        echo "Ajustes personalizados:"
+        read -p "¿Deseas mantener Wi-Fi encendido? [S/n]: " ASK_WIFI
+        read -p "¿Deseas apagar Bluetooth? [S/n]: " ASK_BT
+        read -p "¿Deseas reducir brillo al 35%? [S/n]: " ASK_BRIGHT
+        read -p "¿Deseas activar ahorro TLP? [S/n]: " ASK_TLP
+
+        if [[ "$ASK_WIFI" =~ ^[Nn]$ ]]; then sudo rfkill block wifi 2>/dev/null || true; else sudo rfkill unblock wifi 2>/dev/null || true; fi
+        if [[ ! "$ASK_BT" =~ ^[Nn]$ ]]; then sudo rfkill block bluetooth 2>/dev/null || true; fi
+        if [[ ! "$ASK_BRIGHT" =~ ^[Nn]$ ]] && command -v brightnessctl >/dev/null 2>&1; then sudo brightnessctl set 35% >/dev/null 2>&1 || true; fi
+        if [[ ! "$ASK_TLP" =~ ^[Nn]$ ]] && command -v tlp >/dev/null 2>&1; then sudo tlp bat >/dev/null 2>&1 || true; fi
+        read -p "Presiona ENTER para volver..." _
     fi
-    main_menu
 }
 
 apply_normal() {
@@ -124,12 +158,15 @@ apply_normal() {
     echo -e "${CYAN}Restaurando modo normal de energía...${NC}"
     sudo rfkill unblock wifi 2>/dev/null || true
     sudo rfkill unblock bluetooth 2>/dev/null || true
-    if command -v brightnessctl >/dev/null 2>&1; then brightnessctl set 80% >/dev/null 2>&1 || true; fi
-    if command -v tlp >/dev/null 2>&1; then sudo tlp ac >/dev/null 2>&1 || true; fi
+    if command -v brightnessctl >/dev/null 2>&1; then 
+        sudo brightnessctl set 80% >/dev/null 2>&1 || true
+    fi
+    if command -v tlp >/dev/null 2>&1; then 
+        sudo tlp ac >/dev/null 2>&1 || true
+    fi
     xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
     echo -e "${GREEN}✓ Rendimiento normal y todas las conexiones habilitadas.${NC}"
     read -p "Presiona ENTER para volver..." _
-    main_menu
 }
 
 main_menu

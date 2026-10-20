@@ -58,15 +58,10 @@ crear_snapshot_seguridad() {
     fi
 }
 
-actualizar_suite() {
-    banner
-    verificar_root
-    verificar_internet
-    crear_snapshot_seguridad
+do_update_suite() {
+    echo -e "${YELLOW}==> Sincronizando scripts oficiales de Dzulux 2.0 desde GitHub (${REPO_BRANCH})...${NC}\n"
 
-    echo -e "${YELLOW}==> Sincronizando scripts oficiales de Dzulux 2.0 desde GitHub (${REPO_BRANCH})...${NC}"
-    echo ""
-
+    # dzulux-update va al final para evitar problemas de offset de lectura en bash al auto-actualizarse
     SCRIPTS=(
         "dzulux-installer"
         "dzulux-drivers"
@@ -82,11 +77,11 @@ actualizar_suite() {
         "dzulux-stealth"
         "dzulux-looks"
         "dzulux-performance"
-        "dzulux-update"
         "switch-mode"
         "hw-detect"
         "dzulux-welcome"
         "dzulux-live-init"
+        "dzulux-update"
     )
 
     for script in "${SCRIPTS[@]}"; do
@@ -102,19 +97,22 @@ actualizar_suite() {
             echo -e " [ ${YELLOW}OMITIDO/LOCAL${NC} ]"
         fi
     done
-
-    echo ""
-    echo -e "${GREEN}${BOLD}¡La Suite Dzulux Linux 2.0 se ha actualizado exitosamente a la última versión!${NC}"
-    echo "Todas las nuevas herramientas, mejoras y parches ya están instalados y listos para usar."
-    read -p "Presiona ENTER para volver al menú..."
 }
 
-actualizar_seguridad_ubuntu() {
+actualizar_suite() {
     banner
     verificar_root
     verificar_internet
     crear_snapshot_seguridad
+    do_update_suite
 
+    echo ""
+    echo -e "${GREEN}${BOLD}¡La Suite Dzulux Linux 2.0 se ha actualizado exitosamente a la última versión!${NC}"
+    echo "Todas las nuevas herramientas, mejoras y parches ya están instalados y listos para usar."
+    read -p "Presiona ENTER para volver al menú..." _
+}
+
+do_update_ubuntu_security() {
     echo -e "${CYAN}==> Verificando canales oficiales de seguridad de Ubuntu 24.04 LTS (noble-security / noble-updates)...${NC}"
     if ! grep -q "noble-security" /etc/apt/sources.list 2>/dev/null; then
         cat <<'EOF' > /etc/apt/sources.list
@@ -145,10 +143,18 @@ EOF
         sed -i 's/^NAME=.*/NAME="Dzulux Linux"/' /usr/lib/os-release
         sed -i 's/^ID=.*/ID=dzulux/' /usr/lib/os-release
     fi
+}
+
+actualizar_seguridad_ubuntu() {
+    banner
+    verificar_root
+    verificar_internet
+    crear_snapshot_seguridad
+    do_update_ubuntu_security
 
     echo ""
     echo -e "${GREEN}${BOLD}✓ ¡Parches de seguridad de Ubuntu LTS aplicados y protección automática (unattended-upgrades) activa!${NC}"
-    read -p "Presiona ENTER para continuar..."
+    read -p "Presiona ENTER para continuar..." _
 }
 
 actualizar_sistema_completo() {
@@ -157,25 +163,26 @@ actualizar_sistema_completo() {
     verificar_internet
     crear_snapshot_seguridad
 
-    echo -e "${YELLOW}==> 1. Actualizando la Suite Dzulux 2.0 desde GitHub...${NC}"
-    actualizar_suite
+    echo -e "\n${YELLOW}==> [Paso 1/2] Actualizando la Suite Dzulux 2.0 desde GitHub...${NC}"
+    do_update_suite
+
+    echo -e "\n${YELLOW}==> [Paso 2/2] Sincronizando parches de seguridad y paquetes de Ubuntu LTS...${NC}"
+    do_update_ubuntu_security
+    apt-get autoremove -y >/dev/null 2>&1 || true
 
     echo ""
-    echo -e "${YELLOW}==> 2. Sincronizando parches de seguridad y paquetes del sistema (Ubuntu LTS)...${NC}"
-    actualizar_seguridad_ubuntu
-    apt-get autoremove -y
-
-    echo ""
-    echo -e "${GREEN}${BOLD}¡Actualización completa del sistema finalizada con éxito!${NC}"
-    read -p "Presiona ENTER para continuar..."
+    echo -e "${GREEN}${BOLD}==================================================================${NC}"
+    echo -e "${GREEN}${BOLD}    ¡Actualización completa del sistema finalizada con éxito!     ${NC}"
+    echo -e "${GREEN}${BOLD}==================================================================${NC}"
+    echo "Tu sistema cuenta con las últimas herramientas de Dzulux y los parches de seguridad de Ubuntu al día."
+    read -p "Presiona ENTER para continuar..." _
 }
 
 comprobar_version_iso() {
     banner
     verificar_internet
 
-    echo -e "${CYAN}Consultando últimas publicaciones en GitHub Releases...${NC}"
-    echo ""
+    echo -e "${CYAN}Consultando últimas publicaciones en GitHub Releases...${NC}\n"
 
     LOCAL_VER=$(grep "^VERSION=" /etc/os-release 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "2.0 (Beta)")
     LATEST_JSON=$(curl -s "$API_URL" || true)
@@ -190,8 +197,7 @@ comprobar_version_iso() {
     fi
 
     echo -e "Versión instalada actualmente: ${BOLD}${LOCAL_VER}${NC}"
-    echo -e "Última versión en GitHub:      ${GREEN}${BOLD}${LATEST_TAG} (${LATEST_NAME})${NC}"
-    echo ""
+    echo -e "Última versión en GitHub:      ${GREEN}${BOLD}${LATEST_TAG} (${LATEST_NAME})${NC}\n"
 
     DESKTOP_ISO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${LATEST_TAG}/dzulux-desktop-hybrid.iso"
     SERVER_ISO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${LATEST_TAG}/dzulux-server-hybrid.iso"
@@ -203,26 +209,34 @@ comprobar_version_iso() {
     echo ""
     read -p "Selecciona una opción [1-3]: " opt_iso
 
-    TARGET_DIR="$HOME/Descargas"
-    [ -d "$TARGET_DIR" ] || TARGET_DIR="$HOME/Downloads"
+    TARGET_USER="${SUDO_USER:-$USER}"
+    TARGET_HOME="$HOME"
+    if [ -n "$TARGET_USER" ] && [ -d "/home/$TARGET_USER" ]; then
+        TARGET_HOME="/home/$TARGET_USER"
+    fi
+    TARGET_DIR="$TARGET_HOME/Descargas"
+    [ -d "$TARGET_DIR" ] || TARGET_DIR="$TARGET_HOME/Downloads"
     mkdir -p "$TARGET_DIR"
+    chown "$TARGET_USER:$TARGET_USER" "$TARGET_DIR" 2>/dev/null || true
 
     case "$opt_iso" in
         1)
             echo -e "${YELLOW}Descargando Dzulux Desktop ISO en ${TARGET_DIR}...${NC}"
             wget -c "$DESKTOP_ISO_URL" -P "$TARGET_DIR"
+            chown "$TARGET_USER:$TARGET_USER" "$TARGET_DIR/"*.iso 2>/dev/null || true
             echo -e "${GREEN}✓ Descarga completada en: ${TARGET_DIR}${NC}"
             ;;
         2)
             echo -e "${YELLOW}Descargando Dzulux Server ISO en ${TARGET_DIR}...${NC}"
             wget -c "$SERVER_ISO_URL" -P "$TARGET_DIR"
+            chown "$TARGET_USER:$TARGET_USER" "$TARGET_DIR/"*.iso 2>/dev/null || true
             echo -e "${GREEN}✓ Descarga completada en: ${TARGET_DIR}${NC}"
             ;;
         *)
             return
             ;;
     esac
-    read -p "Presiona ENTER para continuar..."
+    read -p "Presiona ENTER para continuar..." _
 }
 
 menu_principal() {
@@ -247,7 +261,7 @@ menu_principal() {
             5) 
                 verificar_root
                 crear_snapshot_seguridad
-                read -p "Presiona ENTER para continuar..."
+                read -p "Presiona ENTER para continuar..." _
                 ;;
             6) 
                 echo "¡Hasta pronto!"
@@ -261,7 +275,6 @@ menu_principal() {
     done
 }
 
-# Si se pasa el argumento --auto o --quick, actualiza directamente la suite
 if [ "${1:-}" == "--quick" ] || [ "${1:-}" == "-q" ] || [ "${1:-}" == "--auto" ]; then
     actualizar_suite
     exit 0

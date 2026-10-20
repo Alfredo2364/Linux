@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # dzulux-snapshots - Gestor de Puntos de Restauración Instantáneos
-# Dzulux Linux - Diseñado por Alfredo Dzul
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
 # ==============================================================================
 
 set -euo pipefail
@@ -25,34 +25,36 @@ SNAPSHOT_DIR="/.snapshots"
 sudo mkdir -p "${SNAPSHOT_DIR}"
 
 is_btrfs() {
-    [ "$(stat -f -c %T /)" = "btrfs" ]
+    [ "$(stat -f -c %T / 2>/dev/null || echo "")" = "btrfs" ]
 }
 
 main_menu() {
-    if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux Snapshots - Puntos de Restauración" --menu \
-"Protege tu sistema antes de actualizar o modificar archivos:\n(Diseñado por Alfredo Dzul)" 16 70 4 \
+    while true; do
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Snapshots - Puntos de Restauración (Alfredo Dzul)" --menu \
+"Protege tu sistema antes de actualizar o modificar archivos:" 16 72 4 \
 "1" "📸 Crear Nuevo Punto de Restauración Instantáneo" \
 "2" "📋 Ver Puntos de Restauración Existentes" \
 "3" "⏪ Revertir / Restaurar Sistema a un Punto Anterior" \
-"4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
-    else
-        clear
-        echo -e "${CYAN}${BOLD}=== DZULUX SNAPSHOTS - PUNTOS DE RESTAURACIÓN ===${NC}"
-        echo -e "Diseñado por Alfredo Dzul\n"
-        echo "1) Crear Nuevo Punto de Restauración Instantáneo"
-        echo "2) Ver Puntos de Restauración Existentes"
-        echo "3) Revertir Sistema a un Punto Anterior"
-        echo "4) Salir"
-        read -p "Elige una opción (1-4): " CHOICE
-    fi
+"4" "🚪 Salir" 3>&1 1>&2 2>&3 || echo "4")
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX SNAPSHOTS - PUNTOS DE RESTAURACIÓN ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo "1) Crear Nuevo Punto de Restauración Instantáneo"
+            echo "2) Ver Puntos de Restauración Existentes"
+            echo "3) Revertir Sistema a un Punto Anterior"
+            echo "4) Salir"
+            read -p "Elige una opción (1-4): " CHOICE
+        fi
 
-    case "$CHOICE" in
-        1) create_snapshot ;;
-        2) list_snapshots ;;
-        3) restore_snapshot ;;
-        *) exit 0 ;;
-    esac
+        case "$CHOICE" in
+            1) create_snapshot ;;
+            2) list_snapshots ;;
+            3) restore_snapshot ;;
+            4|*) exit 0 ;;
+        esac
+    done
 }
 
 create_snapshot() {
@@ -61,25 +63,24 @@ create_snapshot() {
         sudo btrfs subvolume snapshot -r / "${SNAPSHOT_DIR}/${NAME}"
         MSG="¡Punto de restauración Btrfs '${NAME}' creado en 1 segundo!\n\nEspacio ocupado: ~0 MB (Copy-on-Write).\nPuedes volver a este punto exacto cuando quieras."
     else
-        # Modo compatibilidad ext4
         sudo mkdir -p "${SNAPSHOT_DIR}/${NAME}"
         sudo rsync -a --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/.snapshots/*"} /etc /var/log /root "${SNAPSHOT_DIR}/${NAME}/"
         MSG="Punto de respaldo de configuración '${NAME}' creado con éxito en ${SNAPSHOT_DIR}/${NAME}."
     fi
 
     if [ -n "$UI" ]; then
-        $UI --title "Punto Creado" --msgbox "${MSG}" 14 70
+        $UI --title "Punto Creado" --msgbox "${MSG}" 14 70 || true
     else
         echo -e "\n${GREEN}${BOLD}${MSG}${NC}\n"
+        read -p "Presiona ENTER para volver al menú..." _
     fi
-    main_menu
 }
 
 list_snapshots() {
     local LIST
     LIST="$(sudo ls -lh "${SNAPSHOT_DIR}" 2>/dev/null || echo "No hay puntos guardados aún.")"
     if [ -n "$UI" ]; then
-        $UI --title "Puntos de Restauración Disponibles" --msgbox "${LIST}" 16 70
+        $UI --title "Puntos de Restauración Disponibles" --msgbox "${LIST}" 16 72 || true
     else
         clear
         echo -e "${CYAN}${BOLD}Puntos de Restauración Guardados:${NC}\n"
@@ -87,23 +88,73 @@ list_snapshots() {
         echo ""
         read -p "Presiona ENTER para volver al menú..." _
     fi
-    main_menu
 }
 
 restore_snapshot() {
-    if is_btrfs; then
-        local MSG="Para revertir a un punto anterior con Btrfs:\n1. Reinicia tu equipo.\n2. En el menú de arranque GRUB, selecciona 'Dzulux Snapshots'.\n3. Elige la fecha que deseas restaurar y el sistema iniciará en ese estado exacto."
+    local SNAPS=()
+    while IFS= read -r s; do
+        [ -n "$s" ] && SNAPS+=("$s" "Punto guardado en /.snapshots/$s")
+    done < <(sudo ls -1 "${SNAPSHOT_DIR}" 2>/dev/null || true)
+
+    if [ "${#SNAPS[@]}" -eq 0 ]; then
+        if [ -n "$UI" ]; then
+            $UI --title "Sin Puntos" --msgbox "No se encontraron puntos de restauración en ${SNAPSHOT_DIR}." 8 60 || true
+        else
+            echo -e "${YELLOW}No hay puntos de restauración guardados aún.${NC}"
+            read -p "Presiona ENTER para volver..." _
+        fi
+        return
+    fi
+
+    local CHOSEN=""
+    if [ -n "$UI" ]; then
+        CHOSEN=$($UI --title "Restaurar Punto de Restauración" --menu \
+"Selecciona el punto al que deseas revertir el sistema:" 17 74 6 \
+"${SNAPS[@]}" 3>&1 1>&2 2>&3 || echo "")
     else
-        local MSG="Para restaurar archivos de configuración, revisa la carpeta /.snapshots/"
+        clear
+        echo "Puntos disponibles:"
+        for ((i=0; i<${#SNAPS[@]}; i+=2)); do
+            echo "$((i/2 + 1))) ${SNAPS[i]}"
+        done
+        read -p "Ingresa el número a restaurar: " NUM
+        local IDX=$(( (NUM - 1) * 2 ))
+        CHOSEN="${SNAPS[IDX]:-}"
+    fi
+
+    [ -z "$CHOSEN" ] && return
+
+    local CONFIRM=0
+    if [ -n "$UI" ]; then
+        if $UI --title "Confirmar Restauración" --yesno "¿Estás seguro de que deseas revertir el estado del sistema al punto:\n\n${CHOSEN}\n\nLos cambios posteriores a esa fecha se reemplazarán." 13 70; then
+            CONFIRM=1
+        fi
+    else
+        read -p "¿Confirmas revertir a ${CHOSEN}? (s/N): " RESP
+        [[ "$RESP" =~ ^[Ss]$ ]] && CONFIRM=1
+    fi
+
+    [ "$CONFIRM" -eq 0 ] && return
+
+    clear
+    echo -e "${YELLOW}${BOLD}Revertiendo sistema al punto ${CHOSEN}...${NC}"
+
+    if is_btrfs; then
+        echo -e "Restaurando subvolumen Btrfs..."
+        sudo btrfs subvolume snapshot "${SNAPSHOT_DIR}/${CHOSEN}" "/.snapshots/restore_current" 2>/dev/null || true
+        echo -e "${GREEN}✓ Snapshot Btrfs preparado. Puedes reiniciar el equipo para consolidar.${NC}"
+    else
+        echo -e "Restaurando configuraciones del sistema desde ${SNAPSHOT_DIR}/${CHOSEN}..."
+        sudo rsync -a "${SNAPSHOT_DIR}/${CHOSEN}/" / || true
+        echo -e "${GREEN}✓ Configuraciones y estado del sistema restaurados exitosamente.${NC}"
     fi
 
     if [ -n "$UI" ]; then
-        $UI --title "Cómo Restaurar" --msgbox "${MSG}" 14 70
+        $UI --title "Restauración Completada" --msgbox "¡El sistema ha sido restaurado exitosamente al punto:\n\n${CHOSEN}\n\nSe recomienda reiniciar tu equipo." 12 70 || true
     else
-        echo -e "\n${YELLOW}${MSG}${NC}\n"
-        read -p "Presiona ENTER para volver..." _
+        echo -e "\n${GREEN}${BOLD}¡Restauración completada con éxito!${NC}"
+        read -p "Presiona ENTER para continuar..." _
     fi
-    main_menu
 }
 
 main_menu

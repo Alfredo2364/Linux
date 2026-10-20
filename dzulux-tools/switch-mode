@@ -45,8 +45,9 @@ case "$ACTION" in
         ;;
     cli)
         echo -e "${YELLOW}Deteniendo Entorno Gráfico y cambiando a Modo Consola / Terminal...${NC}"
-        sudo systemctl stop lightdm
-        sudo systemctl isolate multi-user.target
+        sudo nohup sh -c "sleep 0.5; systemctl stop lightdm; systemctl isolate multi-user.target; systemctl start getty@tty1.service; chvt 1" >/dev/null 2>&1 &
+        echo -e "${GREEN}✓ Conmutando a terminal tty1...${NC}"
+        exit 0
         ;;
     status)
         CURRENT_TARGET="$(systemctl get-default)"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # dzulux-looks - Gestor de Estilos Visuales y Disposición de Escritorio
-# Dzulux Linux - Diseñado por Alfredo Dzul
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
 # ==============================================================================
 
 set -euo pipefail
@@ -20,61 +20,48 @@ else
     UI=""
 fi
 
+FAVORITES_LIST="thunar.desktop,xfce4-terminal.desktop,dzulux-installer.desktop,dzulux-apps.desktop,dzulux-gaming.desktop,dzulux-drivers.desktop,dzulux-looks.desktop,dzulux-rescue.desktop,dzulux-update.desktop"
+
 main_menu() {
-    if [ -n "$UI" ]; then
-        CHOICE=$($UI --title "Dzulux Looks - Personalización Visual (Alfredo Dzul)" --menu \
+    while true; do
+        if [ -n "$UI" ]; then
+            CHOICE=$($UI --title "Dzulux Looks - Personalización Visual (Alfredo Dzul)" --menu \
 "Elige la apariencia y disposición de escritorio que prefieras:" 16 70 4 \
 "1" "🌌 Dzulux Cyberpunk Dark (Panel superior moderno, tema oscuro neón)" \
 "2" "🪟 Estilo Windows 10 (Menú de inicio con buscador, categorías y apps)" \
 "3" "⚡ Modo Minimal Flat (Cero efectos, ultra veloz para laptops modestas)" \
 "4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
-    else
-        clear
-        echo -e "${CYAN}${BOLD}=== DZULUX LOOKS - ESTILOS VISUALES ===${NC}"
-        echo -e "Diseñado por Alfredo Dzul\n"
-        echo "1) Dzulux Cyberpunk Dark (Predeterminado)"
-        echo "2) Estilo Windows 10 (Menú de inicio con buscador y categorías)"
-        echo "3) Modo Minimal Flat (Ultra veloz)"
-        echo "4) Salir"
-        read -p "Elige una opción (1-4): " CHOICE
-    fi
+        else
+            clear
+            echo -e "${CYAN}${BOLD}=== DZULUX LOOKS - ESTILOS VISUALES ===${NC}"
+            echo -e "Diseñado por Alfredo Dzul\n"
+            echo "1) Dzulux Cyberpunk Dark (Predeterminado - Barra Superior)"
+            echo "2) Estilo Windows 10 (Barra Inferior con buscador y categorías)"
+            echo "3) Modo Minimal Flat (Ultra veloz)"
+            echo "4) Salir"
+            read -p "Elige una opción (1-4): " CHOICE
+        fi
 
-    case "$CHOICE" in
-        1) set_cyberpunk ;;
-        2) set_windows_style ;;
-        3) set_minimal_flat ;;
-        *) exit 0 ;;
-    esac
+        case "$CHOICE" in
+            1) set_cyberpunk ;;
+            2) set_windows_style ;;
+            3) set_minimal_flat ;;
+            4|*) exit 0 ;;
+        esac
+    done
 }
 
-set_cyberpunk() {
-    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
-    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
-    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
-    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=6;x=0;y=0" 2>/dev/null || true
-    xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
-    xfce4-panel --restart 2>/dev/null || true
-    show_msg "¡Estilo Dzulux Cyberpunk Dark activado con éxito!"
-}
-
-set_windows_style() {
-    # Mover el panel XFCE a la parte inferior (altura 40px estilo Windows 10)
-    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=8;x=0;y=0" 2>/dev/null || true
-    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 40 2>/dev/null || true
-    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
-    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
-    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
-
-    # Configurar Menú de Inicio estilo Windows 10 (Whisker Menu con buscador y categorías de apps)
+update_whiskermenu() {
+    local SHOW_TITLE="$1"
     mkdir -p "${HOME}/.config/xfce4/panel"
     touch "${HOME}/.config/xfce4/panel/whiskermenu-1.rc"
     for wrc in "${HOME}/.config/xfce4/panel/whiskermenu-"*.rc; do
         if [ -f "$wrc" ]; then
-            cat << 'EOF' > "$wrc"
-favorites=thunar.desktop,xfce4-terminal.desktop,dzulux-apps.desktop,dzulux-gaming.desktop,dzulux-drivers.desktop,dzulux-rescue.desktop,dzulux-installer.desktop
+            cat << EOF > "$wrc"
+favorites=${FAVORITES_LIST}
 button-title=Inicio
 button-icon=org.xfce.panel.whiskermenu
-show-button-title=false
+show-button-title=${SHOW_TITLE}
 show-button-icon=true
 category-icon-size=1
 item-icon-size=2
@@ -88,15 +75,34 @@ show-category-name=true
 EOF
         fi
     done
+}
 
-    # Vincular la tecla Windows / Super para abrir el menú de inicio al instante
+set_cyberpunk() {
+    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=6;x=0;y=0" 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 38 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+    update_whiskermenu "true"
+    xfce4-panel --restart 2>/dev/null || true
+    show_msg "¡Estilo Dzulux Cyberpunk Dark activado!\n• Barra superior de 38px con acentos neón.\n• Compositor y efectos habilitados."
+}
+
+set_windows_style() {
+    xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=8;x=0;y=0" 2>/dev/null || true
+    xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 40 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/theme -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Materia-dark" 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
+
+    update_whiskermenu "false"
+
     xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -n -t string -s "xfce4-popup-whiskermenu" 2>/dev/null || \
     xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -s "xfce4-popup-whiskermenu" 2>/dev/null || true
 
-    # Reiniciar panel para aplicar el cambio visual
     xfce4-panel --restart 2>/dev/null || true
-
-    show_msg "¡Estilo Windows 10 activado!\n\n• Barra de tareas colocada abajo.\n• Menú de inicio tipo Windows 10 con buscador de apps y categorías.\n• Presiona la tecla Windows en tu teclado para abrir el menú en cualquier momento."
+    show_msg "¡Estilo Windows 10 activado!\n\n• Barra de tareas en la parte inferior.\n• Menú de inicio por categorías.\n• Tecla Super / Windows vinculada."
 }
 
 set_minimal_flat() {
@@ -109,12 +115,11 @@ set_minimal_flat() {
 show_msg() {
     local M="$1"
     if [ -n "$UI" ]; then
-        $UI --title "Apariencia Actualizada" --msgbox "${M}" 10 65
+        $UI --title "Apariencia Actualizada" --msgbox "${M}" 11 65 || true
     else
         echo -e "\n${GREEN}${BOLD}✓ ${M}${NC}\n"
         read -p "Presiona ENTER para continuar..." _
     fi
-    main_menu
 }
 
 main_menu

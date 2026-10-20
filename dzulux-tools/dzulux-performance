@@ -121,6 +121,7 @@ apply_office_mode() {
 
     # Descongelar cualquier app que haya quedado pausada
     resume_all_apps
+    sudo rm -f /etc/profile.d/dzulux-gpu-boost.sh 2>/dev/null || true
 
     # CPU Governor: schedutil o conservative (ajuste dinámico suave)
     if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
@@ -163,14 +164,19 @@ apply_game_booster() {
     sudo sync
     echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null 2>&1 || true
 
-    # 3. Forzar tarjeta gráfica de alto rendimiento en laptops híbridas
-    export DRI_PRIME=1
-    export __NV_PRIME_RENDER_OFFLOAD=1
-    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    # 3. Forzar tarjeta gráfica de alto rendimiento de forma persistente
+    sudo mkdir -p /etc/profile.d
+    {
+        echo "export DRI_PRIME=1"
+        if lsmod 2>/dev/null | grep -q "nvidia"; then
+            echo "export __NV_PRIME_RENDER_OFFLOAD=1"
+            echo "export __GLX_VENDOR_LIBRARY_NAME=nvidia"
+        fi
+    } | sudo tee /etc/profile.d/dzulux-gpu-boost.sh >/dev/null
 
     echo -e "  * ${GREEN}✓ Frecuencias de CPU estabilizadas para erradicar micro-tirones (stuttering).${NC}"
     echo -e "  * ${GREEN}✓ Memoria RAM física optimizada.${NC}"
-    echo -e "  * ${GREEN}✓ GPU dedicada seleccionada como primaria.${NC}"
+    echo -e "  * ${GREEN}✓ Perfil de aceleración de GPU configurado (/etc/profile.d/dzulux-gpu-boost.sh).${NC}"
 
     show_alert "Game Booster Activo" "El procesador mantendrá sus frecuencias óptimas estables y la RAM ha sido liberada para que tu juego corra sin tirones."
 }
@@ -192,9 +198,9 @@ apply_gamer_unlimited() {
     # 2. Blindar OBS Studio, Discord y herramientas de streaming
     echo -e "  * Protegiendo procesos críticos de Streaming y Audio..."
     for proc in obs obs64 discord Vesktop spotify; do
-        if pgrep -x "$proc" >/dev/null 2>&1; then
-            # Dar máxima prioridad al codificador y captura
-            sudo renice -n -10 -p $(pgrep -x "$proc") 2>/dev/null || true
+        PIDS=$(pgrep -x "$proc" 2>/dev/null || true)
+        if [ -n "$PIDS" ]; then
+            echo "$PIDS" | xargs -r sudo renice -n -10 >/dev/null 2>&1 || true
             echo -e "    ${GREEN}↳ Proceso '${proc}' blindado contra caídas de cuadros.${NC}"
         fi
     done
@@ -246,8 +252,7 @@ apply_lowspec_mode() {
     echo -e "${GREEN}${BOLD}Activando Perfil de Bajo Consumo y Equipos Modestos...${NC}"
 
     resume_all_apps
-
-    if [ -d /sys/devices/system/cpu/cpu0/cpufreq ]; then
+    sudo rm -f /etc/profile.d/dzulux-gpu-boost.sh 2>/dev/null || true
         for g in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
             echo "powersave" | sudo tee "$g" >/dev/null 2>&1 || true
         done

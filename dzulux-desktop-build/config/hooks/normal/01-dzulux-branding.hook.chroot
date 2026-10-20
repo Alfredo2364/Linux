@@ -54,9 +54,22 @@ systemctl enable zramswap.service 2>/dev/null || true
 # 3. Eliminar motd y avisos legales de Ubuntu
 rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
 
-# 4. Inyectar Dzulux Welcome en terminal (bashrc global)
+# 4. Inyectar Dzulux Welcome en terminal (solo en shells interactivas) y alias/wrapper fastfetch
 if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
-    echo "dzulux-welcome" >> /etc/bash.bashrc
+    cat <<'EOF_BASHRC' >> /etc/bash.bashrc
+if [ -t 1 ] && [ -z "${DZULUX_WELCOME_SHOWN:-}" ]; then
+    export DZULUX_WELCOME_SHOWN=1
+    /usr/local/bin/dzulux-welcome
+fi
+EOF_BASHRC
+fi
+
+if [ ! -f /usr/bin/fastfetch ] && [ ! -f /usr/local/bin/fastfetch ]; then
+    cat <<'EOF_FF' > /usr/local/bin/fastfetch
+#!/usr/bin/env bash
+exec neofetch
+EOF_FF
+    chmod +x /usr/local/bin/fastfetch
 fi
 
 # 5. Asegurar creación del usuario live 'dzulux' y autologin en LightDM
@@ -123,14 +136,34 @@ create_launcher "dzulux-looks"       "Dzulux Looks (Apariencia)"     "Alterna en
 create_launcher "dzulux-update"      "Dzulux Update (Actualizador)"  "Actualiza la Suite Dzulux y paquetes del sistema"   "sudo /usr/local/bin/dzulux-update"      "system-software-update"       "System;Settings;PackageManager;"
 create_launcher "hw-detect"          "Dzulux Auditoría de Hardware"  "Diagnóstico completo de CPU, GPU, Audio y Red"      "/usr/local/bin/hw-detect"               "computer"                     "System;Monitor;"
 
-# Colocar accesos directos clave en el Escritorio por defecto
-mkdir -p /home/dzulux/Desktop
+# Colocar accesos directos clave en el Escritorio por defecto y marcarlos como confiables en XFCE 4.18
+mkdir -p /home/dzulux/Desktop /etc/xdg/autostart
 for desk_item in dzulux-installer dzulux-apps dzulux-gaming dzulux-drivers dzulux-update; do
     cp "/usr/share/applications/${desk_item}.desktop" "/etc/skel/Desktop/${desk_item}.desktop"
     chmod +x "/etc/skel/Desktop/${desk_item}.desktop"
     cp "/usr/share/applications/${desk_item}.desktop" "/home/dzulux/Desktop/${desk_item}.desktop"
     chmod +x "/home/dzulux/Desktop/${desk_item}.desktop"
 done
+
+cat <<'EOF_TRUST' > /usr/local/bin/dzulux-trust-desktop
+#!/usr/bin/env bash
+for f in "$HOME"/Desktop/*.desktop; do
+    [ -f "$f" ] || continue
+    chmod +x "$f" 2>/dev/null || true
+    gio set "$f" metadata::trusted true 2>/dev/null || true
+done
+EOF_TRUST
+chmod +x /usr/local/bin/dzulux-trust-desktop
+
+cat <<'EOF_AUTOSTART' > /etc/xdg/autostart/dzulux-desktop-trust.desktop
+[Desktop Entry]
+Type=Application
+Name=Dzulux Desktop Shortcuts Trust
+Exec=/usr/local/bin/dzulux-trust-desktop
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+EOF_AUTOSTART
 
 # 6b. Asegurar fondo de pantalla oficial Dzulux en todos los monitores de XFCE (VirtualBox, VMware, Laptop, PC)
 if [ -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg ]; then

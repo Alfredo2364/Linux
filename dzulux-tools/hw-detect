@@ -141,3 +141,7 @@ fi
 echo -e "${CYAN}----------------------------------------------------------------${NC}"
 echo -e "Diagnóstico finalizado. Para instalar Dzulux ejecuta: ${GREEN}${BOLD}dzulux-installer${NC}"
 echo -e "${CYAN}================================================================${NC}"
+if [ -t 0 ] && [ -n "${DISPLAY:-}" ]; then
+    echo ""
+    read -r -p "Presiona ENTER para cerrar esta ventana..." _ || true
+fi

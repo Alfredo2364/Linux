@@ -31,9 +31,7 @@ jobs:
           find dzulux-tools dzulux-server-build scripts -type f -exec sed -i 's/\r$//' {} +
           echo "Copiando herramientas maestras al entorno del servidor..."
           mkdir -p dzulux-server-build/config/includes.chroot/usr/local/bin
-          mkdir -p dzulux-server-build/config/includes.chroot/etc/modprobe.d
           cp -r dzulux-tools/* dzulux-server-build/config/includes.chroot/usr/local/bin/
-          cp -f arch-legacy/airootfs/etc/modprobe.d/apple-mac.conf dzulux-server-build/config/includes.chroot/etc/modprobe.d/ 2>/dev/null || true
           chmod +x dzulux-server-build/config/includes.chroot/usr/local/bin/*
           chmod +x dzulux-server-build/config/hooks/normal/*.chroot || true
           
@@ -121,16 +119,10 @@ jobs:
           mkdir -p dzulux-desktop-build/config/includes.chroot/usr/local/bin
           mkdir -p dzulux-desktop-build/config/includes.chroot/usr/share/backgrounds/dzulux
           mkdir -p dzulux-desktop-build/config/includes.chroot/usr/share/pixmaps
-          mkdir -p dzulux-desktop-build/config/includes.chroot/etc/skel/.config
           mkdir -p dzulux-desktop-build/config/includes.chroot/etc/skel/Desktop
-          mkdir -p dzulux-desktop-build/config/includes.chroot/etc/lightdm
-          mkdir -p dzulux-desktop-build/config/includes.chroot/etc/modprobe.d
           cp dzulux-tools/* dzulux-desktop-build/config/includes.chroot/usr/local/bin/
           cp -f artwork/dzulux-wallpaper.svg dzulux-desktop-build/config/includes.chroot/usr/share/backgrounds/dzulux/dzulux-wallpaper.svg
           cp -f artwork/dzulux-logo.svg dzulux-desktop-build/config/includes.chroot/usr/share/pixmaps/dzulux-logo.svg
-          cp -rf arch-legacy/airootfs/etc/skel/.config/xfce4 dzulux-desktop-build/config/includes.chroot/etc/skel/.config/
-          cp -f arch-legacy/airootfs/etc/lightdm/lightdm-gtk-greeter.conf dzulux-desktop-build/config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf
-          cp -f arch-legacy/airootfs/etc/modprobe.d/apple-mac.conf dzulux-desktop-build/config/includes.chroot/etc/modprobe.d/apple-mac.conf
           cp -f output/Guia_y_Agradecimientos_Dzulux.pdf dzulux-desktop-build/config/includes.chroot/etc/skel/Desktop/Guia_y_Agradecimientos_Dzulux.pdf 2>/dev/null || true
           chmod +x dzulux-desktop-build/config/includes.chroot/usr/local/bin/*
           chmod +x dzulux-desktop-build/config/hooks/normal/*.chroot || true

@@ -8,12 +8,16 @@ network-manager-gnome
 unattended-upgrades
 apt-listchanges
 ca-certificates
+locales
+zstd
 nano
 vim
 curl
 wget
 git
 htop
+btop
+tmux
 neofetch
 dialog
 zram-tools
@@ -30,18 +34,24 @@ grub-efi-amd64-bin
 grub-pc-bin
 os-prober
 chntpw
+macchanger
 
-# Interfaz Gráfica (XFCE ligero y temas)
+# Interfaz Gráfica (XFCE ligero, fuentes y temas)
 xorg
 xfce4
 xfce4-goodies
 xfce4-whiskermenu-plugin
 xfce4-pulseaudio-plugin
 librsvg2-common
+libglib2.0-bin
+libnotify-bin
+wmctrl
 lightdm
 lightdm-gtk-greeter
 materia-gtk-theme
 papirus-icon-theme
+fonts-inter
+fonts-jetbrains-mono
 
 # Controladores de Video Universales (Intel, AMD, Nouveau, VMware, VirtualBox, QEMU/KVM)
 mesa-utils

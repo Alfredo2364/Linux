@@ -7,12 +7,16 @@ network-manager
 unattended-upgrades
 apt-listchanges
 ca-certificates
+locales
+zstd
 nano
 vim
 curl
 wget
 git
 htop
+btop
+tmux
 neofetch
 dialog
 zram-tools
@@ -30,6 +34,9 @@ grub-efi-amd64-bin
 grub-pc-bin
 os-prober
 chntpw
+macchanger
+brightnessctl
+tlp
 pciutils
 usbutils
 rfkill

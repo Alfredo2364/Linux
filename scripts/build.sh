@@ -64,9 +64,6 @@ else
     cp "${ROOT_DIR}/dzulux-tools/"* "${BUILD_DIR}/config/includes.chroot/usr/local/bin/"
     cp -f "${ROOT_DIR}/artwork/dzulux-wallpaper.svg" "${BUILD_DIR}/config/includes.chroot/usr/share/backgrounds/dzulux/dzulux-wallpaper.svg"
     cp -f "${ROOT_DIR}/artwork/dzulux-logo.svg" "${BUILD_DIR}/config/includes.chroot/usr/share/pixmaps/dzulux-logo.svg"
-    cp -rf "${ROOT_DIR}/arch-legacy/airootfs/etc/skel/.config/xfce4" "${BUILD_DIR}/config/includes.chroot/etc/skel/.config/"
-    cp -f "${ROOT_DIR}/arch-legacy/airootfs/etc/lightdm/lightdm-gtk-greeter.conf" "${BUILD_DIR}/config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf"
-    cp -f "${ROOT_DIR}/arch-legacy/airootfs/etc/modprobe.d/apple-mac.conf" "${BUILD_DIR}/config/includes.chroot/etc/modprobe.d/apple-mac.conf"
     cp -f "${OUT_DIR}/Guia_y_Agradecimientos_Dzulux.pdf" "${BUILD_DIR}/config/includes.chroot/etc/skel/Desktop/Guia_y_Agradecimientos_Dzulux.pdf" 2>/dev/null || true
     chmod +x "${BUILD_DIR}/config/includes.chroot/usr/local/bin/"*
     chmod +x "${BUILD_DIR}/config/hooks/normal/"*.chroot || true

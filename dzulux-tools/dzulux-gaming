@@ -1,37 +1,54 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# dzulux-gaming - Centro de Configuración Gamer en 1 Clic
+# Dzulux Linux 2.0 (Beta) - Diseñado por Alfredo Dzul
+# ==============================================================================
 
-echo "========================================"
-echo "    Iniciando Dzulux Gaming Setup       "
-echo "========================================"
-echo "Este script preparará tu PC para correr juegos de Linux y Windows."
-echo "Nota: Se requieren permisos de administrador."
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+clear
+echo -e "${CYAN}${BOLD}======================================================${NC}"
+echo -e "${CYAN}${BOLD}        DZULUX GAMING SETUP 2.0 (Alfredo Dzul)        ${NC}"
+echo -e "${CYAN}${BOLD}======================================================${NC}"
+echo "Este asistente preparará tu PC para correr juegos de Linux y Windows."
 echo ""
 
-# 1. Habilitar arquitectura de 32 bits (Esencial para Wine y Steam)
-echo "[1/5] Habilitando soporte para 32 bits (i386)..."
-sudo dpkg --add-architecture i386
-sudo apt-get update
+# 1. Habilitar arquitectura de 32 bits (Esencial para Wine, Proton y Steam)
+echo -e "${YELLOW}[1/5] Habilitando soporte para arquitectura de 32 bits (i386)...${NC}"
+sudo dpkg --add-architecture i386 || true
+sudo apt-get update -y || true
 
-# 2. Instalar dependencias clave y Wine
-echo "[2/5] Instalando Wine y controladores gráficos 32/64 bits..."
-sudo apt-get install -y wine64 wine32 libvulkan1 libvulkan1:i386 mesa-vulkan-drivers mesa-vulkan-drivers:i386
+# 2. Instalar dependencias clave, Vulkan y Wine
+echo -e "${YELLOW}[2/5] Instalando Wine y controladores gráficos Vulkan 32/64 bits...${NC}"
+sudo apt-get install -y wine64 wine32 libvulkan1 libvulkan1:i386 mesa-vulkan-drivers mesa-vulkan-drivers:i386 || \
+sudo apt-get install -y wine64 libvulkan1 mesa-vulkan-drivers || true
 
 # 3. Instalar Steam
-echo "[3/5] Instalando Steam..."
+echo -e "${YELLOW}[3/5] Instalando Steam...${NC}"
 sudo apt-get install -y steam-installer || sudo apt-get install -y steam || true
 
-# 4. Instalar Lutris (Para juegos de Epic, GOG, y Windows)
-echo "[4/5] Instalando Lutris..."
-sudo apt-get install -y lutris
+# 4. Instalar Lutris y Heroic (Para juegos de Epic, GOG y Windows)
+echo -e "${YELLOW}[4/5] Instalando Lutris...${NC}"
+sudo apt-get install -y lutris || true
 
-# 5. Instalar MangoHud (Contador de FPS)
-echo "[5/5] Instalando MangoHud (Monitor de rendimiento en pantalla)..."
-sudo apt-get install -y mangohud
+# 5. Instalar GameMode y MangoHud (Optimizador de CPU/GPU y Contador de FPS)
+echo -e "${YELLOW}[5/5] Instalando Feral GameMode y MangoHud (Monitor de FPS)...${NC}"
+sudo apt-get install -y gamemode mangohud || true
 
 echo ""
-echo "========================================"
-echo "    ¡Configuración Gaming Completada!   "
-echo "========================================"
-echo "- Ya puedes buscar 'Steam' o 'Lutris' en tu menú de aplicaciones."
-echo "- Para ver tus FPS mientras juegas, inicia tus juegos de Steam con: mangohud %command%"
+echo -e "${GREEN}${BOLD}======================================================${NC}"
+echo -e "${GREEN}${BOLD}       ✓ ¡Configuración Gaming Completada!            ${NC}"
+echo -e "${GREEN}${BOLD}======================================================${NC}"
+echo "• Ya puedes buscar 'Steam' o 'Lutris' en tu menú de aplicaciones."
+echo "• Para activar GameMode + FPS en Steam, usa en parámetros de lanzamiento:"
+echo "  gamemoderun mangohud %command%"
 echo ""
+if [ -t 0 ]; then
+    read -r -p "Presiona ENTER para cerrar esta ventana..." _ || true
+fi

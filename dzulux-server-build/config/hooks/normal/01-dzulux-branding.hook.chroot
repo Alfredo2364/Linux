@@ -28,13 +28,25 @@ DISTRIB_CODENAME=noble
 DISTRIB_DESCRIPTION="Dzulux Linux 2.0 Server (Beta)"
 EOF
 
-# 2. Eliminar MOTD de Ubuntu Server y vincular nuestro dzulux-welcome
+# 2. Eliminar MOTD de Ubuntu Server y vincular nuestro dzulux-welcome y wrapper fastfetch
 rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
-cat <<EOF > /etc/update-motd.d/00-dzulux-welcome
-#!/bin/sh
-/usr/local/bin/dzulux-welcome
-EOF
-chmod +x /etc/update-motd.d/00-dzulux-welcome
+
+if ! grep -q "dzulux-welcome" /etc/bash.bashrc; then
+    cat <<'EOF_BASHRC' >> /etc/bash.bashrc
+if [ -t 1 ] && [ -z "${DZULUX_WELCOME_SHOWN:-}" ]; then
+    export DZULUX_WELCOME_SHOWN=1
+    /usr/local/bin/dzulux-welcome
+fi
+EOF_BASHRC
+fi
+
+if [ ! -f /usr/bin/fastfetch ] && [ ! -f /usr/local/bin/fastfetch ]; then
+    cat <<'EOF_FF' > /usr/local/bin/fastfetch
+#!/usr/bin/env bash
+exec neofetch
+EOF_FF
+    chmod +x /usr/local/bin/fastfetch
+fi
 
 # 3. Cambiar texto de login tty y SSH (issue / issue.net) y GRUB distributor
 echo "Dzulux Linux 2.0 Server (Beta) \n \l
@@ -95,11 +107,6 @@ BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
 EOF
 ln -sf /usr/lib/os-release /etc/os-release || true
 rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
-cat <<EOF > /etc/update-motd.d/00-dzulux-welcome
-#!/bin/sh
-/usr/local/bin/dzulux-welcome
-EOF
-chmod +x /etc/update-motd.d/00-dzulux-welcome
 echo "Dzulux Linux 2.0 Server (Beta) \n \l
 " > /etc/issue
 echo "Dzulux Linux 2.0 Server (Beta)" > /etc/issue.net

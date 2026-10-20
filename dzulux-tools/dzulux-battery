@@ -24,11 +24,12 @@ fi
 main_menu() {
     if [ -n "$UI" ]; then
         CHOICE=$($UI --title "Dzulux Battery - Ahorro de Batería (Alfredo Dzul)" --menu \
-"Selecciona un perfil de energía adaptado a tus necesidades:" 18 72 4 \
+"Selecciona un perfil de energía adaptado a tus necesidades:" 18 72 5 \
 "1" "📶 Modo Productivo (Wi-Fi Activo, Bluetooth apagado, Brillo moderado)" \
 "2" "🚨 Modo Emergencia Extrema (Offline, Brillo al 15%, Ultra ahorro)" \
 "3" "⚙️ Configuración Personalizada (Elegir qué componentes desactivar)" \
-"4" "⚡ Restaurar Modo Normal / Alto Rendimiento" 3>&1 1>&2 2>&3)
+"4" "⚡ Restaurar Modo Normal / Alto Rendimiento" \
+"5" "🚪 Salir" 3>&1 1>&2 2>&3 || echo "5")
     else
         clear
         echo -e "${CYAN}${BOLD}=== DZULUX BATTERY - GESTOR DE ENERGÍA ===${NC}"

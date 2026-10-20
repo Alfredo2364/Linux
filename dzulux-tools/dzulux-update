@@ -109,6 +109,48 @@ actualizar_suite() {
     read -p "Presiona ENTER para volver al menú..."
 }
 
+actualizar_seguridad_ubuntu() {
+    banner
+    verificar_root
+    verificar_internet
+    crear_snapshot_seguridad
+
+    echo -e "${CYAN}==> Verificando canales oficiales de seguridad de Ubuntu 24.04 LTS (noble-security / noble-updates)...${NC}"
+    if ! grep -q "noble-security" /etc/apt/sources.list 2>/dev/null; then
+        cat <<'EOF' > /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+EOF
+    fi
+
+    echo -e "${YELLOW}==> Descargando e instalando parches de seguridad críticos y de Kernel (CVE)...${NC}"
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y unattended-upgrades apt-listchanges 2>/dev/null || true
+
+    mkdir -p /etc/apt/apt.conf.d
+    cat <<'EOF' > /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+    systemctl enable --now unattended-upgrades.service 2>/dev/null || true
+
+    # Preservar identidad Dzulux Linux 2.0 por si el paquete base-files de Ubuntu se actualizó
+    if grep -q "Ubuntu" /usr/lib/os-release 2>/dev/null; then
+        sed -i 's/PRETTY_NAME=.*/PRETTY_NAME="Dzulux Linux 2.0 (Beta)"/' /usr/lib/os-release
+        sed -i 's/^NAME=.*/NAME="Dzulux Linux"/' /usr/lib/os-release
+        sed -i 's/^ID=.*/ID=dzulux/' /usr/lib/os-release
+    fi
+
+    echo ""
+    echo -e "${GREEN}${BOLD}✓ ¡Parches de seguridad de Ubuntu LTS aplicados y protección automática (unattended-upgrades) activa!${NC}"
+    read -p "Presiona ENTER para continuar..."
+}
+
 actualizar_sistema_completo() {
     banner
     verificar_root
@@ -119,9 +161,8 @@ actualizar_sistema_completo() {
     actualizar_suite
 
     echo ""
-    echo -e "${YELLOW}==> 2. Sincronizando repositorios y paquetes del sistema (Ubuntu/Debian APT)...${NC}"
-    apt-get update -y
-    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+    echo -e "${YELLOW}==> 2. Sincronizando parches de seguridad y paquetes del sistema (Ubuntu LTS)...${NC}"
+    actualizar_seguridad_ubuntu
     apt-get autoremove -y
 
     echo ""
@@ -190,23 +231,25 @@ menu_principal() {
         echo "Elige qué deseas actualizar:"
         echo ""
         echo -e "  ${GREEN}1)${NC} ⚡ ${BOLD}Actualizar Suite Dzulux${NC} (Descarga los últimos scripts y herramientas desde GitHub)"
-        echo -e "  ${GREEN}2)${NC} 📦 ${BOLD}Actualizar Sistema Completo${NC} (Suite Dzulux + Paquetes base APT Ubuntu/Debian)"
-        echo -e "  ${GREEN}3)${NC} 💿 ${BOLD}Comprobar / Descargar Nueva Versión de la ISO${NC}"
-        echo -e "  ${GREEN}4)${NC} 🛡️ ${BOLD}Crear Punto de Restauración de Emergencia (Snapshot)${NC}"
-        echo -e "  ${RED}5)${NC} 🚪 Salir"
+        echo -e "  ${GREEN}2)${NC} 🛡️ ${BOLD}Instalar Parches de Seguridad de Ubuntu LTS${NC} (CVE + Kernel + Auto-Actualizaciones)"
+        echo -e "  ${GREEN}3)${NC} 📦 ${BOLD}Actualizar Sistema Completo${NC} (Suite Dzulux + Seguridad + Todos los paquetes APT)"
+        echo -e "  ${GREEN}4)${NC} 💿 ${BOLD}Comprobar / Descargar Nueva Versión de la ISO${NC}"
+        echo -e "  ${GREEN}5)${NC} 📸 ${BOLD}Crear Punto de Restauración de Emergencia (Snapshot)${NC}"
+        echo -e "  ${RED}6)${NC} 🚪 Salir"
         echo ""
-        read -p "Ingresa tu opción [1-5]: " opc
+        read -p "Ingresa tu opción [1-6]: " opc
 
         case "$opc" in
             1) actualizar_suite ;;
-            2) actualizar_sistema_completo ;;
-            3) comprobar_version_iso ;;
-            4) 
+            2) actualizar_seguridad_ubuntu ;;
+            3) actualizar_sistema_completo ;;
+            4) comprobar_version_iso ;;
+            5) 
                 verificar_root
                 crear_snapshot_seguridad
                 read -p "Presiona ENTER para continuar..."
                 ;;
-            5) 
+            6) 
                 echo "¡Hasta pronto!"
                 exit 0 
                 ;;

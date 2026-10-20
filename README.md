@@ -1,4 +1,4 @@
-# ⚡ Dzulux Linux (Beta)
+# ⚡ Dzulux Linux 2.0 (Beta)
 
 > **Un sistema operativo equilibrado, ágil y universal con arranque Dual (Gráfico / Terminal)**  
 > **Creado y Diseñado por: Alfredo Dzul**
@@ -10,8 +10,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Estado-BETA-yellow?style=for-the-badge&logo=shield" alt="Estado Beta"/>
-  <img src="https://img.shields.io/badge/Base-Ubuntu_y_Debian-E95420?style=for-the-badge&logo=ubuntu" alt="Ubuntu"/>
+  <img src="https://img.shields.io/badge/Estado-2.0_BETA-yellow?style=for-the-badge&logo=shield" alt="Estado Beta"/>
+  <img src="https://img.shields.io/badge/Base-Ubuntu_24.04_LTS-E95420?style=for-the-badge&logo=ubuntu" alt="Ubuntu"/>
+  <img src="https://img.shields.io/badge/Seguridad-Actualizaciones_Automáticas-10b981?style=for-the-badge&logo=linux" alt="Security"/>
   <img src="https://img.shields.io/badge/Arquitectura-x86__64-brightgreen?style=for-the-badge" alt="x86_64"/>
   <img src="https://img.shields.io/badge/Diseño-Alfredo%20Dzul-00f2fe?style=for-the-badge" alt="Alfredo Dzul"/>
   <img src="https://img.shields.io/badge/ISOs-Desktop_y_Server-blueviolet?style=for-the-badge" alt="Dual Mode"/>
@@ -49,7 +50,7 @@
 
 ### 1. 🔄 Concepto Dual Integrado (Gráfico vs. Terminal)
 Tú decides cómo interactuar con tu equipo en cualquier momento:
-* **Modo Gráfico (Desktop GUI)**: Entorno visual moderno basado en **XFCE personalizado** con tema oscuro elegante (*Arc-Dark*), iconos estilizados (*Papirus*), tipografía limpia (*Inter*) y fondos de pantalla oficiales de Dzulux. Consumo medio de solo **~550 MB de RAM**.
+* **Modo Gráfico (Desktop GUI)**: Entorno visual moderno basado en **XFCE personalizado** con tema oscuro elegante (*Materia-dark*), iconos estilizados (*Papirus-Dark*), tipografía limpia (*Inter*) y fondos de pantalla oficiales de Dzulux. Consumo medio de solo **~420 - 550 MB de RAM**.
 * **Modo Terminal (Inspirado en la estabilidad de Ubuntu Server)**: Arranque directo en línea de comandos de alto rendimiento. Diseñado con las mismas comodidades y herramientas de administración que hacen popular a Ubuntu Server:
   * **Acceso Remoto**: Servidor **OpenSSH** (`sshd`) preconfigurado para conectarte desde otras PCs.
   * **Seguridad Sencilla**: Cortafuegos **UFW** (el mismo de Ubuntu: `sudo ufw allow 22`, `sudo ufw enable`).
@@ -60,11 +61,11 @@ Tú decides cómo interactuar con tu equipo en cualquier momento:
 
 ### 2. 🎮 Compatibilidad Universal de Hardware
 * **Tarjetas Gráficas (GPU)**:
-  * **Intel**: Soporte completo con controladores Mesa, Vulkan y aceleración por hardware (`intel-media-driver`).
-  * **AMD Radeon**: Controladores libres `amdgpu` y aceleración `vulkan-radeon`.
-  * **NVIDIA**: Soporte para controladores propietarios dinámicos (`nvidia-dkms`), utilidades y gestión de tarjetas híbridas en laptops con `nvidia-prime`.
+  * **Intel**: Soporte completo con controladores Mesa, Vulkan y aceleración por hardware (`intel-media-va-driver`).
+  * **AMD Radeon**: Controladores libres `amdgpu` y aceleración `mesa-vulkan-drivers`.
+  * **NVIDIA**: Soporte para controladores propietarios dinámicos (`nvidia-driver-550`), utilidades y gestión de tarjetas híbridas en laptops con `nvidia-prime`.
 * **Equipos Apple Mac (Intel x86_64)**:
-  * Controladores Wi-Fi para chips Broadcom (`broadcom-wl`).
+  * Controladores Wi-Fi para chips Broadcom (`bcmwl-kernel-source`).
   * Configuración del teclado Apple (`hid_apple`) con teclas multimedia/brillo nativas y distribución adaptada.
 * **Portátiles y Laptops**:
   * Gestión inteligente de batería mediante **TLP** y `upower` para maximizar la autonomía.
@@ -72,7 +73,7 @@ Tú decides cómo interactuar con tu equipo en cualquier momento:
   * Gestión térmica para procesadores portátiles con `thermald`.
 * **Sonido de Nueva Generación**:
   * Pila de audio moderna **PipeWire** con **WirePlumber**.
-  * Paquete de firmware **SOF** (`sof-firmware`) y `alsa-ucm-conf`, indispensables para reconocer bocinas y micrófonos internos en laptops modernas.
+  * Paquete de firmware **SOF** (`firmware-sof-signed`) y `alsa-ucm-conf`, indispensables para reconocer bocinas y micrófonos internos en laptops modernas.
 
 ### 3. 🪟 Soporte Dual Boot (Conservar Windows / macOS)
 Dzulux está preparado para convivir en paz con el sistema que trajo tu equipo:
@@ -88,7 +89,13 @@ Dzulux está preparado para convivir en paz con el sistema que trajo tu equipo:
 * **Detección Automática de Hardware Modesto**: El instalador evalúa el procesador (Intel Celeron, Pentium, Atom, AMD Athlon básico de 2 núcleos) y restringe opciones pesadas para instalar de forma segura **Dzulux Lite** (~380 MB de RAM en reposo, compositor de sombras desactivado y respuesta instantánea a 60 FPS).
 * **Compresión Btrfs Transparente (zstd:1)**: En equipos con discos soldados de 32 GB (HP Stream, Lenovo IdeaPad 1, Cloudbooks), donde Windows se satura por falta de espacio, Dzulux comprime el sistema reduciendo su huella a solo **~3.5 GB**, dejando más de **26 GB libres** para tus documentos.
 * **zRAM Integrado**: Duplica la memoria útil comprimiendo páginas inactivas directamente en RAM para eliminar los congelamientos en laptops con 2 GB o 4 GB.
-* **Protección de Vida Útil de Memoria Flash**: Montaje con opción `noatime` y servicio `paccache.timer` para auto-limpiar paquetes obsoletos y evitar el desgaste prematuro de chips eMMC.
+* **Protección de Vida Útil de Memoria Flash**: Montaje con opción `noatime` y limpieza inteligente mediante `dzulux-cleaner` y `apt autoremove` para evitar el desgaste prematuro de chips eMMC.
+
+### 5. 🛡️ Actualizaciones Continuas de Seguridad de Ubuntu 24.04 LTS
+Para no quedarnos atrás en nivel de seguridad en ningún momento, Dzulux Linux 2.0 sincroniza sus parches en 3 niveles:
+* **En tus equipos instalados**: Viene preconfigurado con `unattended-upgrades` apuntando directamente a `noble-security` y `noble-updates`, aplicando parches de seguridad del kernel y CVEs críticos automáticamente en segundo plano sin romper tu identidad ni configuración de Dzulux.
+* **Desde la terminal con `dzulux-update`**: Incluye la opción dedicada **"Blindaje de Seguridad Ubuntu LTS"** para aplicar al instante todos los parches de seguridad de Ubuntu junto con las últimas herramientas del repositorio oficial de Dzulux.
+* **Recompilación Semanal de ISOs en GitHub Actions**: Todos los lunes a las 06:00 UTC, GitHub Actions recompila automáticamente las imágenes `dzulux-desktop-hybrid.iso` y `dzulux-server-hybrid.iso` integrando todos los paquetes y parches de seguridad lanzados por Ubuntu durante la semana.
 
 ---
 
@@ -100,14 +107,19 @@ Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles
 | :--- | :--- | :---: | :--- |
 | **Instalador Guiado** | `dzulux-installer` | 📋 | Asistente paso a paso con soporte Dual Boot real, detección de eMMC y selector automático de **Dzulux Lite** para Celeron/Athlon. |
 | **Motor de Rendimiento** | `dzulux-performance` | ⚡ | Audita tu CPU y ofrece perfiles: *Oficina Inteligente* (cero lag y silencioso), *Game Booster* puro y *Gamer Sin Límites* (con OBS/Discord blindados y congelador de apps). |
+| **Centro Gamer** | `dzulux-gaming` | 🕹️ | Instala Steam, Heroic (Epic/GOG), Lutris, RetroArch, GameMode, MangoHud y Wine-Staging en 1 clic. |
 | **Descarga de Drivers** | `dzulux-drivers` | 🎮 | Escanea tu hardware real (GPU NVIDIA/AMD/Intel, Wi-Fi Broadcom/Realtek, audio SOF, batería) y descarga los controladores oficiales en 1 clic sin engordar la ISO. |
 | **Tienda de Software** | `dzulux-apps` | 🛍️ | Centro de instalación rápida en 1 clic para Steam, Discord, VS Code, LibreOffice, Obsidian, Chrome y Brave con Flathub preconfigurado. |
+| **Limpiador Inteligente** | `dzulux-cleaner` | 🧹 | Libera espacio limpiando caché APT, logs de systemd, Flatpaks huérfanos y miniaturas sin riesgo para el sistema. |
+| **Copias de Seguridad** | `dzulux-backup` | 📦 | Respalda y restaura tus documentos y configuraciones en discos externos o USB con compresión `zstd` ultrarrápida. |
+| **Transferencia Wi-Fi QR** | `dzulux-share` | 📱 | Comparte archivos entre tu PC y tu celular (Android/iPhone) escaneando un código QR en terminal sin cables ni cuentas. |
+| **Creador de USB Booteable** | `dzulux-usb` | 💾 | Graba imágenes ISO en memorias USB con verificación de integridad y protección contra borrado del disco del sistema. |
 | **Puntos de Restauración** | `dzulux-snapshots` | 🛡️ | Crea capturas instantáneas del sistema en 1 segundo con Btrfs (0 MB de espacio) con reversión desde el menú de arranque GRUB. |
 | **Rescate de Windows** | `dzulux-rescue` | 🚑 | Elimina contraseñas olvidadas de Windows en 10 segundos con `chntpw`, rescata archivos de discos dañados y audita la salud S.M.A.R.T. del disco. |
 | **Gestor de Batería** | `dzulux-battery` | 🔋 | Ahorro de energía para laptops con Wi-Fi configurable (Modo Productivo mantiene internet activo para entregar tareas, y Modo Emergencia Extrema). |
 | **Modo Privacidad** | `dzulux-stealth` | 🕵️ | Protección en redes Wi-Fi públicas: asigna una dirección MAC aleatoria, activa DNS seguro anti-malware (Quad9/Cloudflare) y activa firewall estricto. |
 | **Gestor de Estilos** | `dzulux-looks` | 🎨 | Cambia entre tema Cyberpunk Dark, **Estilo Windows 10** (con barra inferior y Menú de Inicio con buscador y categorías) o Modo Minimal Flat. |
-| **Actualizador Oficial** | `dzulux-update` | 🔄 | Descarga directamente los últimos scripts, parches y herramientas oficiales de Dzulux desde GitHub sin reinstalar el sistema. |
+| **Actualizador Oficial** | `dzulux-update` | 🔄 | Sincroniza los últimos scripts de Dzulux desde GitHub y aplica los parches de seguridad oficiales de Ubuntu 24.04 LTS (`noble-security`). |
 | **Alternador de Modo** | `switch-mode` | 🔄 | Cambia en vivo entre escritorio gráfico y modo terminal (`switch-mode gui`, `switch-mode cli`, `switch-mode lowspec on/off`). |
 | **Diagnóstico de Hardware** | `hw-detect` | 🖥️ | Escanea y reporta el estado de tu GPU (Intel/AMD/NVIDIA), batería de laptop, servidor de audio y compatibilidad Mac. |
 | **Información del Sistema** | `fastfetch` | ⚡ | Muestra los datos de hardware del equipo acompañados del logo oficial y la firma de **Alfredo Dzul**. |
@@ -115,17 +127,16 @@ Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles
 
 ---
 
-## 🔥 Novedades y Parches de la Versión 1.1 (Beta)
+## 🔥 Novedades y Parches de la Versión 2.0 (Beta)
 
-* **Actualizador del Sistema en Vivo (`dzulux-update`)**: Permite que cuando subas actualizaciones o mejoras al repositorio de GitHub, cualquier usuario ejecute este comando y descargue directamente la última versión de scripts, temas y parches sin reinstalar el sistema operativo.
-* **Asistente Inteligente de Controladores (`dzulux-drivers`)**: Descarga dinámica al vuelo según el hardware específico, logrando que la imagen ISO se mantenga en **1.69 GB** (muy por debajo del límite de 2 GiB de GitHub Releases).
+* **Migración Completa a Base Ubuntu 24.04 LTS (Noble Numbat) con Seguridad Continua**: Máxima compatibilidad de paquetes `.deb`, repositorios `noble-security` activos con actualizaciones desatendidas (`unattended-upgrades`) y recompilación automática semanal de las ISOs en GitHub Actions.
+* **Actualizador del Sistema y Seguridad en Vivo (`dzulux-update`)**: Descarga directamente la última versión de scripts, temas y herramientas desde GitHub y aplica al instante las actualizaciones de seguridad de Ubuntu sin perder el branding de Dzulux.
+* **5 Nuevas Herramientas Nativas**: `dzulux-gaming` (Centro Gamer Proton/Lutris), `dzulux-cleaner` (Liberador de espacio), `dzulux-backup` (Respaldos zstd), `dzulux-share` (Transferencia por QR a celulares) y `dzulux-usb` (Grabador seguro de ISOs).
+* **Asistente Inteligente de Controladores (`dzulux-drivers`)**: Descarga dinámica al vuelo según el hardware específico (GPU NVIDIA/AMD/Intel, Wi-Fi Broadcom/Realtek, Audio SOF).
 * **Edición "Dzulux Lite" con Detección de CPU**: Si el instalador detecta procesadores Intel Celeron, Pentium, Atom o AMD Athlon (<= 2 núcleos), limita las opciones a la versión Lite con optimizaciones para erradicar congelamientos.
 * **Menú de Inicio estilo Windows 10 en `dzulux-looks`**: Integración de Whisker Menu en la barra inferior con buscador instantáneo, cuadrícula de aplicaciones categorizadas y tecla `Super` vinculada.
 * **Dzulux Performance Engine (`dzulux-performance`)**: Auditoría de CPU por gama, perfil de oficina silencioso y modo streaming blindado para OBS Studio y Discord con congelador de procesos secundarios (`SIGSTOP`/`SIGCONT`).
 * **Suite de Emergencia y Rescate (`dzulux-rescue`)**: Quitado de contraseñas de Windows en 10 segundos y auditoría de salud de disco S.M.A.R.T.
-* **Tienda Curada (`dzulux-apps`)**: Acceso inmediato a aplicaciones populares con repositorio oficial y Flatpak.
-* **Escudo Wi-Fi Público (`dzulux-stealth`)**: Anonimato con MAC cambiante y DNS cifrado anti-rastreo.
-* **Gestor de Batería con Wi-Fi (`dzulux-battery`)**: Resuelve la necesidad de ahorrar energía sin quedarse sin internet para enviar trabajos escolares o laborales.
 * **Soporte Avanzado para Memorias Soldadas de 32 GB (eMMC)**: Particionado con Btrfs zstd:1, reduciendo la instalación a solo ~3.5 GB y dejando más de 26 GB libres.
 
 ---
@@ -135,22 +146,22 @@ Dzulux Linux incorpora una suite de utilidades interactivas nativas (disponibles
 ```text
 Linux Propio/
 ├── .github/workflows/
-│   └── build-iso.yml          # Flujo de CI/CD para compilar la ISO en GitHub Actions
-├── artwork/                   # Logotipos y fondos de pantalla vectoriales SVG
+│   └── build-iso.yml          # Flujo CI/CD (Push + Cron semanal de seguridad Ubuntu LTS)
+├── artwork/                   # Logotipos y fondos de pantalla vectoriales SVG oficiales
 │   ├── dzulux-logo.svg
 │   └── dzulux-wallpaper.svg
-├── iso-profile/               # Perfil maestro de archiso
-│   ├── profiledef.sh          # Definición de la ISO, versión y permisos
-│   ├── packages.x86_64        # Lista exhaustiva de paquetes y controladores
-│   ├── pacman.conf            # Configuración de repositorios oficiales
-│   ├── grub/                  # Menú de arranque UEFI con opciones Dual Mode
-│   ├── syslinux/              # Menú de arranque BIOS Legacy
-│   └── airootfs/              # Sistema de archivos superpuesto
-│       ├── etc/               # os-release, banners, configs de XFCE, LightDM y Mac
-│       ├── usr/local/bin/     # Scripts: installer, hw-detect, switch-mode
-│       └── usr/share/         # Fondos de pantalla y Fastfetch
+├── dzulux-desktop-build/      # Perfil live-build de Dzulux Desktop (Ubuntu 24.04 LTS + XFCE)
+│   ├── auto/config            # Configuración de repositorios noble, updates y security
+│   └── config/                # Hooks de branding, listas de paquetes y lanzadores .desktop
+├── dzulux-server-build/       # Perfil live-build de Dzulux Server (Ubuntu 24.04 LTS CLI)
+│   ├── auto/config            # Configuración de repositorios noble, updates y security
+│   └── config/                # Hooks de servidor, SSH, UFW y herramientas CLI
+├── dzulux-tools/              # Las 17 herramientas exclusivas de la Suite Dzulux
+├── docs/
+│   └── guia-usuario.html      # Fuente HTML del Manual y Agradecimientos en PDF
 ├── scripts/
-│   ├── build.sh               # Script de compilación local en Linux o WSL2
+│   ├── build.sh               # Script de compilación local en Ubuntu 24.04 / WSL2
+│   ├── build-in-docker.sh     # Compilador en contenedor Docker Ubuntu 24.04
 │   └── test-qemu.bat          # Script para probar la ISO en Windows con QEMU
 └── README.md                  # Documentación del proyecto
 ```
@@ -163,32 +174,31 @@ Tienes dos formas de generar el archivo `.iso` de instalación:
 
 ### Método A: Compilación Automática en la Nube (Recomendado si usas Windows)
 No necesitas instalar Linux ni configurar herramientas complejas en tu equipo:
-1. Sube tus cambios o haz un push a este repositorio en GitHub:
+1. Sube tus cambios o haz un push a este repositorio en GitHub (además, se ejecuta automáticamente cada lunes para integrar parches de seguridad de Ubuntu):
    ```bash
    git add .
-   git commit -m "Compilar Dzulux Beta"
+   git commit -m "Actualizar Dzulux 2.0"
    git push origin main
    ```
 2. Ve a la pestaña **Actions** en tu repositorio de GitHub.
-3. El flujo de trabajo `Compilar ISO y Paquete de Dzulux Linux` se iniciará automáticamente.
-4. Al finalizar la compilación, encontrarás en la sección de **Artifacts** o **Releases** el paquete comprimido:
-   * 📦 **`Dzulux-Linux-1.1-Beta-Paquete-Completo.zip`**, que incluye:
-     * 💿 La imagen del sistema: **`dzulux-1.1-beta-x86_64.iso`**
-     * 📄 La **`Guía y Agradecimientos en PDF`** escrita y firmada por **Alfredo Dzul** con instrucciones de booteo y primeros pasos.
-     * 🔒 El archivo de sumas de comprobación **`sha256sum.txt`**.
+3. El flujo de trabajo `Compilar ISOs de Dzulux (Desktop y Server)` se iniciará automáticamente.
+4. Al finalizar la compilación, encontrarás en la sección de **Releases (`latest`)**:
+   * 🖥️ **`dzulux-desktop-hybrid.iso`** (Edición Escritorio XFCE + Terminal)
+   * 💻 **`dzulux-server-hybrid.iso`** (Edición Servidor Ultraligero CLI)
+   * 📄 **`Guia_y_Agradecimientos_Dzulux.pdf`** escrita y firmada por **Alfredo Dzul**.
 
-### Método B: Compilación Local (En Arch Linux o WSL2)
-Si cuentas con una máquina con Arch Linux o WSL2 con soporte de contenedores/archiso:
+### Método B: Compilación Local (En Ubuntu 24.04 LTS o WSL2)
+Si cuentas con una máquina con Ubuntu 24.04 LTS o WSL2:
 1. Clona el repositorio e ingresa en él:
    ```bash
    git clone https://github.com/Alfredo2364/Linux.git
    cd Linux
    ```
-2. Ejecuta el script de compilación con privilegios de superusuario:
+2. Ejecuta el script de compilación con privilegios de superusuario (`desktop`, `server` o `all`):
    ```bash
-   sudo ./scripts/build.sh
+   sudo ./scripts/build.sh all
    ```
-3. La ISO compilada se generará en la carpeta `output/`.
+3. Las ISOs híbridas compiladas se generarán en la carpeta `output/`.
 
 ---
 
@@ -203,9 +213,9 @@ O arrastra la ISO descargada sobre el archivo `.bat`.
 
 ### 2. En Máquinas Virtuales (VirtualBox / VMware)
 * **Tipo**: Linux
-* **Versión**: Arch Linux (64-bit)
+* **Versión**: Ubuntu (64-bit) / Debian (64-bit)
+* **Importante en VirtualBox**: Marcar la casilla **"Omitir instalación desatendida" (Skip Unattended Installation)** al elegir la ISO para arrancar directamente el sistema Live de Dzulux.
 * **Memoria RAM**: 2 GB mínimo (4 GB recomendado)
-* **Arranque**: Habilitar soporte EFI en la configuración de la máquina virtual.
 
 ### 3. En Hardware Real (PC, Laptop o Apple Mac)
 Graba la imagen `.iso` en una memoria USB usando cualquiera de las siguientes herramientas:
@@ -220,11 +230,11 @@ Conecta la USB al equipo, enciéndelo presionando la tecla de arranque (`F12`, `
 ## ✒️ Créditos y Autoría
 
 * **Diseño, Arquitectura e Identidad**: Alfredo Dzul
-* **Base de Distribución**: Arch Linux Project
+* **Base de Distribución**: Ubuntu 24.04 LTS (Noble Numbat) / Debian GNU/Linux
 * **Repositorio Oficial**: [https://github.com/Alfredo2364/Linux](https://github.com/Alfredo2364/Linux)
 
 ---
 
 <p align="center">
-  <i>Dzulux Linux 1.1 (Beta) — Hecho con pasión por el software libre y el control total de tu equipo.</i>
+  <i>Dzulux Linux 2.0 (Beta) — Hecho con pasión por el software libre, la seguridad continua y el control total de tu equipo.</i>
 </p>

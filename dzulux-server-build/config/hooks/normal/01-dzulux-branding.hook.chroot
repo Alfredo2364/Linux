@@ -59,6 +59,51 @@ systemctl enable zramswap.service 2>/dev/null || true
 # 5. Activar firewall UFW pero permitiendo SSH
 ufw allow ssh 2>/dev/null || true
 
+# 6. Configurar repositorios de seguridad de Ubuntu 24.04 (noble-security / noble-updates) y aplicar últimos parches CVE
+cat <<'EOF' > /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+EOF
+apt-get update -y 2>/dev/null || true
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" 2>/dev/null || true
+apt-get clean 2>/dev/null || true
+
+# Activar actualizaciones automáticas de seguridad en segundo plano (unattended-upgrades)
+mkdir -p /etc/apt/apt.conf.d
+cat <<'EOF' > /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+systemctl enable unattended-upgrades.service 2>/dev/null || true
+
+# Reaplicar os-release y lsb-release después de dist-upgrade (por si base-files se actualizó)
+cat <<EOF > /usr/lib/os-release
+PRETTY_NAME="Dzulux Linux 2.0 Server (Beta)"
+NAME="Dzulux Linux"
+VERSION_ID="2.0"
+VERSION="2.0 (Beta)"
+VERSION_CODENAME=noble
+ID=dzulux
+ID_LIKE=debian
+HOME_URL="https://alfredo2364.github.io/Linux/"
+SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+EOF
+ln -sf /usr/lib/os-release /etc/os-release || true
+rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
+cat <<EOF > /etc/update-motd.d/00-dzulux-welcome
+#!/bin/sh
+/usr/local/bin/dzulux-welcome
+EOF
+chmod +x /etc/update-motd.d/00-dzulux-welcome
+echo "Dzulux Linux 2.0 Server (Beta) \n \l
+" > /etc/issue
+echo "Dzulux Linux 2.0 Server (Beta)" > /etc/issue.net
+
 # Configurar Auto-Login en CLI
 mkdir -p /etc/systemd/system/getty@tty1.service.d/
 cat <<'EOF' > /etc/systemd/system/getty@tty1.service.d/override.conf

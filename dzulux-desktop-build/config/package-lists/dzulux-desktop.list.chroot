@@ -1,7 +1,13 @@
 live-boot
+live-boot-initramfs-tools
 live-config
+live-config-systemd
 systemd-sysv
 network-manager
+network-manager-gnome
+unattended-upgrades
+apt-listchanges
+ca-certificates
 nano
 vim
 curl
@@ -29,6 +35,9 @@ chntpw
 xorg
 xfce4
 xfce4-goodies
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+librsvg2-common
 lightdm
 lightdm-gtk-greeter
 materia-gtk-theme

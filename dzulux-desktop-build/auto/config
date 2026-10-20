@@ -7,6 +7,8 @@ lb config noauto \
     --distribution noble \
     --architectures amd64 \
     --archive-areas "main restricted universe multiverse" \
+    --security true \
+    --updates true \
     --iso-application "Dzulux Desktop (GUI)" \
     --iso-publisher "Alfredo Dzul" \
     --iso-volume "DZULUX_DESKTOP" \

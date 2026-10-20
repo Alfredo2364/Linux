@@ -51,7 +51,7 @@ main_menu() {
 "1" "💼 Modo Oficina Lite (Ágil, Cero Lentitud en Celeron/Athlon)" \
 "2" "🍃 Modo Ultra Fluido (60 FPS sin sombras ni efectos pesados)" \
 "3" "🔒 Modos Gamer (Restringidos: Requieren CPU de 4+ hilos)" \
-"4" "Salir" 3>&1 1>&2 2>&3)
+"4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
         else
             clear
             echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE - EDICIÓN LITE ===${NC}"
@@ -79,7 +79,7 @@ main_menu() {
 "2" "🎮 Modo Gamer: Game Booster (Prioridad Absoluta al Juego, Cero Tirones)" \
 "3" "🚀 Modo Gamer Sin Límites (Gaming + Streaming OBS / Discord Protegido)" \
 "4" "🍃 Modo Ahorro y Equipos Modestos (Bajo Consumo / zRAM Activa)" \
-"5" "Salir" 3>&1 1>&2 2>&3)
+"5" "Salir" 3>&1 1>&2 2>&3 || echo "5")
         else
             clear
             echo -e "${CYAN}${BOLD}=== DZULUX PERFORMANCE ENGINE ===${NC}"

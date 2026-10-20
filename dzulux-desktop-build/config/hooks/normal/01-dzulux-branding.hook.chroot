@@ -131,7 +131,70 @@ for desk_item in dzulux-installer dzulux-apps dzulux-gaming dzulux-drivers dzulu
     cp "/usr/share/applications/${desk_item}.desktop" "/home/dzulux/Desktop/${desk_item}.desktop"
     chmod +x "/home/dzulux/Desktop/${desk_item}.desktop"
 done
+
+# 6b. Asegurar fondo de pantalla oficial Dzulux en todos los monitores de XFCE (VirtualBox, VMware, Laptop, PC)
+if [ -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg ]; then
+    mkdir -p /usr/share/backgrounds/xfce /usr/share/xfce4/backdrops
+    for bg in /usr/share/backgrounds/xfce/* /usr/share/xfce4/backdrops/*; do
+        if [ -f "$bg" ]; then
+            cp -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg "$bg" 2>/dev/null || true
+        fi
+    done
+    cp -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg /usr/share/backgrounds/xfce/xfce-shapes.svg 2>/dev/null || true
+    cp -f /usr/share/backgrounds/dzulux/dzulux-wallpaper.svg /usr/share/backgrounds/xfce/xfce-verticals.png 2>/dev/null || true
+fi
+
+# Copiar configuraciones XFCE, tema oscuro y Manual PDF desde /etc/skel a /home/dzulux y /etc/xdg
+cp -rf /etc/skel/. /home/dzulux/ 2>/dev/null || true
+if [ -d /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml ]; then
+    mkdir -p /etc/xdg/xfce4/xfconf/xfce-perchannel-xml /etc/xdg/xfce4/panel
+    cp -rf /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/* /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/ 2>/dev/null || true
+    if [ -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc ]; then
+        cp -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc /etc/xdg/xfce4/panel/default.rc 2>/dev/null || true
+        cp -f /etc/skel/.config/xfce4/panel/whiskermenu-1.rc /etc/xdg/xfce4/panel/whiskermenu-1.rc 2>/dev/null || true
+    fi
+fi
 chown -R dzulux:dzulux /home/dzulux 2>/dev/null || true
+
+# 6c. Repositorios de seguridad de Ubuntu 24.04 (noble-security / noble-updates) y parches automáticos
+cat <<'EOF' > /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+EOF
+apt-get update -y 2>/dev/null || true
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" 2>/dev/null || true
+apt-get clean 2>/dev/null || true
+
+mkdir -p /etc/apt/apt.conf.d
+cat <<'EOF' > /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+systemctl enable unattended-upgrades.service 2>/dev/null || true
+
+# Reaplicar identidad Dzulux 2.0 en os-release tras dist-upgrade (por si base-files se actualizó)
+cat <<EOF > /usr/lib/os-release
+PRETTY_NAME="Dzulux Linux 2.0 Desktop (Beta)"
+NAME="Dzulux Desktop"
+VERSION_ID="2.0"
+VERSION="2.0 (Beta)"
+VERSION_CODENAME=noble
+ID=dzulux
+ID_LIKE=debian
+HOME_URL="https://alfredo2364.github.io/Linux/"
+SUPPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+BUG_REPORT_URL="https://github.com/Alfredo2364/Linux/issues"
+PRIVACY_POLICY_URL="https://github.com/Alfredo2364/Linux"
+EOF
+ln -sf /usr/lib/os-release /etc/os-release || true
+rm -rf /etc/update-motd.d/* /etc/motd /etc/legal
+echo "Dzulux Linux 2.0 Desktop (Beta) \n \l
+" > /etc/issue
+echo "Dzulux Linux 2.0 Desktop (Beta)" > /etc/issue.net
 
 # 7. Registrar servicio de inicialización Live de Dzulux
 cat <<'EOF' > /etc/systemd/system/dzulux-live-init.service

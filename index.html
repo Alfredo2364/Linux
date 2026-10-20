@@ -1128,7 +1128,7 @@
       
       <div class="hero-badge">
         <span class="badge-dot"></span>
-        <span>VERSIÓN 1.1 BETA • OPTIMIZADO PARA LAPTOPS DE GAMA BAJA Y MODESTAS</span>
+        <span>VERSIÓN 2.0 BETA • BASE UBUNTU 24.04 LTS CON SEGURIDAD AUTOMÁTICA</span>
       </div>
 
       <h1 class="hero-title">
@@ -1180,7 +1180,7 @@
         <!-- Verificación SHA256 con copiado fácil -->
         <div class="sha-box">
           <span style="color:#38bdf8; font-weight:700;">SHA256:</span>
-          <span class="sha-text" id="sha-val">Verificado Oficialmente en GitHub Releases v1.1-beta</span>
+          <span class="sha-text" id="sha-val">Verificado Oficialmente en GitHub Releases (Dzulux 2.0 LTS)</span>
           <button class="btn-copy" onclick="copySHA()">Copiar</button>
         </div>
       </div>
@@ -1285,9 +1285,9 @@
 /_-''    ''-_\
                       </pre>
                       <div>
-                        <div><strong style="color:#00f2fe;">OS:</strong> Dzulux Linux 1.1 (Beta) x86_64</div>
+                        <div><strong style="color:#00f2fe;">OS:</strong> Dzulux Linux 2.0 (Beta) x86_64</div>
                         <div><strong style="color:#00f2fe;">Autor:</strong> Alfredo Dzul</div>
-                        <div><strong style="color:#00f2fe;">Kernel:</strong> Linux 6.x Universal</div>
+                        <div><strong style="color:#00f2fe;">Kernel:</strong> Linux 6.8+ LTS (Ubuntu 24.04 Security)</div>
                         <div><strong style="color:#00f2fe;">DE:</strong> XFCE 4.18 (Tema Oscuro Materia)</div>
                         <div><strong style="color:#00f2fe;">GPU:</strong> Intel / AMD Radeon / NVIDIA</div>
                         <div><strong style="color:#00f2fe;">Audio:</strong> PipeWire + SOF-Firmware</div>
@@ -1312,7 +1312,7 @@
 ██████╔╝███████╗╚██████╔╝███████╗╚██████╔╝██╔╝ ██╗
 ╚═════╝ ╚══════╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
               </pre>
-              <p style="color:#94a3b8; margin-bottom: 12px;">Dzulux Linux 1.1 Beta - Modo Servidor / Terminal CLI (Inspirado en Ubuntu Server)</p>
+              <p style="color:#94a3b8; margin-bottom: 12px;">Dzulux Linux 2.0 Beta - Modo Servidor / Terminal CLI (Ubuntu 24.04 LTS + Parches de Seguridad Activos)</p>
               <div class="cli-metric"><span class="key">Arquitectura:</span> x86_64 UEFI / BIOS Legacy MBR</div>
               <div class="cli-metric"><span class="key">Uso de RAM en Reposo:</span> <span class="val-green">148 MB de 16 GB (99% de recursos libres)</span></div>
               <div class="cli-metric"><span class="key">Servicios Activos:</span> OpenSSH Server, Firewall UFW, PipeWire Audio, TLP Power</div>
@@ -1361,7 +1361,7 @@
             <div class="os-slot active">
               <span style="font-size: 24px;">⚡</span>
               <div class="os-slot-info">
-                <h4>Dzulux Linux 1.1</h4>
+                <h4>Dzulux Linux 2.0</h4>
                 <p>Tu nuevo sistema principal ultra rápido</p>
               </div>
             </div>
@@ -1473,7 +1473,7 @@
             <div class="bento-icon">💾</div>
             <h3>El Milagro para 32 GB Soldados (eMMC)</h3>
             <p>
-              En laptops con 32 GB de memoria soldada (HP Stream, Lenovo 1, Cloudbooks), Windows colapsa sin espacio libre. Dzulux activa <strong>compresión Btrfs (zstd)</strong>: el sistema solo ocupa <strong>~3.5 GB</strong>, dejándote <strong>más de 26 GB libres</strong> para tus archivos, protegiendo además la vida útil del chip con <code style="color:var(--cyan-neon)">noatime</code> y mantenimiento automático <code style="color:var(--cyan-neon)">paccache</code>.
+              En laptops con 32 GB de memoria soldada (HP Stream, Lenovo 1, Cloudbooks), Windows colapsa sin espacio libre. Dzulux activa <strong>compresión Btrfs (zstd)</strong>: el sistema solo ocupa <strong>~3.5 GB</strong>, dejándote <strong>más de 26 GB libres</strong> para tus archivos, protegiendo además la vida útil del chip con <code style="color:var(--cyan-neon)">noatime</code> y mantenimiento automático <code style="color:var(--cyan-neon)">dzulux-cleaner</code>.
             </p>
           </div>
         </div>
@@ -1534,8 +1534,26 @@
 
         <div class="bento-card">
           <div class="bento-icon">🔄</div>
-          <h3>Dzulux Update</h3>
-          <p>Actualizador en vivo desde GitHub. Si Alfredo Dzul publica mejoras o nuevos parches, ejecutas <code style="color:var(--cyan-neon)">dzulux-update</code> y tu sistema descarga directamente la última versión sin reinstalar.</p>
+          <h3>Dzulux Update & Security</h3>
+          <p>Actualizador en vivo desde GitHub + Blindaje Ubuntu 24.04 LTS. Ejecuta <code style="color:var(--cyan-neon)">dzulux-update</code> o deja que <code style="color:var(--cyan-neon)">unattended-upgrades</code> instale automáticamente los últimos parches de seguridad de Ubuntu sin perder la identidad de Dzulux.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🕹️</div>
+          <h3>Dzulux Gaming Center</h3>
+          <p>Centro Gamer en 1 clic (<code style="color:var(--cyan-neon)">dzulux-gaming</code>): instala Steam con Proton, Heroic (Epic/GOG), Lutris, RetroArch, GameMode de Feral, MangoHud y Wine-Staging listos para jugar.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🧹</div>
+          <h3>Dzulux Cleaner</h3>
+          <p>Limpiador inteligente (<code style="color:var(--cyan-neon)">dzulux-cleaner</code>) que recupera gigabytes borrando cachés APT, logs antiguos de systemd, paquetes huérfanos y residuos de Flatpak de forma segura.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">📦</div>
+          <h3>Dzulux Backup, USB & Share</h3>
+          <p>Crea copias de seguridad comprimidas con <code style="color:var(--cyan-neon)">dzulux-backup</code>, graba memorias USB booteables con <code style="color:var(--cyan-neon)">dzulux-usb</code> y transfiere archivos a tu celular por Wi-Fi escaneando un código QR con <code style="color:var(--cyan-neon)">dzulux-share</code>.</p>
         </div>
 
         <div class="bento-card bento-col-2">
@@ -1675,7 +1693,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>Dzulux Linux es un proyecto de código abierto basado en Arch Linux. Todos los derechos reconocidos a sus respectivos creadores.</p>
+        <p>Dzulux Linux es un proyecto de código abierto basado en Ubuntu 24.04 LTS y Debian GNU/Linux, con actualizaciones continuas de seguridad. Todos los derechos reconocidos a sus respectivos creadores.</p>
         <p style="margin-top: 6px;">Creado con ❤️ por Alfredo Dzul • 2026</p>
       </div>
     </div>
@@ -1703,7 +1721,7 @@
     }
 
     function copySHA() {
-      const textToCopy = "https://github.com/Alfredo2364/Linux/releases/tag/v1.1-beta";
+      const textToCopy = "https://github.com/Alfredo2364/Linux/releases/tag/latest";
       navigator.clipboard.writeText("sha256sum oficial incluido en paquete ZIP").then(() => {
         const btn = document.querySelector('.btn-copy');
         const originalText = btn.innerText;

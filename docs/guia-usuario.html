@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Manual Maestro Oficial - Dzulux Linux 1.1 (Beta)</title>
+  <title>Manual Maestro Oficial - Dzulux Linux 2.0 (Beta)</title>
   <style>
     @page {
       size: A4;
@@ -229,8 +229,8 @@
     <div class="logo-title">DZUL<span>UX</span> LINUX</div>
     <div class="subtitle">MANUAL MAESTRO DE USUARIO, ARQUITECTURA Y REFERENCIA TÉCNICA</div>
     <div>
-      <span class="badge">VERSIÓN 1.1 BETA</span>
-      <span class="badge badge-alt">ARQUITECTURA x86_64</span>
+      <span class="badge">VERSIÓN 2.0 BETA</span>
+      <span class="badge badge-alt">BASE UBUNTU 24.04 LTS (x86_64)</span>
       <span class="badge">DISEÑADO Y CREADO POR ALFREDO DZUL</span>
     </div>
   </div>
@@ -239,12 +239,12 @@
   <div class="cred-banner">
     <h3>🔑 ACCESO Y CREDENCIALES DEL SISTEMA LIVE</h3>
     <p style="margin: 0; font-size: 8.5pt; color: #cbd5e1;">
-      Dzulux Linux está diseñado para arrancar en <strong>inicio de sesión automático (Autologin)</strong> tanto en el escritorio visual como en la consola. Si en algún momento la pantalla se bloquea, entras por terminal o un comando de administrador (<span style="color:#38bdf8;">sudo</span>) te solicita confirmación, usa estos datos:
+      Dzulux Linux 2.0 está diseñado para arrancar en <strong>inicio de sesión automático (Autologin)</strong> tanto en el escritorio visual como en la consola. Si en algún momento la pantalla se bloquea, entras por terminal o un comando de administrador (<span style="color:#38bdf8;">sudo</span>) te solicita confirmación, usa estos datos:
     </p>
     <div class="cred-grid">
       <div class="cred-item">
         <span class="label">Usuario Predeterminado</span>
-        <span class="val">liveuser</span>
+        <span class="val">dzulux</span>
       </div>
       <div class="cred-item">
         <span class="label">Contraseña Live</span>
@@ -265,7 +265,7 @@
   <h2>💖 1. Bienvenida y Filosofía del Sistema</h2>
   <div class="letter-box">
     "Estimado usuario y compañero de la comunidad tecnológica:<br><br>
-    Quiero agradecerte sinceramente por descargar y confiar en <strong>Dzulux Linux 1.1 (Beta)</strong>. Esta distribución nace del deseo de tener una plataforma verdaderamente equilibrada: con la potencia, control y solidez de un servidor moderno, pero con la accesibilidad, estética y velocidad de un escritorio universal.<br><br>
+    Quiero agradecerte sinceramente por descargar y confiar en <strong>Dzulux Linux 2.0 (Beta)</strong>. Esta distribución nace del deseo de tener una plataforma verdaderamente equilibrada: con la potencia, control y seguridad continua de Ubuntu 24.04 LTS, pero con la accesibilidad, estética y velocidad de un escritorio universal.<br><br>
     Ha sido diseñada pensando en los problemas reales: laptops con procesadores modestos que se congelan con otros sistemas, equipos con memorias soldadas de 32 GB donde Windows ya no cabe, y creadores de contenido que necesitan jugar y transmitir en directo sin perder cuadros. Esta guía ha sido escrita para que domines cada rincón del sistema.<br><br>
     ¡Gracias por acompañarme en este proyecto!"
     <div class="author-sign">— Alfredo Dzul (Creador y Diseñador de Dzulux Linux)</div>
@@ -273,7 +273,7 @@
 
   <!-- Grabado de USB y Arranque -->
   <h2>💾 2. Grabado en USB y Arranque del Sistema</h2>
-  <p>Graba el archivo <span class="code-pill">dzulux-1.1-beta-x86_64.iso</span> en una memoria USB de al menos 4 GB:</p>
+  <p>Graba el archivo <span class="code-pill">dzulux-desktop-hybrid.iso</span> (o <span class="code-pill">dzulux-server-hybrid.iso</span>) en una memoria USB de al menos 4 GB:</p>
   <ul class="step-list">
     <li><strong>Ventoy (La opción más recomendada):</strong> Instala Ventoy en tu memoria una sola vez. Luego solo copia y pega el archivo ISO dentro de la memoria USB.</li>
     <li><strong>Rufus (Windows):</strong> Selecciona tu USB, elige la imagen ISO de Dzulux y presiona <em>Empezar</em> (en modo ISO o DD).</li>
@@ -457,28 +457,28 @@
     </ul>
 
     <div class="revert-box">
-      <strong>¿Cómo revertir?</strong> Los controladores son paquetes nativos de pacman; puedes desinstalarlos en cualquier momento ejecutando <span class="code-pill">sudo pacman -R &lt;nombre-del-paquete&gt;</span>.
+      <strong>¿Cómo revertir?</strong> Los controladores son paquetes nativos de Ubuntu/Debian; puedes desinstalarlos en cualquier momento ejecutando <span class="code-pill">sudo apt remove &lt;nombre-del-paquete&gt;</span>.
     </div>
   </div>
 
   <!-- Centro de Software App Hub -->
-  <h2>🛍️ 9. Centro de Software en 1 Clic (`dzulux-apps`)</h2>
+  <h2>🛍️ 9. Centro de Software en 1 Clic (`dzulux-apps`) y Gaming (`dzulux-gaming`)</h2>
   <div class="tool-card purple">
     <h3>¿Para qué sirve?</h3>
-    <p>Instala tus programas favoritos sin memorizar comandos ni lidiar con dependencias complejas.</p>
+    <p>Instala tus programas favoritos y configura tu entorno de videojuegos sin memorizar comandos ni lidiar con dependencias complejas.</p>
 
     <h3>¿Cómo usarlo?</h3>
-    <p>Abre <em>"Dzulux App Hub"</em> en el menú o escribe en terminal: <span class="code-pill">dzulux-apps</span>.</p>
+    <p>Abre <em>"Dzulux App Hub"</em> en el menú o escribe en terminal: <span class="code-pill">dzulux-apps</span> (y <span class="code-pill">dzulux-gaming</span> para juegos).</p>
     <ul class="step-list">
-      <li><strong>Oficina y Estudio:</strong> LibreOffice Fresh, Visor PDF Evince y Obsidian.</li>
-      <li><strong>Juegos y Multimedia:</strong> Steam, Heroic Games Launcher (Epic Games / GOG), Discord, Spotify y reproductor VLC.</li>
+      <li><strong>Oficina y Estudio:</strong> LibreOffice, Visor PDF Evince y Obsidian.</li>
+      <li><strong>Dzulux Gaming Setup (<span class="code-pill">dzulux-gaming</span>):</strong> Habilita arquitectura de 32 bits, drivers Vulkan, Wine, Steam, Lutris y MangoHud en 1 clic.</li>
       <li><strong>Desarrollo de Software:</strong> Visual Studio Code, Docker, NodeJS, Python 3 y Git.</li>
-      <li><strong>Navegadores Web:</strong> Google Chrome, Brave Browser y Chromium.</li>
-      <li><strong>Diseño y Creatividad:</strong> GIMP (edición fotográfica), Inkscape (vectorial), Krita (ilustración digital) y Blender (3D).</li>
+      <li><strong>Navegadores y Multimedia:</strong> Firefox, Chromium, VLC, GIMP, Krita, Inkscape y Blender.</li>
+      <li><strong>Utilidades Nuevas 2.0:</strong> <span class="code-pill">dzulux-cleaner</span> (limpieza profunda), <span class="code-pill">dzulux-backup</span> (respaldos .tar.gz y rsync), <span class="code-pill">dzulux-share</span> (compartir archivos por Wi-Fi con QR) y <span class="code-pill">dzulux-usb</span> (formateo y montaje seguro de USB).</li>
     </ul>
 
     <div class="revert-box">
-      <strong>¿Cómo desinstalar?</strong> Cualquier app instalada puede eliminarse con <span class="code-pill">sudo pacman -R &lt;app&gt;</span> o con <span class="code-pill">flatpak uninstall &lt;app&gt;</span>.
+      <strong>¿Cómo desinstalar?</strong> Cualquier app instalada puede eliminarse con <span class="code-pill">sudo apt remove &lt;app&gt;</span> o con <span class="code-pill">flatpak uninstall &lt;app&gt;</span>.
     </div>
   </div>
 
@@ -610,7 +610,7 @@
   <h2>❓ 15. Solución de Problemas Frecuentes (FAQ)</h2>
   <div class="tool-card purple">
     <h3>1. ¿Qué hago si la terminal o una ventana me pide contraseña?</h3>
-    <p>En el entorno Live de Dzulux, el usuario es <span class="code-pill">liveuser</span> y la contraseña es <span class="code-pill">dzulux</span>. También puedes simplemente <strong>presionar ENTER</strong> (dejar la clave en blanco). Para comandos de administrador ejecuta <span class="code-pill">sudo &lt;comando&gt;</span> y no te pedirá contraseña.</p>
+    <p>En el entorno Live de Dzulux 2.0, el usuario es <span class="code-pill">dzulux</span> y la contraseña es <span class="code-pill">dzulux</span>. También puedes simplemente <strong>presionar ENTER</strong> (dejar la clave en blanco). Para comandos de administrador ejecuta <span class="code-pill">sudo &lt;comando&gt;</span> y no te pedirá contraseña.</p>
 
     <h3>2. ¿Cómo me conecto a una red Wi-Fi si estoy en la terminal CLI?</h3>
     <p>Simplemente escribe <span class="code-pill">nmtui</span> y presiona ENTER. Se abrirá una interfaz gráfica interactiva en consola donde puedes elegir tu red Wi-Fi e ingresar la contraseña con las flechas del teclado.</p>
@@ -655,13 +655,38 @@
       </tr>
       <tr>
         <td><span class="code-pill">dzulux-drivers</span></td>
-        <td>Escanea y descarga controladores de GPU, Wi-Fi, audio y batería.</td>
-        <td>Instala paquetes oficiales; desinstalables con sudo pacman -R.</td>
+        <td>Escanea y descarga controladores de GPU, Wi-Fi, audio, VirtualBox y VMware.</td>
+        <td>Instala paquetes oficiales; desinstalables con sudo apt remove.</td>
       </tr>
       <tr>
         <td><span class="code-pill">dzulux-apps</span></td>
-        <td>Tienda curada para instalar Steam, Discord, VS Code, Office y browsers.</td>
-        <td>Desinstalable desde terminal con pacman -R o flatpak uninstall.</td>
+        <td>Tienda curada para instalar Office, VS Code, diseño y navegadores.</td>
+        <td>Desinstalable desde terminal con sudo apt remove o flatpak uninstall.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-gaming</span></td>
+        <td>Configura Steam, Lutris, Wine, Vulkan y MangoHud automáticamente.</td>
+        <td>Desinstalable mediante apt remove.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-cleaner</span></td>
+        <td>Limpia caché APT, paquetes huérfanos, logs systemd y papelera.</td>
+        <td>Libera espacio de forma segura sin tocar archivos personales.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-backup</span></td>
+        <td>Crea respaldos comprimidos .tar.gz o sincroniza carpetas a USB con rsync.</td>
+        <td>Incluye asistente de restauración en la opción 3 del menú.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-share</span></td>
+        <td>Comparte archivos por Wi-Fi local generando un código QR en pantalla.</td>
+        <td>Se detiene al presionar Ctrl+C y cierra el puerto temporal en UFW.</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">dzulux-usb</span></td>
+        <td>Monta, expulsa y formatea memorias USB (FAT32, NTFS, EXT4).</td>
+        <td>Protege el disco principal del sistema contra formateo accidental.</td>
       </tr>
       <tr>
         <td><span class="code-pill">dzulux-snapshots</span></td>
@@ -735,7 +760,7 @@
   </table>
 
   <div class="footer">
-    <strong>Dzulux Linux 1.1 (Beta)</strong> — Manual Oficial Maestro creado y diseñado por <strong>Alfredo Dzul</strong>.<br>
+    <strong>Dzulux Linux 2.0 (Beta)</strong> — Manual Oficial Maestro creado y diseñado por <strong>Alfredo Dzul</strong>.<br>
     Repositorio Oficial y Comunidad: <u>https://github.com/Alfredo2364/Linux</u> • Sitio Web: <u>https://alfredo2364.github.io/Linux/</u>
   </div>
 

@@ -1,7 +1,12 @@
 live-boot
+live-boot-initramfs-tools
 live-config
+live-config-systemd
 systemd-sysv
 network-manager
+unattended-upgrades
+apt-listchanges
+ca-certificates
 nano
 vim
 curl

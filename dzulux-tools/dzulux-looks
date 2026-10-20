@@ -27,7 +27,7 @@ main_menu() {
 "1" "🌌 Dzulux Cyberpunk Dark (Panel superior moderno, tema oscuro neón)" \
 "2" "🪟 Estilo Windows 10 (Menú de inicio con buscador, categorías y apps)" \
 "3" "⚡ Modo Minimal Flat (Cero efectos, ultra veloz para laptops modestas)" \
-"4" "Salir" 3>&1 1>&2 2>&3)
+"4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
     else
         clear
         echo -e "${CYAN}${BOLD}=== DZULUX LOOKS - ESTILOS VISUALES ===${NC}"
@@ -53,6 +53,7 @@ set_cyberpunk() {
     xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark" 2>/dev/null || true
     xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=6;x=0;y=0" 2>/dev/null || true
     xfconf-query -c xfwm4 -p /general/use_compositing -s true 2>/dev/null || true
+    xfce4-panel --restart 2>/dev/null || true
     show_msg "¡Estilo Dzulux Cyberpunk Dark activado con éxito!"
 }
 
@@ -66,10 +67,11 @@ set_windows_style() {
 
     # Configurar Menú de Inicio estilo Windows 10 (Whisker Menu con buscador y categorías de apps)
     mkdir -p "${HOME}/.config/xfce4/panel"
+    touch "${HOME}/.config/xfce4/panel/whiskermenu-1.rc"
     for wrc in "${HOME}/.config/xfce4/panel/whiskermenu-"*.rc; do
         if [ -f "$wrc" ]; then
             cat << 'EOF' > "$wrc"
-favorites=firefox.desktop,thunar.desktop,xfce4-terminal.desktop,dzulux-apps.desktop,dzulux-drivers.desktop,dzulux-rescue.desktop
+favorites=thunar.desktop,xfce4-terminal.desktop,dzulux-apps.desktop,dzulux-gaming.desktop,dzulux-drivers.desktop,dzulux-rescue.desktop,dzulux-installer.desktop
 button-title=Inicio
 button-icon=org.xfce.panel.whiskermenu
 show-button-title=false

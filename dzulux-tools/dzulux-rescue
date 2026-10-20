@@ -126,9 +126,9 @@ rescue_files() {
 
         # Si estamos en entorno gráfico XFCE, abrir el administrador de archivos Thunar
         if [ -n "${DISPLAY:-}" ] && command -v thunar >/dev/null 2>&1; then
-            # Abrir como usuario normal si existe liveuser
-            if id -u liveuser >/dev/null 2>&1; then
-                su - liveuser -c "thunar '${TARGET_OPEN}' &" 2>/dev/null || thunar "$TARGET_OPEN" &
+            TARGET_USER="${SUDO_USER:-dzulux}"
+            if id -u "$TARGET_USER" >/dev/null 2>&1; then
+                su - "$TARGET_USER" -c "thunar '${TARGET_OPEN}' &" 2>/dev/null || thunar "$TARGET_OPEN" &
             else
                 thunar "$TARGET_OPEN" &
             fi

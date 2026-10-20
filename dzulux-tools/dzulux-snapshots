@@ -35,7 +35,7 @@ main_menu() {
 "1" "📸 Crear Nuevo Punto de Restauración Instantáneo" \
 "2" "📋 Ver Puntos de Restauración Existentes" \
 "3" "⏪ Revertir / Restaurar Sistema a un Punto Anterior" \
-"4" "Salir" 3>&1 1>&2 2>&3)
+"4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
     else
         clear
         echo -e "${CYAN}${BOLD}=== DZULUX SNAPSHOTS - PUNTOS DE RESTAURACIÓN ===${NC}"

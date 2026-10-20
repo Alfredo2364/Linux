@@ -30,7 +30,7 @@ main_menu() {
 "1" "🛡️ Activar Escudo Stealth (MAC Aleatoria + DNS Seguro + Firewall)" \
 "2" "🔓 Desactivar Escudo (Restaurar Conexión Estándar)" \
 "3" "🔍 Comprobar Estado de Privacidad y Dirección MAC" \
-"4" "Salir" 3>&1 1>&2 2>&3)
+"4" "Salir" 3>&1 1>&2 2>&3 || echo "4")
     else
         clear
         echo -e "${CYAN}${BOLD}=== DZULUX STEALTH - ESCUDO DE PRIVACIDAD ===${NC}"
